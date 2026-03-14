@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aperçu Carte Scolaire</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 40px;
+            background: #f3f4f6;
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        h1 {
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+
+        .info {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .carte-container {
+            width: 324px; /* 85.6mm */
+            height: 204px; /* 53.98mm */
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 3px solid #10B981;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* En-tête */
+        .carte-header {
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid #047857;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo-mini {
+            width: 38px;
+            height: 38px;
+            background: white;
+            border-radius: 6px;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .header-text {
+            color: white;
+            text-align: left;
+        }
+
+        .school-name {
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 1.2;
+            text-transform: uppercase;
+        }
+
+        .carte-subtitle {
+            font-size: 8px;
+            opacity: 0.9;
+            margin-top: 2px;
+        }
+
+        .year-badge {
+            background: white;
+            color: #10B981;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        /* Corps */
+        .carte-body {
+            padding: 12px;
+            display: flex;
+            gap: 12px;
+            height: calc(100% - 54px - 32px);
+        }
+
+        /* Photo */
+        .photo-section {
+            flex-shrink: 0;
+        }
+
+        .photo-frame {
+            width: 83px;
+            height: 106px;
+            border: 3px solid #10B981;
+            border-radius: 6px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
+        }
+
+        .photo-placeholder {
+            font-size: 48px;
+            color: #10B981;
+        }
+
+        /* Informations */
+        .info-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            font-size: 9px;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: #047857;
+            font-size: 8px;
+            min-width: 68px;
+            flex-shrink: 0;
+        }
+
+        .info-value {
+            color: #1f2937;
+            font-size: 9px;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .matricule-box {
+            background: #FCD116;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            color: #000;
+            display: inline-block;
+            border: 1px solid #10B981;
+            font-size: 9px;
+        }
+
+        .classe-badge {
+            background: #10B981;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            display: inline-block;
+            font-size: 9px;
+        }
+
+        .email-text {
+            font-size: 8px !important;
+        }
+
+        /* QR Code */
+        .qr-section {
+            flex-shrink: 0;
+            text-align: center;
+        }
+
+        .qr-frame {
+            width: 68px;
+            height: 68px;
+            background: white;
+            padding: 4px;
+            border: 3px solid #10B981;
+            border-radius: 6px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qr-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f3f4f6;
+            color: #000;
+            font-size: 48px;
+            font-weight: bold;
+        }
+
+        .qr-label {
+            font-size: 7px;
+            color: #6b7280;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        /* Pied de page */
+        .carte-footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+            padding: 6px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 3px solid #047857;
+        }
+
+        .footer-left,
+        .footer-center,
+        .footer-right {
+            color: white;
+            font-size: 7px;
+        }
+
+        .footer-center {
+            font-size: 8px;
+            font-weight: bold;
+        }
+
+        .footer-right {
+            text-align: right;
+        }
+
+        .buttons {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #10B981;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-secondary {
+            background: #3B82F6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #2563EB;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📋 Aperçu de la Nouvelle Carte Scolaire</h1>
+        
+        <div class="info">
+            <p><strong>✅ Un seul cadre</strong> - Toutes les informations sur une page</p>
+            <p><strong>✅ Email visible</strong> - Dans les infos et le pied de page</p>
+            <p><strong>✅ QR Code visible</strong> - Noir sur blanc avec bordure verte</p>
+        </div>
+
+        <div class="carte-container">
+            <!-- En-tête -->
+            <div class="carte-header">
+                <div class="header-left">
+                    <div class="logo-mini">🏫</div>
+                    <div class="header-text">
+                        <div class="school-name">Lycée de Loum</div>
+                        <div class="carte-subtitle">Carte d'Identité Scolaire</div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="year-badge">2025-2026</div>
+                </div>
+            </div>
+            
+            <!-- Corps -->
+            <div class="carte-body">
+                <!-- Photo -->
+                <div class="photo-section">
+                    <div class="photo-frame">
+                        <div class="photo-placeholder">👤</div>
+                    </div>
+                </div>
+                
+                <!-- Informations -->
+                <div class="info-section">
+                    <div class="info-row">
+                        <div class="info-label">Matricule :</div>
+                        <div class="info-value">
+                            <span class="matricule-box">mamsdkp21di</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Nom :</div>
+                        <div class="info-value">TAPDUR</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Prénom(s) :</div>
+                        <div class="info-value">Tapdur</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Né(e) le :</div>
+                        <div class="info-value">10/05/1999</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Lieu :</div>
+                        <div class="info-value">nkongsamba</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Sexe :</div>
+                        <div class="info-value">Masculin</div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Classe :</div>
+                        <div class="info-value">
+                            <span class="classe-badge">6e 1</span>
+                        </div>
+                    </div>
+                    
+                    <div class="info-row">
+                        <div class="info-label">Email :</div>
+                        <div class="info-value email-text">tapdur@email.com</div>
+                    </div>
+                </div>
+                
+                <!-- QR Code -->
+                <div class="qr-section">
+                    <div class="qr-frame">
+                        <div class="qr-placeholder">▓▓</div>
+                    </div>
+                    <div class="qr-label">Scan QR</div>
+                </div>
+            </div>
+            
+            <!-- Pied de page -->
+            <div class="carte-footer">
+                <div class="footer-left">
+                    Délivré le: 20/01/2026
+                </div>
+                <div class="footer-center">
+                    📧 tapdur@email.com
+                </div>
+                <div class="footer-right">
+                    Expire le: 20/01/2028
+                </div>
+            </div>
+        </div>
+
+        <div class="buttons">
+            <a href="http://127.0.0.1:8000/storage/cartes/carte_mamsdkp21di_1768906614.pdf" target="_blank" class="btn btn-primary">
+                📄 Voir le PDF Réel
+            </a>
+            <a href="http://localhost:4200/proviseur/cartes" target="_blank" class="btn btn-secondary">
+                🎨 Générer Plus de Cartes
+            </a>
+        </div>
+    </div>
+</body>
+</html>

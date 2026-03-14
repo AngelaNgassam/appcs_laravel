@@ -1,0 +1,1674 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API Cartes Scolaires",
+        "description": "API complète pour la gestion des cartes scolaires",
+        "contact": {
+            "name": "Support API",
+            "email": "support@cartes-scolaires.com"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000/api/v1",
+            "description": "Serveur de développement"
+        },
+        {
+            "url": "https://api.cartes-scolaires.com/api/v1",
+            "description": "Serveur de production"
+        }
+    ],
+    "paths": {
+        "/api/annees-academiques": {
+            "get": {
+                "tags": [
+                    "Années Académiques"
+                ],
+                "summary": "Liste des années académiques",
+                "operationId": "748b8c05af678c0898e8ba1fdc262957",
+                "parameters": [
+                    {
+                        "name": "etablissement_id",
+                        "in": "query",
+                        "description": "Filtrer par établissement",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "active",
+                        "in": "query",
+                        "description": "Filtrer par statut actif",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des années académiques"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Années Académiques"
+                ],
+                "summary": "Créer une année académique",
+                "operationId": "079a8540a14c822571fd8dfffbb975b2",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "libelle",
+                                    "date_debut",
+                                    "date_fin"
+                                ],
+                                "properties": {
+                                    "libelle": {
+                                        "type": "string",
+                                        "example": "2024-2025"
+                                    },
+                                    "date_debut": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2024-09-01"
+                                    },
+                                    "date_fin": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-07-31"
+                                    },
+                                    "active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Année académique créée"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/annees-academiques/{id}": {
+            "get": {
+                "tags": [
+                    "Années Académiques"
+                ],
+                "summary": "Détails d'une année académique",
+                "operationId": "c12e54512ff223605848d01d8337c5f5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Détails de l'année"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Années Académiques"
+                ],
+                "summary": "Mettre à jour une année académique",
+                "operationId": "217eca4ec38bbe2fb3c147a742befff3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "libelle": {
+                                        "type": "string"
+                                    },
+                                    "date_debut": {
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "date_fin": {
+                                        "type": "string",
+                                        "format": "date"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Année mise à jour"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Années Académiques"
+                ],
+                "summary": "Supprimer une année académique",
+                "operationId": "7890b0a630b160ee129b0355f843ab94",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Année supprimée"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/annees-academiques/{id}/activer": {
+            "patch": {
+                "tags": [
+                    "Années Académiques"
+                ],
+                "summary": "Activer une année académique",
+                "operationId": "ba58ee4ea2969585b9b7a3e3f52bd3b6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Année activée"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/annees-academiques/active": {
+            "get": {
+                "tags": [
+                    "Années Académiques"
+                ],
+                "summary": "Obtenir l'année académique active",
+                "operationId": "f9ec57464ba9a10f0d2fc0c2d3d72641",
+                "responses": {
+                    "200": {
+                        "description": "Année active"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Inscription d'un proviseur avec création automatique de l'établissement",
+                "operationId": "38e3071463848ba373dfeae5623cdfa4",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "nom",
+                                    "prenom",
+                                    "email",
+                                    "mot_de_passe",
+                                    "nom_etablissement",
+                                    "adresse_etablissement",
+                                    "ville_etablissement"
+                                ],
+                                "properties": {
+                                    "nom": {
+                                        "type": "string",
+                                        "example": "KAMGA"
+                                    },
+                                    "prenom": {
+                                        "type": "string",
+                                        "example": "Paul"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "paul.kamga@lycee.cm"
+                                    },
+                                    "mot_de_passe": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    },
+                                    "telephone": {
+                                        "type": "string",
+                                        "example": "677123456"
+                                    },
+                                    "nom_etablissement": {
+                                        "type": "string",
+                                        "example": "Lycée Bilingue de Douala"
+                                    },
+                                    "adresse_etablissement": {
+                                        "type": "string",
+                                        "example": "Quartier Akwa"
+                                    },
+                                    "ville_etablissement": {
+                                        "type": "string",
+                                        "example": "Douala"
+                                    },
+                                    "telephone_etablissement": {
+                                        "type": "string",
+                                        "example": "699123456"
+                                    },
+                                    "email_etablissement": {
+                                        "type": "string",
+                                        "example": "contact@lycee.cm"
+                                    },
+                                    "logo": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Inscription réussie"
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    }
+                }
+            }
+        },
+        "/api/v1/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Connexion avec identification automatique du rôle",
+                "operationId": "b9b760991d94b179960cd7ddc93eedf2",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "mot_de_passe"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "admin@example.com"
+                                    },
+                                    "mot_de_passe": {
+                                        "type": "string",
+                                        "example": "password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Connexion réussie"
+                    },
+                    "401": {
+                        "description": "Identifiants incorrects"
+                    }
+                }
+            }
+        },
+        "/api/v1/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Déconnexion",
+                "operationId": "b66dd8a7864f561822c01bc8339363fb",
+                "responses": {
+                    "200": {
+                        "description": "Déconnexion réussie"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/v1/me": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Obtenir les informations de l'utilisateur connecté",
+                "operationId": "c24e88aea4324667c5f4e38549a5298f",
+                "responses": {
+                    "200": {
+                        "description": "Informations utilisateur"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cartes/classe/{classe_id}": {
+            "get": {
+                "tags": [
+                    "Cartes"
+                ],
+                "summary": "Obtenir les élèves d'une classe avec leurs cartes",
+                "operationId": "589d71296c8cf2950704e759b37562f7",
+                "parameters": [
+                    {
+                        "name": "classe_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Élèves avec cartes"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cartes": {
+            "get": {
+                "tags": [
+                    "Cartes"
+                ],
+                "summary": "Liste des cartes scolaires avec pagination",
+                "operationId": "31f146739e707745aa9235907afdbe73",
+                "parameters": [
+                    {
+                        "name": "statut",
+                        "in": "query",
+                        "description": "Filtrer par statut",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "en_attente",
+                                "generee",
+                                "imprimee",
+                                "distribuee"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "classe_id",
+                        "in": "query",
+                        "description": "Filtrer par classe",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des cartes"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cartes/generer/{eleve_id}": {
+            "post": {
+                "tags": [
+                    "Cartes"
+                ],
+                "summary": "Générer une carte pour un élève",
+                "operationId": "adafb10d4d121a1427e4ce0a5740b9f6",
+                "parameters": [
+                    {
+                        "name": "eleve_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Carte générée"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cartes/generer-classe/{classe_id}": {
+            "post": {
+                "tags": [
+                    "Cartes"
+                ],
+                "summary": "Générer les cartes pour toute une classe",
+                "operationId": "daa3356adb71eddb6a1a464b5b593e48",
+                "parameters": [
+                    {
+                        "name": "classe_id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Cartes générées"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cartes/generer-planche": {
+            "post": {
+                "tags": [
+                    "Cartes"
+                ],
+                "summary": "Générer une planche d'impression (10 cartes par page A4)",
+                "operationId": "9a4618d4e180bac23261f1fc5bab47a3",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "eleve_ids": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "integer"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Planche générée"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cartes/{id}": {
+            "get": {
+                "tags": [
+                    "Cartes"
+                ],
+                "summary": "Détails d'une carte",
+                "operationId": "82acb427e58df5b80898052c317451b6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Détails de la carte"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cartes/{id}/telecharger": {
+            "get": {
+                "tags": [
+                    "Cartes"
+                ],
+                "summary": "Télécharger le PDF d'une carte",
+                "operationId": "e2dd102ab09faf9043ea2f26d6d1d87a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "PDF téléchargé"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cartes/{id}/previsualiser": {
+            "get": {
+                "tags": [
+                    "Cartes"
+                ],
+                "summary": "Prévisualiser le PDF d'une carte dans le navigateur",
+                "operationId": "ce97d6539c5547ef2db515c5054c3127",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "PDF affiché"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cartes/{id}/imprimer": {
+            "patch": {
+                "tags": [
+                    "Cartes"
+                ],
+                "summary": "Marquer une carte comme imprimée",
+                "operationId": "aea108948ddd5170967cda3f1568d805",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Carte marquée comme imprimée"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cartes/{id}/distribuer": {
+            "patch": {
+                "tags": [
+                    "Cartes"
+                ],
+                "summary": "Marquer une carte comme distribuée",
+                "operationId": "abaf26a443e171965772bc6a35d2899c",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Carte marquée comme distribuée"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/cartes/statistiques": {
+            "get": {
+                "tags": [
+                    "Cartes"
+                ],
+                "summary": "Statistiques des cartes",
+                "operationId": "202b16af743833297fd2e389e274c93c",
+                "responses": {
+                    "200": {
+                        "description": "Statistiques"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/etablissements": {
+            "get": {
+                "tags": [
+                    "Etablissements"
+                ],
+                "summary": "Liste des établissements (Admin uniquement)",
+                "operationId": "0a3bfcab07ae4e55e4e256999fb25850",
+                "responses": {
+                    "200": {
+                        "description": "Liste des établissements"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/etablissements/{id}": {
+            "get": {
+                "tags": [
+                    "Etablissements"
+                ],
+                "summary": "Détails d'un établissement",
+                "operationId": "093e64c6cd789100f7c92a325864b67f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Détails de l'établissement"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Etablissements"
+                ],
+                "summary": "Mettre à jour un établissement",
+                "operationId": "b462adfc1bfe9dccccb88efb5dcaa973",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "nom": {
+                                        "type": "string"
+                                    },
+                                    "adresse": {
+                                        "type": "string"
+                                    },
+                                    "ville": {
+                                        "type": "string"
+                                    },
+                                    "telephone": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Établissement mis à jour"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/etablissements/{id}/logo": {
+            "post": {
+                "tags": [
+                    "Etablissements"
+                ],
+                "summary": "Mettre à jour le logo",
+                "operationId": "21180c75c638d150fc0587ee58b819a2",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "logo": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Logo mis à jour"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/etablissements/{id}/statistiques": {
+            "get": {
+                "tags": [
+                    "Etablissements"
+                ],
+                "summary": "Statistiques détaillées d'un établissement",
+                "operationId": "6518603811cc70cc0e5ba49b161717fb",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Statistiques"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/historique": {
+            "get": {
+                "tags": [
+                    "Historique"
+                ],
+                "summary": "Historique des actions avec pagination",
+                "operationId": "7e9edaeda59638ebe37d67e7ad23b245",
+                "parameters": [
+                    {
+                        "name": "action",
+                        "in": "query",
+                        "description": "Filtrer par type d'action",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "user_id",
+                        "in": "query",
+                        "description": "Filtrer par utilisateur",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Historique des actions"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/historique/{id}": {
+            "get": {
+                "tags": [
+                    "Historique"
+                ],
+                "summary": "Détails d'une action",
+                "operationId": "415aca960c9fd3f244eb004e439afae5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Détails de l'action"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/historique/statistiques": {
+            "get": {
+                "tags": [
+                    "Historique"
+                ],
+                "summary": "Statistiques des actions",
+                "operationId": "7f6d93b84bd438b81378d4854d4b0c1b",
+                "responses": {
+                    "200": {
+                        "description": "Statistiques"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications": {
+            "get": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Liste des notifications de l'utilisateur",
+                "operationId": "6d56a555955089a73fdf3f7229e8ead8",
+                "parameters": [
+                    {
+                        "name": "lue",
+                        "in": "query",
+                        "description": "Filtrer par statut lu/non lu",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des notifications"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications/{id}/lire": {
+            "patch": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Marquer une notification comme lue",
+                "operationId": "1f426adba81fa3f64c7c6affb33c43ca",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Notification marquée comme lue"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications/tout-lire": {
+            "patch": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Marquer toutes les notifications comme lues",
+                "operationId": "6ee2537b4dda43ff538024315d998ad2",
+                "responses": {
+                    "200": {
+                        "description": "Toutes les notifications marquées comme lues"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/notifications/{id}": {
+            "delete": {
+                "tags": [
+                    "Notifications"
+                ],
+                "summary": "Supprimer une notification",
+                "operationId": "ab7264b840570ab1351fff8ba6732bdc",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Notification supprimée"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/photos": {
+            "get": {
+                "tags": [
+                    "Photos"
+                ],
+                "summary": "Liste des photos avec pagination",
+                "operationId": "6976ed4acb075501fdc62ab3ae4f1538",
+                "parameters": [
+                    {
+                        "name": "eleve_id",
+                        "in": "query",
+                        "description": "Filtrer par élève",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "statut",
+                        "in": "query",
+                        "description": "Filtrer par statut",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "brouillon",
+                                "validee",
+                                "refusee",
+                                "archivee"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des photos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Photos"
+                ],
+                "summary": "Uploader une photo d'élève",
+                "operationId": "6afbf2a4293d76ace58310a9c4935330",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "photo",
+                                    "eleve_id"
+                                ],
+                                "properties": {
+                                    "photo": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "eleve_id": {
+                                        "type": "integer"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Photo uploadée"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/photos/{id}": {
+            "get": {
+                "tags": [
+                    "Photos"
+                ],
+                "summary": "Détails d'une photo",
+                "operationId": "1391ded23a5afa18bde665dea5be5df5",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Détails de la photo"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Photos"
+                ],
+                "summary": "Supprimer une photo",
+                "operationId": "fc095f78b657d783539b4790853c8e11",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Photo supprimée"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/photos/{id}/valider": {
+            "patch": {
+                "tags": [
+                    "Photos"
+                ],
+                "summary": "Valider une photo",
+                "operationId": "b95218ec65da24249e288491b4061b67",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Photo validée"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/photos/{id}/refuser": {
+            "patch": {
+                "tags": [
+                    "Photos"
+                ],
+                "summary": "Refuser une photo",
+                "operationId": "0ee9f9e1552c1f02a87d640733dca98f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "motif"
+                                ],
+                                "properties": {
+                                    "motif": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Photo refusée"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/photos/statistiques": {
+            "get": {
+                "tags": [
+                    "Photos"
+                ],
+                "summary": "Statistiques des photos",
+                "operationId": "3f5aea89a7df0ec768c7fb6bbc303bcd",
+                "responses": {
+                    "200": {
+                        "description": "Statistiques"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/users": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Liste des utilisateurs (avec pagination)",
+                "operationId": "566aed8efb436ca506e0ef51a032ecd9",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Numéro de la page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Nombre d'éléments par page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "role",
+                        "in": "query",
+                        "description": "Filtrer par rôle",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": [
+                                "admin",
+                                "proviseur",
+                                "surveillant",
+                                "operateur"
+                            ]
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des utilisateurs"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Créer un utilisateur (surveillant ou opérateur par le proviseur)",
+                "operationId": "be551c1d694a01c164966f58bfa77013",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "nom",
+                                    "prenom",
+                                    "email",
+                                    "password",
+                                    "role"
+                                ],
+                                "properties": {
+                                    "nom": {
+                                        "type": "string"
+                                    },
+                                    "prenom": {
+                                        "type": "string"
+                                    },
+                                    "email": {
+                                        "type": "string"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "enum": [
+                                            "surveillant",
+                                            "operateur"
+                                        ]
+                                    },
+                                    "telephone": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utilisateur créé"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/users/{id}": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Détails d'un utilisateur",
+                "operationId": "6f51bd5fa2dddcd25e44cfa53dcbd10a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Détails de l'utilisateur"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Mettre à jour un utilisateur",
+                "operationId": "070e37fc9aff78ae73860751bc990ed3",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "nom": {
+                                        "type": "string"
+                                    },
+                                    "prenom": {
+                                        "type": "string"
+                                    },
+                                    "telephone": {
+                                        "type": "string"
+                                    },
+                                    "actif": {
+                                        "type": "boolean"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Utilisateur mis à jour"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Supprimer un utilisateur (soft delete)",
+                "operationId": "0b4133ed462528a5e648b88ead11e929",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Utilisateur supprimé"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/users/{id}/toggle-active": {
+            "patch": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Activer/Désactiver un utilisateur",
+                "operationId": "8d1606fc691af328e47b49d3dabbcafa",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Statut modifié"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "name": "bearerAuth",
+                "in": "header"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Endpoints d'authentification"
+        },
+        {
+            "name": "Users",
+            "description": "Gestion des utilisateurs"
+        },
+        {
+            "name": "Etablissements",
+            "description": "Gestion des établissements scolaires"
+        },
+        {
+            "name": "Années Académiques",
+            "description": "Gestion des années académiques"
+        },
+        {
+            "name": "Photos",
+            "description": "Gestion des photos d'élèves"
+        },
+        {
+            "name": "Cartes",
+            "description": "Gestion des cartes scolaires"
+        },
+        {
+            "name": "Historique",
+            "description": "Historique des actions"
+        },
+        {
+            "name": "Notifications",
+            "description": "Gestion des notifications"
+        }
+    ],
+    "security": [
+        {
+            "bearerAuth": []
+        }
+    ]
+}

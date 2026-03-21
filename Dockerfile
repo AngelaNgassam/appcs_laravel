@@ -17,6 +17,7 @@ RUN apt-get update && apt-get install -y \
 # Installation de Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# Definis le dossier de travail dans le conteneur
 WORKDIR /var/www
 
 # Copie des fichiers du projet
@@ -36,5 +37,8 @@ RUN mkdir -p /var/www/storage/framework/cache \
 # Ajustement des permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
+# Dire a Docker sur quel port l'application tourne
 EXPOSE 9000
+
+# Commande qui lance l'applicatiom
 CMD ["php-fpm"]

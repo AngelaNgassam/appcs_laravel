@@ -32,7 +32,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
-          tools: cs2pr        # formate les erreurs pour GitHub Annotations
+          tools: cs2pr
 
       - name: Installation des dépendances Composer
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
@@ -41,7 +41,7 @@ jobs:
         run: |
           composer require --dev friendsofphp/php-cs-fixer --no-interaction
           vendor/bin/php-cs-fixer fix --dry-run --diff --format=checkstyle app/ \
-            | cs2pr || true   # informatif, non bloquant
+            | cs2pr || true
 
       - name: PHPStan — Analyse statique niveau 5
         run: |
@@ -54,7 +54,7 @@ jobs:
       - name: Laravel Pint — Formatage du code Laravel
         run: |
           composer require --dev laravel/pint --no-interaction
-          vendor/bin/pint --test || true   # vérifie sans modifier
+          vendor/bin/pint --test || true
 
   # ════════════════════════════════════════════════════════════
   # STAGE 2 : TESTS — Unitaires et Feature
@@ -62,7 +62,7 @@ jobs:
   tests:
     name: Tests (PHP / Laravel)
     runs-on: ubuntu-latest
-    needs: lint          # les tests ne tournent qu'après le linting
+    needs: lint
 
     services:
       mysql:
@@ -137,7 +137,7 @@ jobs:
         run: composer install --no-interaction --prefer-dist
 
       - name: Audit des dépendances Composer (CVE connues)
-        run: composer audit || true   # informatif, non bloquant
+        run: composer audit || true
 
       - name: Scan de l'image Docker avec Trivy
         uses: aquasecurity/trivy-action@master
@@ -145,7 +145,7 @@ jobs:
           scan-type: 'fs'
           scan-ref: '.'
           format: 'table'
-          exit-code: '0'   # non bloquant
+          exit-code: '0'
 
   # ════════════════════════════════════════════════════════════
   # STAGE 4 : BUILD — Image Docker
@@ -192,8 +192,7 @@ jobs:
           cache-to: type=gha,mode=max
 
   # ════════════════════════════════════════════════════════════
-  # STAGE 5 : CD STAGING — Déploiement automatique
-  # Déclenché uniquement sur les branches master et develop
+  # STAGE 5 : CD STAGING — Déploiement simulé
   # ════════════════════════════════════════════════════════════
   deploy-staging:
     name: Déploiement Staging (CD)
@@ -203,45 +202,24 @@ jobs:
 
     environment:
       name: staging
-      url: http://staging.appcs.local:8080
+      url: http://localhost:8000
 
     steps:
       - name: Checkout du code
         uses: actions/checkout@v4
 
-      - name: Déploiement sur le serveur staging (SSH)
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.STAGING_HOST }}
-          username: ${{ secrets.STAGING_USER }}
-          key: ${{ secrets.STAGING_SSH_KEY }}
-          port: 22
-          script: |
-            echo "=== Déploiement APPCS Laravel sur Staging ==="
-            cd /opt/appcs_laravel || exit 1
-
-            # Récupère le dernier code
-            git pull origin ${{ github.ref_name }}
-
-            # Met à jour l'image Docker
-            docker compose pull
-
-            # Redémarre les services sans downtime
-            docker compose up -d --remove-orphans
-
-            # Lance les migrations
-            docker compose exec -T app php artisan migrate --force
-
-            # Vide les caches
-            docker compose exec -T app php artisan config:clear
-            docker compose exec -T app php artisan cache:clear
-            docker compose exec -T app php artisan view:clear
-
-            echo "=== Déploiement Staging terminé avec succès ==="
+      - name: Simulation déploiement staging
+        run: |
+          echo "=== Déploiement APPCS Laravel sur Staging ==="
+          echo "Image   : ${{ needs.build.outputs.image-tag }}"
+          echo "Branche : ${{ github.ref_name }}"
+          echo "Commit  : ${{ github.sha }}"
+          echo "Auteur  : ${{ github.actor }}"
+          echo "Statut  : Déploiement simulé (pas de serveur distant configuré)"
+          echo "=== Staging terminé avec succès ==="
 
   # ════════════════════════════════════════════════════════════
-  # STAGE 6 : CD PRODUCTION — Déploiement manuel
-  # Nécessite une approbation manuelle (environment protection)
+  # STAGE 6 : CD PRODUCTION — Déploiement simulé
   # ════════════════════════════════════════════════════════════
   deploy-production:
     name: Déploiement Production (CD Manuel)
@@ -251,38 +229,20 @@ jobs:
 
     environment:
       name: production
-      url: http://appcs.local:8080
+      url: http://localhost:8000
 
     steps:
       - name: Checkout du code
         uses: actions/checkout@v4
 
-      - name: Déploiement en production (SSH)
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.PROD_HOST }}
-          username: ${{ secrets.PROD_USER }}
-          key: ${{ secrets.PROD_SSH_KEY }}
-          port: 22
-          script: |
-            echo "=== Déploiement APPCS Laravel en Production ==="
-            cd /opt/appcs_laravel || exit 1
-
-            # Sauvegarde la version actuelle pour rollback
-            CURRENT_TAG=$(docker inspect appcs_backend --format='{{.Config.Image}}' 2>/dev/null || echo "unknown")
-            echo "Version actuelle : $CURRENT_TAG"
-
-            # Met à jour et redémarre
-            git pull origin master
-            docker compose pull
-            docker compose up -d --remove-orphans
-
-            # Migrations et cache
-            docker compose exec -T app php artisan migrate --force
-            docker compose exec -T app php artisan config:cache
-            docker compose exec -T app php artisan route:cache
-
-            echo "=== Déploiement Production terminé ==="
+      - name: Simulation déploiement production
+        run: |
+          echo "=== Déploiement APPCS Laravel en Production ==="
+          echo "Image   : ${{ needs.build.outputs.image-tag }}"
+          echo "Branche : ${{ github.ref_name }}"
+          echo "Commit  : ${{ github.sha }}"
+          echo "Statut  : Déploiement simulé (approbation manuelle requise en prod réelle)"
+          echo "=== Production terminée ==="
 
   # ════════════════════════════════════════════════════════════
   # STAGE 7 : NOTIFICATION — Résultat du pipeline

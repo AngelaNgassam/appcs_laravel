@@ -2,9 +2,9 @@ name: CI/CD Pipeline - APPCS Laravel
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ master, main, develop ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ master, main, develop ]
 
 # Variables d'environnement globales (partagées par tous les jobs)
 env:

@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [ master, main, develop ]
 
-# Variables d'environnement globales (partagées par tous les jobs)
+# ── Variables globales partagées par tous les jobs ───────────
 env:
   DB_CONNECTION: mysql
   DB_HOST: 127.0.0.1
@@ -17,20 +17,57 @@ env:
 
 jobs:
 
-  # STAGE 1 : Tests & Qualité du code
+  # ════════════════════════════════════════════════════════════
+  # STAGE 1 : LINTING — Qualité du code PHP
+  # ════════════════════════════════════════════════════════════
+  lint:
+    name: Linting (Qualité du code)
+    runs-on: ubuntu-latest
 
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Configuration PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: cs2pr        # formate les erreurs pour GitHub Annotations
+
+      - name: Installation des dépendances Composer
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: PHP-CS-Fixer — Vérification du style de code (PSR-12)
+        run: |
+          composer require --dev friendsofphp/php-cs-fixer --no-interaction
+          vendor/bin/php-cs-fixer fix --dry-run --diff --format=checkstyle app/ \
+            | cs2pr || true   # informatif, non bloquant
+
+      - name: PHPStan — Analyse statique niveau 5
+        run: |
+          composer require --dev phpstan/phpstan --no-interaction
+          vendor/bin/phpstan analyse app --level=5 --no-progress \
+            --error-format=github || true   # erreurs affichées en annotations GitHub
+
+      - name: Laravel Pint — Formatage du code Laravel
+        run: |
+          composer require --dev laravel/pint --no-interaction
+          vendor/bin/pint --test || true   # vérifie sans modifier
+
+  # ════════════════════════════════════════════════════════════
+  # STAGE 2 : TESTS — Unitaires et Feature
+  # ════════════════════════════════════════════════════════════
   tests:
     name: Tests (PHP / Laravel)
     runs-on: ubuntu-latest
+    needs: lint          # les tests ne tournent qu'après le linting
 
     services:
       mysql:
         image: mysql:8.0
         env:
-          MYSQL_DATABASE: cartes_scolaires      # même nom que le projet
+          MYSQL_DATABASE: cartes_scolaires
           MYSQL_ROOT_PASSWORD: root
-          # NOTE : MYSQL_USER ne peut pas être "root" (déjà réservé)
-          # On utilise uniquement root / root comme dans le .env
         ports:
           - 3306:3306
         options: >-
@@ -59,20 +96,27 @@ jobs:
       - name: Installation des dépendances Composer
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Préparation du fichier .env (copie du .env.example)
+      - name: Préparation du fichier .env
         run: |
           cp .env.example .env
           php artisan key:generate
 
-      - name: Migration de la base de données cartes_scolaires
+      - name: Migration de la base de données
         run: php artisan migrate --force
 
       - name: Exécution des tests
-        run: php artisan test
+        run: php artisan test --log-junit test-results.xml
 
-  # ─────────────────────────────────────────────
-  # STAGE 2 : Sécurité — Scan des dépendances
-  # ─────────────────────────────────────────────
+      - name: Publication des résultats de tests
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: test-results.xml
+
+  # ════════════════════════════════════════════════════════════
+  # STAGE 3 : SÉCURITÉ — Audit des dépendances
+  # ════════════════════════════════════════════════════════════
   security:
     name: Audit de sécurité
     runs-on: ubuntu-latest
@@ -90,22 +134,27 @@ jobs:
       - name: Installation des dépendances
         run: composer install --no-interaction --prefer-dist
 
-      - name: Audit des dépendances Composer (vulnérabilités connues)
-        run: composer audit || true   # audit informatif, non bloquant
+      - name: Audit des dépendances Composer (CVE connues)
+        run: composer audit || true   # informatif, non bloquant
 
-      - name: Analyse statique avec PHPStan (niveau 5)
-        run: |
-          composer require --dev phpstan/phpstan --no-interaction
-          vendor/bin/phpstan analyse app --level=5 --no-progress || true
+      - name: Scan de l'image Docker avec Trivy
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'
+          exit-code: '0'   # non bloquant
 
-  # ─────────────────────────────────────────────
-  # STAGE 3 : Build Docker
-  # ─────────────────────────────────────────────
+  # ════════════════════════════════════════════════════════════
+  # STAGE 4 : BUILD — Image Docker
+  # ════════════════════════════════════════════════════════════
   build:
     name: Build image Docker
     runs-on: ubuntu-latest
     needs: [tests, security]
-    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+
+    outputs:
+      image-tag: ${{ steps.meta.outputs.tags }}
 
     steps:
       - name: Checkout du code
@@ -128,6 +177,7 @@ jobs:
           tags: |
             type=ref,event=branch
             type=sha,prefix=sha-
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' }}
 
       - name: Build et push de l'image Docker
         uses: docker/build-push-action@v5
@@ -139,19 +189,121 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-  # ─────────────────────────────────────────────
-  # STAGE 4 : Notification
-  # ─────────────────────────────────────────────
+  # ════════════════════════════════════════════════════════════
+  # STAGE 5 : CD STAGING — Déploiement automatique
+  # Déclenché uniquement sur les branches master et develop
+  # ════════════════════════════════════════════════════════════
+  deploy-staging:
+    name: Déploiement Staging (CD)
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop'
+
+    environment:
+      name: staging
+      url: http://staging.appcs.local:8080
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Déploiement sur le serveur staging (SSH)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key: ${{ secrets.STAGING_SSH_KEY }}
+          port: 22
+          script: |
+            echo "=== Déploiement APPCS Laravel sur Staging ==="
+            cd /opt/appcs_laravel || exit 1
+
+            # Récupère le dernier code
+            git pull origin ${{ github.ref_name }}
+
+            # Met à jour l'image Docker
+            docker compose pull
+
+            # Redémarre les services sans downtime
+            docker compose up -d --remove-orphans
+
+            # Lance les migrations
+            docker compose exec -T app php artisan migrate --force
+
+            # Vide les caches
+            docker compose exec -T app php artisan config:clear
+            docker compose exec -T app php artisan cache:clear
+            docker compose exec -T app php artisan view:clear
+
+            echo "=== Déploiement Staging terminé avec succès ==="
+
+  # ════════════════════════════════════════════════════════════
+  # STAGE 6 : CD PRODUCTION — Déploiement manuel
+  # Nécessite une approbation manuelle (environment protection)
+  # ════════════════════════════════════════════════════════════
+  deploy-production:
+    name: Déploiement Production (CD Manuel)
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    if: github.ref == 'refs/heads/master'
+
+    environment:
+      name: production
+      url: http://appcs.local:8080
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Déploiement en production (SSH)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key: ${{ secrets.PROD_SSH_KEY }}
+          port: 22
+          script: |
+            echo "=== Déploiement APPCS Laravel en Production ==="
+            cd /opt/appcs_laravel || exit 1
+
+            # Sauvegarde la version actuelle pour rollback
+            CURRENT_TAG=$(docker inspect appcs_backend --format='{{.Config.Image}}' 2>/dev/null || echo "unknown")
+            echo "Version actuelle : $CURRENT_TAG"
+
+            # Met à jour et redémarre
+            git pull origin master
+            docker compose pull
+            docker compose up -d --remove-orphans
+
+            # Migrations et cache
+            docker compose exec -T app php artisan migrate --force
+            docker compose exec -T app php artisan config:cache
+            docker compose exec -T app php artisan route:cache
+
+            echo "=== Déploiement Production terminé ==="
+
+  # ════════════════════════════════════════════════════════════
+  # STAGE 7 : NOTIFICATION — Résultat du pipeline
+  # ════════════════════════════════════════════════════════════
   notify:
     name: Notification résultat pipeline
     runs-on: ubuntu-latest
-    needs: [tests, security, build]
+    needs: [lint, tests, security, build, deploy-staging]
     if: always()
 
     steps:
-      - name: Résumé du pipeline
+      - name: Résumé complet du pipeline
         run: |
-          echo "Pipeline terminé."
-          echo "Tests      : ${{ needs.tests.result }}"
-          echo "Sécurité   : ${{ needs.security.result }}"
-          echo "Build      : ${{ needs.build.result }}"
+          echo "╔══════════════════════════════════════╗"
+          echo "║     RAPPORT PIPELINE CI/CD APPCS     ║"
+          echo "╚══════════════════════════════════════╝"
+          echo "Branche      : ${{ github.ref_name }}"
+          echo "Commit       : ${{ github.sha }}"
+          echo "Auteur       : ${{ github.actor }}"
+          echo "──────────────────────────────────────"
+          echo "Linting      : ${{ needs.lint.result }}"
+          echo "Tests        : ${{ needs.tests.result }}"
+          echo "Sécurité     : ${{ needs.security.result }}"
+          echo "Build Docker : ${{ needs.build.result }}"
+          echo "Staging      : ${{ needs.deploy-staging.result }}"
+          echo "──────────────────────────────────────"

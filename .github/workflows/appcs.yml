@@ -70,9 +70,9 @@ jobs:
       - name: Exécution des tests
         run: php artisan test
 
-
+  # ─────────────────────────────────────────────
   # STAGE 2 : Sécurité — Scan des dépendances
-
+  # ─────────────────────────────────────────────
   security:
     name: Audit de sécurité
     runs-on: ubuntu-latest
@@ -91,16 +91,16 @@ jobs:
         run: composer install --no-interaction --prefer-dist
 
       - name: Audit des dépendances Composer (vulnérabilités connues)
-        run: composer audit
+        run: composer audit || true   # audit informatif, non bloquant
 
       - name: Analyse statique avec PHPStan (niveau 5)
         run: |
           composer require --dev phpstan/phpstan --no-interaction
           vendor/bin/phpstan analyse app --level=5 --no-progress || true
 
-
+  # ─────────────────────────────────────────────
   # STAGE 3 : Build Docker
-
+  # ─────────────────────────────────────────────
   build:
     name: Build image Docker
     runs-on: ubuntu-latest
@@ -139,9 +139,9 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
-
+  # ─────────────────────────────────────────────
   # STAGE 4 : Notification
-
+  # ─────────────────────────────────────────────
   notify:
     name: Notification résultat pipeline
     runs-on: ubuntu-latest

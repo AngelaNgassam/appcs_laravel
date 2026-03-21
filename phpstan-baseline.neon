@@ -1,0 +1,985 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Call to an undefined method Illuminate\\Database\\Eloquent\\Builder\<App\\Models\\Etablissement\>\:\:withTrashed\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\CarteScolaire\:\:count\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 3
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\CarteScolaire\:\:where\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 3
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\CarteScolaire\:\:whereBetween\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\CarteScolaire\:\:whereDate\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\CarteScolaire\:\:whereHas\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Eleve\:\:count\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 4
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Eleve\:\:where\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Eleve\:\:whereBetween\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Etablissement\:\:count\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Etablissement\:\:find\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Etablissement\:\:select\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Etablissement\:\:whereBetween\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Etablissement\:\:whereHas\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Etablissement\:\:whereMonth\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Etablissement\:\:whereYear\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Etablissement\:\:withCount\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\HistoriqueAction\:\:whereBetween\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\HistoriqueAction\:\:whereDate\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Photo\:\:count\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Photo\:\:where\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 4
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Photo\:\:whereDate\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\User\:\:count\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\User\:\:select\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\User\:\:where\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 3
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\User\:\:whereBetween\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AdminController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\AnneeAcademique\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\AnneeAcademique\>\:\:\$etablissement_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AnneeAcademiqueController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$active\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AnneeAcademiqueController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$date_debut\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AnneeAcademiqueController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$date_fin\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AnneeAcademiqueController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$etablissement_id\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Api/AnneeAcademiqueController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$libelle\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Api/AnneeAcademiqueController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\AnneeAcademique\:\:create\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AnneeAcademiqueController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\AnneeAcademique\:\:find\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 3
+			path: app/Http/Controllers/Api/AnneeAcademiqueController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\AnneeAcademique\:\:where\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 4
+			path: app/Http/Controllers/Api/AnneeAcademiqueController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$adresse_etablissement\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AuthController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Api/AuthController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$email_etablissement\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AuthController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$mot_de_passe\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Api/AuthController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$nom\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AuthController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$nom_etablissement\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AuthController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$prenom\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AuthController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$telephone\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AuthController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$telephone_etablissement\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AuthController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$ville_etablissement\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AuthController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\AnneeAcademique\:\:create\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AuthController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Etablissement\:\:create\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AuthController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\User\:\:create\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AuthController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\User\:\:where\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/AuthController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\CarteScolaire\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\CarteScolaire\>\:\:\$chemin_pdf\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/CarteController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\CarteScolaire\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\CarteScolaire\>\:\:\$eleve\.$#'
+			identifier: property.notFound
+			count: 5
+			path: app/Http/Controllers/Api/CarteController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$classe_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/CarteController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$eleve_ids\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/Api/CarteController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$modele_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/CarteController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$statut\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/CarteController.php
+
+		-
+			message: '#^Access to an undefined property Laravel\\Sanctum\\PersonalAccessToken\:\:\$tokenable\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/CarteController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Contracts\\Auth\\Factory\:\:setUser\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Api/CarteController.php
+
+		-
+			message: '#^Call to an undefined method Illuminate\\Contracts\\Auth\\Factory\:\:user\(\)\.$#'
+			identifier: method.notFound
+			count: 1
+			path: app/Http/Controllers/Api/CarteController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\CarteScolaire\:\:find\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: app/Http/Controllers/Api/CarteController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Classe\:\:find\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: app/Http/Controllers/Api/CarteController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Eleve\:\:find\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/CarteController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Eleve\:\:where\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/CarteController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$niveau\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Api/ClasseController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$nom\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Api/ClasseController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$search\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/ClasseController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$serie\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/ClasseController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\AnneeAcademique\:\:where\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/ClasseController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Classe\:\:create\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/ClasseController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Classe\:\:find\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 3
+			path: app/Http/Controllers/Api/ClasseController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Classe\:\:where\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/ClasseController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\CarteScolaire\:\:whereHas\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 5
+			path: app/Http/Controllers/Api/DashboardController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Classe\:\:where\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: app/Http/Controllers/Api/DashboardController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Eleve\:\:where\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 6
+			path: app/Http/Controllers/Api/DashboardController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\HistoriqueAction\:\:whereHas\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/DashboardController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Photo\:\:where\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: app/Http/Controllers/Api/DashboardController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Photo\:\:whereHas\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 3
+			path: app/Http/Controllers/Api/DashboardController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\User\:\:where\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: app/Http/Controllers/Api/DashboardController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Eleve\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Eleve\>\:\:\$etablissement_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/EleveController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$classe_id\.$#'
+			identifier: property.notFound
+			count: 5
+			path: app/Http/Controllers/Api/EleveController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$contact_parent\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/EleveController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$date_naissance\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/EleveController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$lieu_naissance\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/EleveController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$matricule\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/EleveController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$nom\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/EleveController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$nom_parent\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/EleveController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$prenom\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/EleveController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$search\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/EleveController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$sexe\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/EleveController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Classe\:\:find\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 3
+			path: app/Http/Controllers/Api/EleveController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Eleve\:\:create\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/EleveController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Eleve\:\:find\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 4
+			path: app/Http/Controllers/Api/EleveController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Etablissement\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Etablissement\>\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/EtablissementController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$search\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/EtablissementController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$ville\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/EtablissementController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Etablissement\:\:find\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 3
+			path: app/Http/Controllers/Api/EtablissementController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$action\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/HistoriqueController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$date_debut\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/HistoriqueController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$date_fin\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/HistoriqueController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$user_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/HistoriqueController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$actif\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/ModeleCarteController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$configuration\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/ModeleCarteController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$fichier_template\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/ModeleCarteController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$nom_modele\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/ModeleCarteController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\ModeleCarte\:\:create\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 3
+			path: app/Http/Controllers/Api/ModeleCarteController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\ModeleCarte\:\:find\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/ModeleCarteController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\ModeleCarte\:\:where\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/ModeleCarteController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\ModeleCarte\:\:whereNull\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/ModeleCarteController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$lue\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/NotificationController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Notification\:\:find\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: app/Http/Controllers/Api/NotificationController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Notification\:\:where\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 2
+			path: app/Http/Controllers/Api/NotificationController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Photo\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\Photo\>\:\:\$eleve\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/PhotoController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$eleve_id\.$#'
+			identifier: property.notFound
+			count: 3
+			path: app/Http/Controllers/Api/PhotoController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$motif\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Api/PhotoController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$statut\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/PhotoController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Eleve\:\:find\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/PhotoController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Photo\:\:find\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 3
+			path: app/Http/Controllers/Api/PhotoController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\|Illuminate\\Database\\Eloquent\\Collection\<int, App\\Models\\User\>\:\:\$etablissement_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/UserController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$email\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/UserController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$nom\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/UserController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$password\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/UserController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$prenom\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/UserController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$role\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Http/Controllers/Api/UserController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$search\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/UserController.php
+
+		-
+			message: '#^Access to an undefined property Illuminate\\Http\\Request\:\:\$telephone\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Http/Controllers/Api/UserController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\User\:\:create\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Http/Controllers/Api/UserController.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\User\:\:find\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 3
+			path: app/Http/Controllers/Api/UserController.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\CarteScolaire\:\:\$chemin_pdf\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/CarteScolaire.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Classe\:\:\$effectif\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Classe.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Eleve\:\:\$date_naissance\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Eleve.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Eleve\:\:\$nom\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Eleve.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Eleve\:\:\$prenom\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Eleve.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Etablissement\:\:\$logo\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Etablissement.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\ModeleCarte\:\:\$apercu\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/ModeleCarte.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Photo\:\:\$chemin_photo\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Photo.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Photo\:\:\$photo_originale\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Photo.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Photo\:\:\$photo_traitee\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/Photo.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$nom\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$prenom\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\User\:\:\$role\.$#'
+			identifier: property.notFound
+			count: 4
+			path: app/Models/User.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Classe\:\:findOrFail\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Services/ExcelImportService.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Eleve\:\:create\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Services/ExcelImportService.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Eleve\:\:where\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Services/ExcelImportService.php
+
+		-
+			message: '#^Parameter \#1 \$import of static method Maatwebsite\\Excel\\Facades\\Excel\:\:toArray\(\) expects object, array given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/ExcelImportService.php
+
+		-
+			message: '#^Parameter \#2 \$time of static method Carbon\\Carbon\:\:createFromFormat\(\) expects string, float\|int given\.$#'
+			identifier: argument.type
+			count: 1
+			path: app/Services/ExcelImportService.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\HistoriqueAction\:\:create\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Services/HistoriqueService.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Notification\:\:create\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Services/NotificationService.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Notification\:\:find\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Services/NotificationService.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Notification\:\:where\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Services/NotificationService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Eleve\:\:\$classe\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/PDFService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Eleve\:\:\$etablissement\.$#'
+			identifier: property.notFound
+			count: 8
+			path: app/Services/PDFService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Eleve\:\:\$etablissement_id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/PDFService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Eleve\:\:\$id\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/PDFService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Eleve\:\:\$matricule\.$#'
+			identifier: property.notFound
+			count: 7
+			path: app/Services/PDFService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Eleve\:\:\$photoActive\.$#'
+			identifier: property.notFound
+			count: 2
+			path: app/Services/PDFService.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\CarteScolaire\:\:updateOrCreate\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Services/PDFService.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Eleve\:\:where\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Services/PDFService.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\ModeleCarte\:\:find\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 3
+			path: app/Services/PDFService.php
+
+		-
+			message: '#^Deprecated in PHP 8\.4\: Parameter \#2 \$modeleId \(int\) is implicitly nullable via default value null\.$#'
+			identifier: parameter.implicitlyNullable
+			count: 2
+			path: app/Services/PDFService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Photo\:\:\$photo_originale\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/PhotoService.php
+
+		-
+			message: '#^Access to an undefined property App\\Models\\Photo\:\:\$photo_traitee\.$#'
+			identifier: property.notFound
+			count: 1
+			path: app/Services/PhotoService.php
+
+		-
+			message: '#^Call to an undefined static method App\\Models\\Photo\:\:create\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Services/PhotoService.php
+
+		-
+			message: '#^Comparison operation "\>" between int\<1, max\> and 0 is always true\.$#'
+			identifier: greater.alwaysTrue
+			count: 1
+			path: app/Services/PhotoService.php
+
+		-
+			message: '#^Call to an undefined static method SimpleSoftwareIO\\QrCode\\Facades\\QrCode\:\:format\(\)\.$#'
+			identifier: staticMethod.notFound
+			count: 1
+			path: app/Services/QRCodeService.php
+
+		-
+			message: '#^Call to static method disk\(\) on an unknown class Storage\.$#'
+			identifier: class.notFound
+			count: 1
+			path: app/Services/QRCodeService.php

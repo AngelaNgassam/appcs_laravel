@@ -47,7 +47,9 @@ jobs:
         run: |
           composer require --dev phpstan/phpstan --no-interaction
           vendor/bin/phpstan analyse app --level=5 --no-progress \
-            --error-format=github || true   # erreurs affichées en annotations GitHub
+            --memory-limit=512M \
+            --error-format=github \
+            --configuration=phpstan.neon || true
 
       - name: Laravel Pint — Formatage du code Laravel
         run: |

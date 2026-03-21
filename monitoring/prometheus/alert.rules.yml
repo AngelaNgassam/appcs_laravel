@@ -1,0 +1,86 @@
+# ═══════════════════════════════════════════════════════════════
+# Règles d'alertes Prometheus — APPCS Laravel
+# ═══════════════════════════════════════════════════════════════
+
+groups:
+  # ── Alertes Infrastructure ──────────────────────────────────
+  - name: infrastructure
+    rules:
+
+      # CPU élevé (> 80% pendant 5 minutes)
+      - alert: CPUElevé
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "CPU élevé sur {{ $labels.instance }}"
+          description: "CPU à {{ $value }}% depuis plus de 5 minutes."
+
+      # RAM critique (> 90% utilisée)
+      - alert: RAMCritique
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 90
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Mémoire RAM critique sur {{ $labels.instance }}"
+          description: "RAM utilisée à {{ $value }}%."
+
+      # Disque plein (> 85%)
+      - alert: DisquePlein
+        expr: (node_filesystem_size_bytes - node_filesystem_free_bytes) / node_filesystem_size_bytes * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Espace disque faible sur {{ $labels.instance }}"
+          description: "Disque utilisé à {{ $value }}%."
+
+  # ── Alertes Application ─────────────────────────────────────
+  - name: application
+    rules:
+
+      # Conteneur arrêté
+      - alert: ConteneurArrêté
+        expr: absent(container_memory_usage_bytes{name="app_backend"})
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Conteneur app_backend arrêté"
+          description: "Le conteneur Laravel ne répond plus depuis 1 minute."
+
+      # Taux d'erreur HTTP élevé (> 5%)
+      - alert: TauxErreurHTTP
+        expr: rate(nginx_http_requests_total{status=~"5.."}[5m]) / rate(nginx_http_requests_total[5m]) * 100 > 5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Taux d'erreur HTTP élevé"
+          description: "{{ $value }}% des requêtes retournent une erreur 5xx."
+
+  # ── Alertes Base de données ──────────────────────────────────
+  - name: database
+    rules:
+
+      # MySQL indisponible
+      - alert: MySQLIndisponible
+        expr: mysql_up == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "MySQL est hors ligne"
+          description: "Le serveur MySQL ne répond plus."
+
+      # Trop de connexions MySQL (> 80% du max)
+      - alert: MySQLConnexionsÉlevées
+        expr: mysql_global_status_threads_connected / mysql_global_variables_max_connections * 100 > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Connexions MySQL élevées"
+          description: "{{ $value }}% des connexions MySQL sont utilisées."

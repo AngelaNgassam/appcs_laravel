@@ -1,0 +1,72 @@
+# ═══════════════════════════════════════════════════════════════
+# Configuration Alertmanager — Notifications email
+# ═══════════════════════════════════════════════════════════════
+
+global:
+  smtp_smarthost: 'smtp.gmail.com:587'
+  smtp_from: 'appcs.alerts@gmail.com'
+  smtp_auth_username: 'appcs.alerts@gmail.com'
+  smtp_auth_password: 'votre_mot_de_passe_application'
+  smtp_require_tls: true
+  resolve_timeout: 5m
+
+# ── Modèles de notification ──────────────────────────────────
+templates:
+  - '/etc/alertmanager/templates/*.tmpl'
+
+# ── Routage des alertes ──────────────────────────────────────
+route:
+  group_by: ['alertname', 'severity']
+  group_wait: 30s        # Attendre 30s avant d'envoyer (regroupe les alertes)
+  group_interval: 5m     # Intervalle entre les groupes
+  repeat_interval: 4h    # Répéter l'alerte toutes les 4h si non résolue
+  receiver: 'email-admin'
+
+  routes:
+    # Alertes critiques → notification immédiate
+    - match:
+        severity: critical
+      receiver: 'email-admin'
+      group_wait: 10s
+      repeat_interval: 1h
+
+    # Alertes warning → regroupées
+    - match:
+        severity: warning
+      receiver: 'email-admin'
+      group_wait: 5m
+      repeat_interval: 6h
+
+# ── Destinataires ────────────────────────────────────────────
+receivers:
+  - name: 'email-admin'
+    email_configs:
+      - to: 'angela.ngassam@example.com'
+        subject: '[APPCS] Alerte : {{ .GroupLabels.alertname }}'
+        body: |
+          {{ range .Alerts }}
+          🚨 Alerte : {{ .Annotations.summary }}
+          📋 Détail : {{ .Annotations.description }}
+          ⏰ Heure   : {{ .StartsAt.Format "02/01/2006 15:04:05" }}
+          🔴 Sévérité: {{ .Labels.severity }}
+          {{ end }}
+        html: |
+          <h2 style="color:red">🚨 Alerte APPCS Laravel</h2>
+          {{ range .Alerts }}
+          <table border="1" cellpadding="8">
+            <tr><td><b>Alerte</b></td><td>{{ .Annotations.summary }}</td></tr>
+            <tr><td><b>Détail</b></td><td>{{ .Annotations.description }}</td></tr>
+            <tr><td><b>Sévérité</b></td><td>{{ .Labels.severity }}</td></tr>
+            <tr><td><b>Heure</b></td><td>{{ .StartsAt.Format "02/01/2006 15:04:05" }}</td></tr>
+          </table>
+          {{ end }}
+        send_resolved: true   # Notifie aussi quand l'alerte est résolue
+
+# ── Inhibitions (évite les doublons) ────────────────────────
+inhibit_rules:
+  # Si le serveur est down, n'envoie pas les alertes filles
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['instance']

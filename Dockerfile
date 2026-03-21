@@ -1,4 +1,4 @@
-# PHP 8.4 pour Symfony 8 / Laravel (Pest 4)
+# PHP 8.4 pour correspondre aux exigences du composer.json
 FROM php:8.4-fpm
 
 # Installation des dépendances système
@@ -17,14 +17,13 @@ RUN apt-get update && apt-get install -y \
 # Installation de Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Definis le dossier de travail dans le conteneur
+# Définit le dossier de travail dans le conteneur
 WORKDIR /var/www
 
 # Copie des fichiers du projet
 COPY . .
 
 # Installation des dépendances PHP
-# AJOUT : --no-scripts pour éviter que Laravel ne tente d'exécuter du code PHP avant que l'image soit prête
 RUN composer install --no-dev --optimize-autoloader --no-scripts
 
 # Création des répertoires nécessaires
@@ -37,8 +36,7 @@ RUN mkdir -p /var/www/storage/framework/cache \
 # Ajustement des permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-# Dire a Docker sur quel port l'application tourne
+# Port PHP-FPM
 EXPOSE 9000
 
-# Commande qui lance l'applicatiom
 CMD ["php-fpm"]

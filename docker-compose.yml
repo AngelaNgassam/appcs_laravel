@@ -40,7 +40,7 @@ services:
   # La base de données (MySQL)
   db:
     image: mysql:8.0
-    container_name: mysql_db
+    container_name: mysql_db_appcs 
     restart: unless-stopped
     environment:
       MYSQL_DATABASE: laravel_db

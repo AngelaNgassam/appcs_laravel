@@ -1,0 +1,10 @@
+# ═══════════════════════════════════════════════════════════════
+# Namespace — isole toutes les ressources APPCS dans Kubernetes
+# ═══════════════════════════════════════════════════════════════
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: appcs
+  labels:
+    app: appcs-laravel
+    env: production

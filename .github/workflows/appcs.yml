@@ -1,4 +1,4 @@
-name: CI/CD Pipeline - APPCS Laravel (Amélioré v2)
+name: CI/CD Pipeline - APPCS Laravel
 
 on:
   push:

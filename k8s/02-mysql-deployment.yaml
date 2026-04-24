@@ -1,0 +1,109 @@
+# PersistentVolumeClaim — Stockage persistant pour MySQL
+# Les données MySQL survivent aux redémarrages des pods
+
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+  namespace: appcs
+spec:
+  accessModes:
+    - ReadWriteOnce          # Un seul pod peut écrire à la fois
+  resources:
+    requests:
+      storage: 5Gi           # 5 Go de stockage réservé pour MySQL
+
+---
+
+# Deployment MySQL - Base de données
+# replicas: 1 car MySQL est une base de données stateful (avec état)
+# On ne peut pas avoir 2 MySQL qui écrivent en même temps
+#   sans configuration spéciale (MySQL Cluster)
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql
+  namespace: appcs
+  labels:
+    app: mysql
+    tier: database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql
+  template:
+    metadata:
+      labels:
+        app: mysql
+        tier: database
+    spec:
+      containers:
+        - name: mysql
+          image: mysql:8.0
+          ports:
+            - containerPort: 3306
+          env:
+            # Récupère la valeur depuis le ConfigMap
+            - name: MYSQL_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: appcs-config
+                  key: DB_DATABASE
+            # Récupère le mot de passe depuis le Secret (chiffré)
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: appcs-secrets
+                  key: MYSQL_ROOT_PASSWORD
+          # Monte le volume persistant dans le conteneur
+          volumeMounts:
+            - name: mysql-storage
+              mountPath: /var/lib/mysql
+          # Ressources allouées au pod MySQL
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          # Vérifie que MySQL répond (redémarre le pod si non)
+          livenessProbe:
+            exec:
+              command: ["mysqladmin", "ping", "-h", "localhost"]
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 3
+          # Vérifie que MySQL est prêt à recevoir des requêtes
+          readinessProbe:
+            exec:
+              command: ["mysqladmin", "ping", "-h", "localhost"]
+            initialDelaySeconds: 15
+            periodSeconds: 5
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: mysql-pvc
+
+---
+
+# Service MySQL: Expose MySQL en interne au cluster
+# ClusterIP = accessible uniquement depuis l'intérieur du cluster
+# Les autres pods atteignent MySQL via "mysql-service:3306"
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mysql-service
+  namespace: appcs
+  labels:
+    app: mysql
+spec:
+  selector:
+    app: mysql           # Redirige vers les pods avec ce label
+  ports:
+    - port: 3306
+      targetPort: 3306
+  type: ClusterIP        # Pas accessible depuis l'extérieur

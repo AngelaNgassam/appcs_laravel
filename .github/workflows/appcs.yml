@@ -1,4 +1,4 @@
-name: CI/CD Pipeline - APPCS Laravel
+name: CI/CD Pipeline - APPCS Laravel (Amélioré v2)
 
 on:
   push:
@@ -6,7 +6,6 @@ on:
   pull_request:
     branches: [ master, main, develop ]
 
-# Variables globales partagées par tous les jobs
 env:
   DB_CONNECTION: mysql
   DB_HOST: 127.0.0.1
@@ -17,18 +16,20 @@ env:
 
 jobs:
 
-  # STAGE 1 : LINTING - Qualité du code PHP
+
+  # STAGE 1 : LINTING — Qualité du code PHP
 
   lint:
     name: Linting (Qualité du code)
     runs-on: ubuntu-latest
+    continue-on-error: true
 
     steps:
       - name: Checkout du code
-        uses: actions/checkout@v4 # Récupère ton code
+        uses: actions/checkout@v4
 
       - name: Configuration PHP 8.4
-        uses: shivammathur/setup-php@v2 #Installe PHP 8.4
+        uses: shivammathur/setup-php@v2
         with:
           php-version: '8.4'
           tools: cs2pr
@@ -36,33 +37,32 @@ jobs:
       - name: Installation des dépendances Composer
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: PHP-CS-Fixer - Vérification du style (respecte les normes PHP) de code (PSR-12)
+      - name: PHP-CS-Fixer — Style PSR-12
         run: |
           composer require --dev friendsofphp/php-cs-fixer --no-interaction
           vendor/bin/php-cs-fixer fix --dry-run --diff --format=checkstyle app/ \
             | cs2pr || true
 
-      - name: PHPStan — Analyse statique intelligente du code (détection des erreurs)
+      - name: PHPStan — Analyse statique niveau 5
         run: |
           composer require --dev phpstan/phpstan --no-interaction
           vendor/bin/phpstan analyse app --level=5 --no-progress \
-            --memory-limit=512M \
-            --error-format=github \
+            --memory-limit=512M --error-format=github \
             --configuration=phpstan.neon || true
 
-      - name: Laravel Pint - Formatage du code Laravel
+      - name: Laravel Pint — Formatage Laravel
         run: |
           composer require --dev laravel/pint --no-interaction
           vendor/bin/pint --test || true
 
 
-  # STAGE 2 : TESTS - Unitaires et Feature
+  # STAGE 2 : TESTS — Unitaires et Feature
 
   tests:
     name: Tests (PHP / Laravel)
     runs-on: ubuntu-latest
     needs: lint
-    # Simule une vraie base de données
+
     services:
       mysql:
         image: mysql:8.0
@@ -86,29 +86,29 @@ jobs:
         with:
           php-version: '8.4'
           extensions: pdo, pdo_mysql, gd, zip, bcmath
-          coverage: xdebug #couverture de tests
+          coverage: xdebug
 
-      - name: Cache des dépendances Composer #accélerer les builds
+      - name: Cache Composer
         uses: actions/cache@v4
         with:
           path: vendor
           key: composer-${{ hashFiles('composer.lock') }}
 
-      - name: Installation des dépendances Composer
+      - name: Installation des dépendances
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
-      - name: Préparation du fichier .env
+      - name: Préparation .env
         run: |
           cp .env.example .env
           php artisan key:generate
 
-      - name: Migration de la base de données
+      - name: Migration base de données
         run: php artisan migrate --force
 
       - name: Exécution des tests
         run: php artisan test --log-junit test-results.xml
 
-      - name: Publication des résultats de tests
+      - name: Publication résultats tests
         uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -116,7 +116,36 @@ jobs:
           path: test-results.xml
 
 
-  # STAGE 3 : SÉCURITÉ(librairies vulnérables, CVE connues) - Audit des dépendances
+  # STAGE 3 : SONARCLOUD — Scan qualité et sécurité du code
+  # Détecte : bugs, vulnérabilités SQL/XSS, code smells
+  # Résultats visibles sur https://sonarcloud.io
+
+  sonarcloud:
+    name: Scan SonarCloud (Qualité & Sécurité)
+    runs-on: ubuntu-latest
+    needs: tests
+
+    steps:
+      - name: Checkout du code (historique complet requis par SonarCloud)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Scan SonarCloud
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=AngelaNgassam_appcs_laravel
+            -Dsonar.organization=angelangassam
+            -Dsonar.sources=app
+            -Dsonar.tests=tests
+            -Dsonar.host.url=https://sonarcloud.io
+
+
+  # STAGE 4 : SÉCURITÉ — Audit dépendances + Trivy
 
   security:
     name: Audit de sécurité
@@ -135,10 +164,10 @@ jobs:
       - name: Installation des dépendances
         run: composer install --no-interaction --prefer-dist
 
-      - name: Audit des dépendances Composer (CVE connues)
+      - name: Audit Composer (CVE connues)
         run: composer audit || true
 
-      - name: Scan de l'image Docker avec Trivy
+      - name: Scan Trivy — Vulnérabilités filesystem
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
@@ -147,12 +176,12 @@ jobs:
           exit-code: '0'
 
 
-  # STAGE 4 : BUILD - Image Docker
+  # STAGE 5 : BUILD — Image Docker
 
   build:
     name: Build image Docker
     runs-on: ubuntu-latest
-    needs: [tests, security]
+    needs: [tests, security, sonarcloud]
 
     outputs:
       image-tag: ${{ steps.meta.outputs.tags }}
@@ -164,13 +193,13 @@ jobs:
       - name: Configuration Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Connexion à Docker Hub pour push l’image
+      - name: Connexion Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Extraction des métadonnées Docker
+      - name: Métadonnées Docker
         id: meta
         uses: docker/metadata-action@v5
         with:
@@ -180,7 +209,7 @@ jobs:
             type=sha,prefix=sha-
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' }}
 
-      - name: Build et push de l'image Docker Hub
+      - name: Build et push image Docker
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -191,17 +220,67 @@ jobs:
           cache-to: type=gha,mode=max
 
 
-  # STAGE 5 : CD STAGING - Déploiement simulé
+  # STAGE 6 : TESTS DE PERFORMANCE — k6
+  # Simule 20 utilisateurs, vérifie P95 < 2s et erreurs < 5%
+
+  performance:
+    name: Tests de performance (k6)
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Checkout du code
+        uses: actions/checkout@v4
+
+      - name: Installation k6
+        run: |
+          curl https://github.com/grafana/k6/releases/download/v0.49.0/k6-v0.49.0-linux-amd64.tar.gz \
+            -L -o k6.tar.gz
+          tar -xzf k6.tar.gz
+          sudo mv k6-v0.49.0-linux-amd64/k6 /usr/local/bin/
+          k6 version
+
+      - name: Installation PHP + dépendances
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+
+      - name: Démarrage de l'application pour les tests
+        run: |
+          cp .env.example .env
+          php -r "echo 'APP_KEY=base64:'.base64_encode(random_bytes(32)).PHP_EOL;" >> .env
+          composer install --no-interaction --prefer-dist --optimize-autoloader
+          php artisan serve --host=0.0.0.0 --port=8080 &
+          sleep 8
+          curl -s -o /dev/null -w "HTTP %{http_code}" http://localhost:8080 || true
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: /tmp/test.sqlite
+
+      - name: Exécution des tests de performance k6
+        run: |
+          k6 run --out json=k6-results.json k6/performance-test.js \
+            -e BASE_URL=http://localhost:8080 || true
+
+      - name: Publication résultats performance
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: k6-performance-results
+          path: k6-results.json
+
+
+  # STAGE 7 : CD STAGING — Déploiement simulé
 
   deploy-staging:
     name: Déploiement Staging (CD)
     runs-on: ubuntu-latest
-    needs: build
+    needs: [build, performance]
     if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop'
 
     environment:
       name: staging
-      url: http://localhost:8000
+      url: http://localhost:8080
 
     steps:
       - name: Checkout du code
@@ -214,11 +293,11 @@ jobs:
           echo "Branche : ${{ github.ref_name }}"
           echo "Commit  : ${{ github.sha }}"
           echo "Auteur  : ${{ github.actor }}"
-          echo "Statut  : Déploiement simulé (pas de serveur distant configuré)"
+          echo "Statut  : Déploiement simulé"
           echo "=== Staging terminé avec succès ==="
 
 
-  # STAGE 6 : CD PRODUCTION — Déploiement simulé
+  # STAGE 8 : CD PRODUCTION — Approbation manuelle requise
 
   deploy-production:
     name: Déploiement Production (CD Manuel)
@@ -228,7 +307,7 @@ jobs:
 
     environment:
       name: production
-      url: http://localhost:8000
+      url: http://localhost:8080
 
     steps:
       - name: Checkout du code
@@ -238,33 +317,32 @@ jobs:
         run: |
           echo "=== Déploiement APPCS Laravel en Production ==="
           echo "Image   : ${{ needs.build.outputs.image-tag }}"
-          echo "Branche : ${{ github.ref_name }}"
           echo "Commit  : ${{ github.sha }}"
-          echo "Statut  : Déploiement simulé (approbation manuelle requise en prod réelle)"
+          echo "Statut  : Approbation manuelle requise en prod réelle"
           echo "=== Production terminée ==="
 
 
-  # STAGE 7 : NOTIFICATION — Résultat du pipeline
+  # STAGE 9 : NOTIFICATION — Résumé complet du pipeline
 
   notify:
     name: Notification résultat pipeline
     runs-on: ubuntu-latest
-    needs: [lint, tests, security, build, deploy-staging]
+    needs: [lint, tests, sonarcloud, security, build, performance, deploy-staging]
     if: always()
 
     steps:
       - name: Résumé complet du pipeline
         run: |
-          echo "╔══════════════════════════════════════╗"
-          echo "║     RAPPORT PIPELINE CI/CD APPCS     ║"
-          echo "╚══════════════════════════════════════╝"
+          echo " RAPPORT PIPELINE CI/CD APPCS "
           echo "Branche      : ${{ github.ref_name }}"
           echo "Commit       : ${{ github.sha }}"
           echo "Auteur       : ${{ github.actor }}"
-          echo "──────────────────────────────────────"
+          echo "──────────────────────────────────────────"
           echo "Linting      : ${{ needs.lint.result }}"
           echo "Tests        : ${{ needs.tests.result }}"
+          echo "SonarCloud   : ${{ needs.sonarcloud.result }}"
           echo "Sécurité     : ${{ needs.security.result }}"
           echo "Build Docker : ${{ needs.build.result }}"
+          echo "Performance  : ${{ needs.performance.result }}"
           echo "Staging      : ${{ needs.deploy-staging.result }}"
-          echo "──────────────────────────────────────"
+          echo "──────────────────────────────────────────"

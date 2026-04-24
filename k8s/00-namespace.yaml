@@ -1,0 +1,11 @@
+# Namespace — isole toutes les ressources APPCS dans Kubernetes
+# Commande : kubectl apply -f 00-namespace.yaml
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: appcs
+  labels:
+    app: appcs-laravel
+    env: production
+    project: cartes-scolaires

@@ -1,0 +1,110 @@
+# ConfigMap Nginx : Configuration du serveur web
+# Stocké dans Kubernetes au lieu d'un fichier local
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-config
+  namespace: appcs
+data:
+  default.conf: |
+    server {
+        listen 80;
+        index index.php index.html;
+        root /var/www/public;
+
+        # Transmet les requêtes PHP à Laravel (PHP-FPM)
+        location ~ \.php$ {
+            try_files $uri =404;
+            fastcgi_split_path_info ^(.+\.php)(/.+)$;
+            fastcgi_pass appcs-laravel-service:9000;
+            fastcgi_index index.php;
+            include fastcgi_params;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        }
+
+        # Routes Laravel (SPA routing)
+        location / {
+            try_files $uri $uri/ /index.php?$query_string;
+        }
+
+        # Métriques pour Prometheus (nginx-exporter)
+        location /stub_status {
+            stub_status on;
+            allow 10.0.0.0/8;
+            deny all;
+        }
+    }
+
+---
+
+# Deployment Nginx - Serveur web
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: appcs
+  labels:
+    app: nginx
+    tier: frontend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx
+          image: nginx:alpine
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: nginx-config-volume
+              mountPath: /etc/nginx/conf.d
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "100m"
+            limits:
+              memory: "128Mi"
+              cpu: "200m"
+          livenessProbe:
+            httpGet:
+              path: /stub_status
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 10
+      volumes:
+        - name: nginx-config-volume
+          configMap:
+            name: nginx-config
+
+---
+
+# Service Nginx - Expose l'application vers l'extérieur
+# NodePort = accessible depuis l'extérieur du cluster
+# Port 30080 sur tous les noeuds du cluster
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+  namespace: appcs
+spec:
+  selector:
+    app: nginx
+  ports:
+    - port: 80
+      targetPort: 80
+      nodePort: 30080    # Accessible via http://IP-DU-CLUSTER:30080
+  type: NodePort

@@ -1,0 +1,133 @@
+
+# Deployment Laravel — Application principale
+# Stratégie : Rolling Update (mise à jour sans interruption)
+#
+# Rolling Update = remplace les pods un par un
+# Pendant la mise à jour, toujours au moins 2 pods répondent
+# Si la nouvelle version plante, Kubernetes revient en arrière
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appcs-laravel
+  namespace: appcs
+  labels:
+    app: appcs-laravel
+    version: "1.0"
+    tier: backend
+  annotations:
+    # Raison du déploiement — visible avec kubectl rollout history
+    kubernetes.io/change-cause: "Déploiement initial APPCS Laravel v1.0"
+spec:
+  replicas: 2            # 2 instances pour la haute disponibilité
+  selector:
+    matchLabels:
+      app: appcs-laravel
+
+  # Stratégie Rolling Update
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1         # Pendant la mise à jour : au plus 1 pod en plus
+      maxUnavailable: 0   # Jamais de pod indisponible pendant la mise à jour
+      # Résultat : si on a 2 pods, pendant la mise à jour on passe
+      # brièvement à 3 pods (2 anciens + 1 nouveau), puis 1 ancien
+      # est supprimé, etc.
+
+  template:
+    metadata:
+      labels:
+        app: appcs-laravel
+        version: "1.0"
+    spec:
+      # InitContainer : attend que MySQL soit prêt
+      # Sans ça, Laravel démarre avant MySQL et plante
+      initContainers:
+        - name: wait-for-mysql
+          image: busybox:1.36
+          command:
+            - sh
+            - -c
+            - |
+              echo "Attente de MySQL..."
+              until nc -z mysql-service 3306; do
+                echo "MySQL pas encore prêt, nouvelle tentative dans 2s..."
+                sleep 2
+              done
+              echo "MySQL est prêt! Démarrage de Laravel..."
+
+      containers:
+        - name: appcs-laravel
+          # Remplacer DOCKERHUB_USERNAME par ton vrai nom Docker Hub
+          image: Angelangassam/appcs-laravel:latest
+          ports:
+            - containerPort: 9000    # Port PHP-FPM
+
+          # Charge toutes les variables du ConfigMap
+          envFrom:
+            - configMapRef:
+                name: appcs-config
+
+          # Ajoute les variables sensibles depuis le Secret
+          env:
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: appcs-secrets
+                  key: DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: appcs-secrets
+                  key: DB_PASSWORD
+            - name: APP_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: appcs-secrets
+                  key: APP_KEY
+
+          # Ressources allouées
+          resources:
+            requests:
+              memory: "256Mi"   # RAM minimum garantie
+              cpu: "250m"       # 250 millicores = 0.25 CPU
+            limits:
+              memory: "512Mi"   # RAM maximum autorisée
+              cpu: "500m"       # 500 millicores = 0.5 CPU
+
+          # Liveness Probe
+          # Vérifie que l'application est vivante
+          # Si elle échoue 3 fois, Kubernetes redémarre le pod
+          livenessProbe:
+            tcpSocket:
+              port: 9000
+            initialDelaySeconds: 30   # Attends 30s avant le premier check
+            periodSeconds: 15
+            failureThreshold: 3
+
+          # Readiness Probe
+          # Vérifie que le pod est prêt à recevoir du trafic
+          # Si elle échoue, le pod est retiré du load balancer
+          readinessProbe:
+            tcpSocket:
+              port: 9000
+            initialDelaySeconds: 15
+            periodSeconds: 10
+
+---
+
+# Service Laravel — Expose l'application en interne
+# Les pods Nginx communiquent avec Laravel via ce service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: appcs-laravel-service
+  namespace: appcs
+spec:
+  selector:
+    app: appcs-laravel
+  ports:
+    - port: 9000
+      targetPort: 9000
+  type: ClusterIP

@@ -1,0 +1,149 @@
+# Blue/Green Deployment : Déploiement sans interruption de service
+#
+# Principe :
+#   BLUE  = version actuelle en production (stable)
+#   GREEN = nouvelle version déployée en parallèle (à tester)
+#
+# Processus de déploiement :
+#   1. Déployer la version GREEN (nouvelle version)
+#   2. Tester la version GREEN en interne
+#   3. Basculer le Service de BLUE vers GREEN (0 downtime)
+#   4. Supprimer la version BLUE si GREEN est stable
+#   5. En cas de problème : re-basculer vers BLUE instantanément
+#
+# Commande de bascule :
+#   kubectl patch service appcs-production-service -n appcs \
+#     -p '{"spec":{"selector":{"version":"green"}}}'
+#
+# Commande de rollback :
+#   kubectl patch service appcs-production-service -n appcs \
+#     -p '{"spec":{"selector":{"version":"blue"}}}'
+
+
+# Version BLUE - Production actuelle
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appcs-blue
+  namespace: appcs
+  labels:
+    app: appcs-laravel
+    version: blue
+    slot: production
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: appcs-laravel
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: appcs-laravel
+        version: blue
+    spec:
+      containers:
+        - name: appcs-laravel
+          image: Angelangassam/appcs-laravel:stable   # Version stable
+          ports:
+            - containerPort: 9000
+          envFrom:
+            - configMapRef:
+                name: appcs-config
+          env:
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: appcs-secrets
+                  key: DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: appcs-secrets
+                  key: DB_PASSWORD
+            - name: APP_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: appcs-secrets
+                  key: APP_KEY
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+---
+# Version GREEN — Nouvelle version en attente
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: appcs-green
+  namespace: appcs
+  labels:
+    app: appcs-laravel
+    version: green
+    slot: staging
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: appcs-laravel
+      version: green
+  template:
+    metadata:
+      labels:
+        app: appcs-laravel
+        version: green
+    spec:
+      containers:
+        - name: appcs-laravel
+          image: Angelangassam/appcs-laravel:latest   # Nouvelle version
+          ports:
+            - containerPort: 9000
+          envFrom:
+            - configMapRef:
+                name: appcs-config
+          env:
+            - name: DB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: appcs-secrets
+                  key: DB_USERNAME
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: appcs-secrets
+                  key: DB_PASSWORD
+            - name: APP_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: appcs-secrets
+                  key: APP_KEY
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+---
+# Service Production — pointe vers BLUE par défaut
+# Pour basculer vers GREEN : changer "blue" en "green" dans selector
+apiVersion: v1
+kind: Service
+metadata:
+  name: appcs-production-service
+  namespace: appcs
+  annotations:
+    description: "Basculer vers green: kubectl patch service appcs-production-service -n appcs -p '{\"spec\":{\"selector\":{\"version\":\"green\"}}}'"
+spec:
+  selector:
+    app: appcs-laravel
+    version: blue          # ← Modifier pour basculer (blue ou green)
+  ports:
+    - port: 9000
+      targetPort: 9000
+  type: ClusterIP

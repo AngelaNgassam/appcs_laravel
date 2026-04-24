@@ -1,0 +1,60 @@
+# HorizontalPodAutoscaler (HPA) — Auto-scaling automatique
+#
+# Comment ça marche :
+# - Kubernetes surveille le CPU et la RAM des pods Laravel
+# - Si CPU > 70% → ajoute des pods (jusqu'à 10 max)
+# - Si charge diminue → supprime des pods (minimum 2)
+# - Cela évite les pannes lors des pics de trafic
+#
+# Exemple concret :
+# - Rentrée scolaire : 500 demandes/sec → scale up à 8 pods
+# - Nuit : 5 demandes/sec → scale down à 2 pods
+
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: appcs-hpa
+  namespace: appcs
+spec:
+  # Cible le Deployment Laravel
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: appcs-laravel
+
+  minReplicas: 2    # Toujours au moins 2 pods (haute disponibilité)
+  maxReplicas: 10   # Maximum 10 pods sous forte charge
+
+  metrics:
+    # Déclencheur 1 : charge CPU
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70    # Scale up si CPU moyen > 70%
+
+    # Déclencheur 2 : charge mémoire
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80    # Scale up si RAM moyenne > 80%
+
+  behavior:
+    # Scale UP : réaction rapide aux pics de trafic
+    scaleUp:
+      stabilizationWindowSeconds: 30   # Attends 30s avant de scaler
+      policies:
+        - type: Pods
+          value: 2                 # Ajoute max 2 pods à la fois
+          periodSeconds: 30        # Toutes les 30 secondes
+
+    # Scale DOWN : réduction progressive pour éviter les oscillations
+    scaleDown:
+      stabilizationWindowSeconds: 300  # Attends 5 min avant de réduire
+      policies:
+        - type: Pods
+          value: 1                 # Supprime max 1 pod à la fois
+          periodSeconds: 60        # Toutes les 60 secondes

@@ -1,0 +1,21 @@
+<div class="confirm-backdrop" *ngIf="isVisible" (click)="onBackdropClick($event)">
+  <div class="confirm-content" (click)="$event.stopPropagation()">
+    <div class="confirm-icon">
+      <i class="bi" [ngClass]="getIconClass()"></i>
+    </div>
+
+    <h3 class="confirm-title">{{ title }}</h3>
+    <p class="confirm-message">{{ message }}</p>
+
+    <div class="confirm-actions">
+      <button type="button" class="btn btn-secondary" (click)="onCancel()">
+        <i class="bi bi-x-circle me-2"></i>
+        {{ cancelText }}
+      </button>
+      <button type="button" class="btn" [ngClass]="getButtonClass()" (click)="onConfirm()">
+        <i class="bi bi-check-circle me-2"></i>
+        {{ confirmText }}
+      </button>
+    </div>
+  </div>
+</div>

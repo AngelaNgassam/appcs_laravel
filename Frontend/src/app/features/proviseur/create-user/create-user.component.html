@@ -1,0 +1,220 @@
+<div class="create-user-page bg-light min-vh-100 py-5">
+  <div class="container">
+
+    <!-- 🔙 Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/proviseur/dashboard" class="text-decoration-none text-success">
+            <i class="bi bi-speedometer2 me-1"></i>
+            Dashboard
+          </a>
+        </li>
+        <li class="breadcrumb-item">
+          <a (click)="onCancel()" class="text-decoration-none text-success" style="cursor: pointer;">
+            <i class="bi bi-people me-1"></i>
+            Utilisateurs
+          </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Créer un utilisateur</li>
+      </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+
+        <!-- 📝 Card Formulaire -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-gradient-success text-white py-4">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-person-plus-fill fs-3 me-3"></i>
+              <div>
+                <h4 class="mb-0 fw-bold">Créer un Utilisateur</h4>
+                <p class="mb-0 small opacity-75">Ajoutez un surveillant ou un opérateur photo</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-body p-4">
+
+            <!-- ✅ Message de succès -->
+            <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
+              <i class="bi bi-check-circle-fill me-2"></i>
+              {{ success }}
+              <button type="button" class="btn-close" (click)="success = null"></button>
+            </div>
+
+            <!-- ❌ Message d'erreur -->
+            <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>
+              {{ error }}
+              <button type="button" class="btn-close" (click)="error = null"></button>
+            </div>
+
+            <!-- 📋 Formulaire -->
+            <form (ngSubmit)="onSubmit()" #userForm="ngForm">
+
+              <!-- Rôle -->
+              <div class="mb-4">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-person-badge text-success me-2"></i>
+                  Rôle <span class="text-danger">*</span>
+                </label>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <div class="form-check form-check-card">
+                      <input class="form-check-input" type="radio" name="role" id="roleSurveillant"
+                             [(ngModel)]="formData.role" value="surveillant" required>
+                      <label class="form-check-label w-100" for="roleSurveillant">
+                        <div class="card h-100 border-2"
+                             [class.border-success]="formData.role === 'surveillant'"
+                             [class.bg-success-subtle]="formData.role === 'surveillant'">
+                          <div class="card-body text-center">
+                            <i class="bi bi-shield-check fs-1 text-success mb-2 d-block"></i>
+                            <h6 class="mb-1 fw-bold">Surveillant Général</h6>
+                            <small class="text-muted">Contrôle qualité</small>
+                          </div>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-check form-check-card">
+                      <input class="form-check-input" type="radio" name="role" id="roleOperateur"
+                             [(ngModel)]="formData.role" value="operateur" required>
+                      <label class="form-check-label w-100" for="roleOperateur">
+                        <div class="card h-100 border-2"
+                             [class.border-success]="formData.role === 'operateur'"
+                             [class.bg-success-subtle]="formData.role === 'operateur'">
+                          <div class="card-body text-center">
+                            <i class="bi bi-camera-fill fs-1 text-primary mb-2 d-block"></i>
+                            <h6 class="mb-1 fw-bold">Opérateur Photo</h6>
+                            <small class="text-muted">Prise de photos</small>
+                          </div>
+                        </div>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <hr class="my-4">
+
+              <!-- Nom & Prénom -->
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label for="nom" class="form-label fw-semibold">
+                    Nom <span class="text-danger">*</span>
+                  </label>
+                  <input type="text" class="form-control" id="nom"
+                         [(ngModel)]="formData.nom" name="nom" required
+                         [class.is-invalid]="errors.nom"
+                         placeholder="Ex: KAMGA">
+                  <div *ngIf="errors.nom" class="invalid-feedback d-block">
+                    {{ errors.nom }}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label for="prenom" class="form-label fw-semibold">
+                    Prénom <span class="text-danger">*</span>
+                  </label>
+                  <input type="text" class="form-control" id="prenom"
+                         [(ngModel)]="formData.prenom" name="prenom" required
+                         [class.is-invalid]="errors.prenom"
+                         placeholder="Ex: Paul">
+                  <div *ngIf="errors.prenom" class="invalid-feedback d-block">
+                    {{ errors.prenom }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Email -->
+              <div class="mb-3">
+                <label for="email" class="form-label fw-semibold">
+                  <i class="bi bi-envelope text-success me-2"></i>
+                  Email <span class="text-danger">*</span>
+                </label>
+                <input type="email" class="form-control" id="email"
+                       [(ngModel)]="formData.email" name="email" required
+                       [class.is-invalid]="errors.email"
+                       placeholder="exemple@ecole.com">
+                <div *ngIf="errors.email" class="invalid-feedback d-block">
+                  {{ errors.email }}
+                </div>
+              </div>
+
+              <!-- Téléphone -->
+              <div class="mb-3">
+                <label for="telephone" class="form-label fw-semibold">
+                  <i class="bi bi-phone text-success me-2"></i>
+                  Téléphone
+                </label>
+                <input type="tel" class="form-control" id="telephone"
+                       [(ngModel)]="formData.telephone" name="telephone"
+                       [class.is-invalid]="errors.telephone"
+                       placeholder="Ex: 677123456">
+                <div *ngIf="errors.telephone" class="invalid-feedback d-block">
+                  {{ errors.telephone }}
+                </div>
+              </div>
+
+              <!-- Mot de passe -->
+              <div class="mb-4">
+                <label for="password" class="form-label fw-semibold">
+                  <i class="bi bi-lock text-success me-2"></i>
+                  Mot de passe <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <input [type]="showPassword ? 'text' : 'password'"
+                         class="form-control" id="password"
+                         [(ngModel)]="formData.password" name="password" required
+                         [class.is-invalid]="errors.password"
+                         placeholder="Minimum 8 caractères">
+                  <button class="btn btn-outline-secondary" type="button"
+                          (click)="togglePasswordVisibility()">
+                    <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+                  </button>
+                  <button class="btn btn-outline-success" type="button"
+                          (click)="generatePassword()"
+                          title="Générer un mot de passe">
+                    <i class="bi bi-key"></i>
+                  </button>
+                </div>
+                <div *ngIf="errors.password" class="invalid-feedback d-block">
+                  {{ errors.password }}
+                </div>
+                <small class="text-muted">
+                  <i class="bi bi-info-circle me-1"></i>
+                  Minimum 8 caractères. Utilisez un mot de passe sécurisé.
+                </small>
+              </div>
+
+              <!-- Boutons -->
+              <div class="d-flex gap-2 justify-content-end">
+                <button type="button" class="btn btn-outline-secondary"
+                        (click)="onCancel()" [disabled]="loading">
+                  <i class="bi bi-x-circle me-2"></i>
+                  Annuler
+                </button>
+                <button type="submit" class="btn btn-success" [disabled]="loading || !userForm.valid">
+                  <span *ngIf="!loading">
+                    <i class="bi bi-check-circle me-2"></i>
+                    Créer l'utilisateur
+                  </span>
+                  <span *ngIf="loading">
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    Création en cours...
+                  </span>
+                </button>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

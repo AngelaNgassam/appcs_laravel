@@ -1,0 +1,142 @@
+<!-- Sidebar -->
+<app-sidebar [role]="'surveillant'"></app-sidebar>
+
+<div class="dashboard-page with-sidebar bg-light min-vh-100 py-4">
+  <div class="container">
+
+    <!-- ⏳ Loading -->
+    <div *ngIf="loading" class="text-center py-5">
+      <div class="spinner-border text-success" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+    </div>
+
+    <!-- ❌ Erreur -->
+    <div *ngIf="error && !loading" class="alert alert-danger">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      {{ error }}
+      <button (click)="refresh()" class="btn btn-danger btn-sm ms-3">Réessayer</button>
+    </div>
+
+    <!-- ✅ Contenu -->
+    <div *ngIf="!loading && !error && dashboardData">
+
+      <!-- En-tête -->
+      <div class="row mb-4">
+        <div class="col-lg-8">
+          <h2 class="fw-bold">
+            <i class="bi bi-shield-check text-success me-2"></i>
+            Dashboard Surveillant
+          </h2>
+          <p class="text-muted mb-0">
+            Bienvenue, <strong>{{ currentUser?.prenom }} {{ currentUser?.nom }}</strong>
+            <span *ngIf="etablissement" class="ms-2">• {{ etablissement.nom }}</span>
+          </p>
+        </div>
+        <div class="col-lg-4 text-lg-end">
+          <button (click)="refresh()" class="btn btn-success">
+            <i class="bi bi-arrow-clockwise me-2"></i>
+            Actualiser
+          </button>
+        </div>
+      </div>
+
+      <!-- KPIs -->
+      <div class="row g-4 mb-4">
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="kpi-icon bg-primary bg-opacity-10 text-primary rounded-3 me-3 p-3">
+                  <i class="bi bi-people-fill fs-2"></i>
+                </div>
+                <div>
+                  <h6 class="text-muted text-uppercase small mb-1">Total Élèves</h6>
+                  <h2 class="fw-bold mb-0">{{ formatNumber(dashboardData.kpis.total_eleves) }}</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="kpi-icon bg-success bg-opacity-10 text-success rounded-3 me-3 p-3">
+                  <i class="bi bi-camera-fill fs-2"></i>
+                </div>
+                <div>
+                  <h6 class="text-muted text-uppercase small mb-1">Élèves avec Photo</h6>
+                  <h2 class="fw-bold mb-0">{{ formatNumber(dashboardData.kpis.eleves_avec_photo) }}</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center mb-3">
+                <div class="kpi-icon bg-warning bg-opacity-10 text-warning rounded-3 me-3 p-3">
+                  <i class="bi bi-clock-history fs-2"></i>
+                </div>
+                <div>
+                  <h6 class="text-muted text-uppercase small mb-1">Photos à Valider</h6>
+                  <h2 class="fw-bold mb-0">{{ formatNumber(dashboardData.kpis.photos_a_valider) }}</h2>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Actions Rapides -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-gradient-success text-white py-3">
+          <h5 class="mb-0 fw-bold">
+            <i class="bi bi-lightning-charge-fill me-2"></i>
+            Actions Rapides
+          </h5>
+        </div>
+        <div class="card-body p-4">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <button class="btn btn-outline-success w-100 p-3 text-start"
+                      (click)="navigateTo('/surveillant/eleves')">
+                <div class="d-flex align-items-center">
+                  <div class="action-icon bg-success bg-opacity-10 text-success rounded-3 p-3 me-3">
+                    <i class="bi bi-list-ul fs-3"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0 fw-semibold">Voir les élèves</h6>
+                    <small class="text-muted">Liste complète</small>
+                  </div>
+                </div>
+              </button>
+            </div>
+
+            <div class="col-md-6">
+              <button class="btn btn-outline-primary w-100 p-3 text-start"
+                      (click)="navigateTo('/surveillant/photos')">
+                <div class="d-flex align-items-center">
+                  <div class="action-icon bg-primary bg-opacity-10 text-primary rounded-3 p-3 me-3">
+                    <i class="bi bi-camera-fill fs-3"></i>
+                  </div>
+                  <div>
+                    <h6 class="mb-0 fw-semibold">Gérer les photos</h6>
+                    <small class="text-muted">Validation des photos</small>
+                  </div>
+                </div>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+

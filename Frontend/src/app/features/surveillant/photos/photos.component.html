@@ -1,0 +1,146 @@
+<div class="bg-light min-vh-100 py-4">
+  <div class="container">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div>
+        <h3 class="fw-bold mb-0">
+          <i class="bi bi-camera-fill me-2 text-primary"></i>
+          Validation des photos
+        </h3>
+        <div class="text-muted small">Valider ou refuser les photos prises par les opérateurs</div>
+      </div>
+      <button class="btn btn-outline-primary" (click)="loadPhotos()">
+        <i class="bi bi-arrow-clockwise me-2"></i>
+        Actualiser
+      </button>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-3">
+      <div class="card-body">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-4">
+            <label class="form-label">Statut</label>
+            <select class="form-select" [(ngModel)]="statut" (change)="onFilterChange()">
+              <option value="brouillon">Brouillon (à valider)</option>
+              <option value="validee">Validée</option>
+              <option value="refusee">Refusée</option>
+              <option value="archivee">Archivée</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Matricule</label>
+            <input class="form-control" [(ngModel)]="searchMatricule" placeholder="Rechercher par matricule" (keyup.enter)="onFilterChange()" />
+          </div>
+          <div class="col-md-4 text-end">
+            <button class="btn btn-primary" (click)="onFilterChange()">
+              <i class="bi bi-search me-2"></i>
+              Filtrer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status"></div>
+    </div>
+
+    <div *ngIf="error && !loading" class="alert alert-danger">
+      {{ error }}
+    </div>
+
+    <div *ngIf="!loading && !error" class="card border-0 shadow-sm">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light">
+          <tr>
+            <th>Élève</th>
+            <th>Classe</th>
+            <th>Opérateur</th>
+            <th>Statut</th>
+            <th>Photo</th>
+            <th class="text-end">Actions</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let p of photos">
+            <td>
+              <div class="fw-semibold">{{ p?.eleve?.matricule }} — {{ p?.eleve?.nom_complet || (p?.eleve?.prenom + ' ' + p?.eleve?.nom) }}</div>
+              <div class="text-muted small">Prise: {{ p?.date_prise | date:'dd/MM/yyyy HH:mm' }}</div>
+            </td>
+            <td>{{ p?.eleve?.classe?.nom || '-' }}</td>
+            <td>{{ p?.operateur?.nom_complet || (p?.operateur?.prenom + ' ' + p?.operateur?.nom) }}</td>
+            <td>
+              <span class="badge" [ngClass]="getStatutBadge(p?.statut)">{{ p?.statut }}</span>
+            </td>
+            <td>
+              <a *ngIf="p?.photo_traitee_url" [href]="p.photo_traitee_url" target="_blank">Voir</a>
+              <a *ngIf="!p?.photo_traitee_url && p?.photo_url" [href]="p.photo_url" target="_blank">Voir</a>
+              <span *ngIf="!p?.photo_url && !p?.photo_traitee_url" class="text-muted">-</span>
+            </td>
+            <td class="text-end">
+              <button *ngIf="p?.statut === 'brouillon'" class="btn btn-success btn-sm me-2"
+                      [disabled]="actionLoadingId === p.id"
+                      (click)="valider(p)">
+                <span *ngIf="actionLoadingId !== p.id"><i class="bi bi-check2 me-1"></i>Valider</span>
+                <span *ngIf="actionLoadingId === p.id" class="spinner-border spinner-border-sm"></span>
+              </button>
+
+              <button *ngIf="p?.statut === 'brouillon'" class="btn btn-danger btn-sm"
+                      [disabled]="actionLoadingId === p.id"
+                      (click)="openRefus(p)">
+                <i class="bi bi-x-lg me-1"></i>Refuser
+              </button>
+
+              <span *ngIf="p?.statut === 'refusee'" class="text-muted small">Motif: {{ p?.motif_refus || '-' }}</span>
+            </td>
+          </tr>
+
+          <tr *ngIf="photos.length === 0">
+            <td colspan="6" class="text-center py-5 text-muted">
+              Aucune photo trouvée.
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card-body d-flex justify-content-between align-items-center" *ngIf="totalPages > 1">
+        <div class="text-muted small">Total: {{ total }}</div>
+        <div>
+          <button class="btn btn-outline-secondary btn-sm me-2" [disabled]="currentPage<=1" (click)="goToPage(currentPage-1)">Précédent</button>
+          <span class="small">Page {{ currentPage }} / {{ totalPages }}</span>
+          <button class="btn btn-outline-secondary btn-sm ms-2" [disabled]="currentPage>=totalPages" (click)="goToPage(currentPage+1)">Suivant</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal refus -->
+    <div class="modal-backdrop" *ngIf="showRefusModal"></div>
+    <div class="modal d-block" tabindex="-1" *ngIf="showRefusModal">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Refuser la photo</h5>
+            <button type="button" class="btn-close" (click)="closeRefus()"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-2 text-muted small">
+              Élève: <strong>{{ refusPhoto?.eleve?.matricule }}</strong>
+            </div>
+            <label class="form-label">Motif</label>
+            <textarea class="form-control" rows="3" [(ngModel)]="refusMotif" placeholder="Ex: visage non centré, floue, mauvaise lumière..."></textarea>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-outline-secondary" (click)="closeRefus()">Annuler</button>
+            <button class="btn btn-danger" [disabled]="actionLoadingId === refusPhoto?.id" (click)="confirmerRefus()">
+              <span *ngIf="actionLoadingId !== refusPhoto?.id">Confirmer</span>
+              <span *ngIf="actionLoadingId === refusPhoto?.id" class="spinner-border spinner-border-sm"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

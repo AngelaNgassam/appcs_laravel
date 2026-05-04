@@ -1,0 +1,76 @@
+// Variables
+$primary-green: #10B981;
+$success-dark: #059669;
+
+// Gradient
+.bg-gradient-success {
+  background: linear-gradient(135deg, $primary-green, $success-dark) !important;
+}
+
+// Form styling
+.form-select-lg,
+.form-control {
+  border-radius: 8px;
+  transition: all 0.3s ease;
+
+  &:focus {
+    border-color: $primary-green;
+    box-shadow: 0 0 0 0.2rem rgba(16, 185, 129, 0.25);
+  }
+}
+
+// Radio buttons pour sexe
+.btn-group {
+  .btn-check:checked + .btn-outline-primary {
+    background-color: #3B82F6;
+    border-color: #3B82F6;
+    color: white;
+  }
+
+  .btn-check:checked + .btn-outline-danger {
+    background-color: #EF4444;
+    border-color: #EF4444;
+    color: white;
+  }
+
+  .btn {
+    border-width: 2px;
+    transition: all 0.3s ease;
+
+    &:hover {
+      transform: translateY(-2px);
+    }
+  }
+}
+
+// Animations
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  animation: slideIn 0.3s ease-out;
+}
+
+.alert {
+  animation: slideIn 0.3s ease-out;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .btn-group {
+    flex-direction: column;
+
+    .btn {
+      width: 100%;
+      margin-bottom: 8px;
+    }
+  }
+}

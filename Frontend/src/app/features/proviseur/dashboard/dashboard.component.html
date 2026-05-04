@@ -1,0 +1,252 @@
+<div class="dashboard-container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <i class="bi bi-credit-card-2-front"></i>
+        <span>Cartes Scolaires</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-menu">
+      <a routerLink="/proviseur/dashboard" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="menu-item">
+        <i class="bi bi-speedometer2"></i>
+        <span>Tableau de bord</span>
+      </a>
+
+      <a routerLink="/proviseur/classes" routerLinkActive="active" class="menu-item">
+        <i class="bi bi-grid-3x3"></i>
+        <span>Classes</span>
+      </a>
+
+      <a routerLink="/proviseur/classes/nouvelle" class="menu-item">
+        <i class="bi bi-plus-circle"></i>
+        <span>Créer une classe</span>
+      </a>
+
+      <a routerLink="/proviseur/utilisateurs" routerLinkActive="active" class="menu-item">
+        <i class="bi bi-people"></i>
+        <span>Utilisateurs</span>
+      </a>
+
+      <a routerLink="/proviseur/eleves/importer" class="menu-item">
+        <i class="bi bi-file-earmark-spreadsheet"></i>
+        <span>Importer élèves</span>
+      </a>
+
+      <a routerLink="/proviseur/cartes" routerLinkActive="active" class="menu-item">
+        <i class="bi bi-credit-card"></i>
+        <span>Cartes scolaires</span>
+      </a>
+
+      <div class="menu-divider"></div>
+
+      <a (click)="logout()" class="menu-item menu-logout">
+        <i class="bi bi-box-arrow-right"></i>
+        <span>Déconnexion</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar">
+          <i class="bi bi-person-circle"></i>
+        </div>
+        <div class="user-details">
+          <div class="user-name">{{ currentUser?.nom }}</div>
+          <div class="user-role">Proviseur</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <header class="content-header">
+      <div>
+        <h1 class="page-title">{{ getGreeting() }}, {{ currentUser?.prenom }} 👋</h1>
+        <p class="page-subtitle">Voici un aperçu de votre établissement</p>
+      </div>
+    </header>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="loading-container">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error && !loading" class="alert alert-danger">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      {{ error }}
+    </div>
+
+    <!-- Content -->
+    <div *ngIf="!loading && !error" class="dashboard-content">
+      <!-- Statistics Cards -->
+      <div class="stats-grid">
+        <div class="stat-card stat-primary">
+          <div class="stat-icon">
+            <i class="bi bi-grid-3x3"></i>
+          </div>
+          <div class="stat-details">
+            <div class="stat-value">{{ stats.totalClasses }}</div>
+            <div class="stat-label">Classes</div>
+          </div>
+          <div class="stat-trend">
+            <span class="trend-up">
+              <i class="bi bi-arrow-up"></i> Actif
+            </span>
+          </div>
+        </div>
+
+        <div class="stat-card stat-success">
+          <div class="stat-icon">
+            <i class="bi bi-people"></i>
+          </div>
+          <div class="stat-details">
+            <div class="stat-value">{{ stats.totalEleves }}</div>
+            <div class="stat-label">Élèves</div>
+          </div>
+          <div class="stat-trend">
+            <span class="trend-neutral">Total</span>
+          </div>
+        </div>
+
+        <div class="stat-card stat-info">
+          <div class="stat-icon">
+            <i class="bi bi-camera"></i>
+          </div>
+          <div class="stat-details">
+            <div class="stat-value">{{ stats.elevesAvecPhoto }}</div>
+            <div class="stat-label">Photos prises</div>
+          </div>
+          <div class="stat-trend">
+            <span class="trend-up">
+              <i class="bi bi-arrow-up"></i> {{ stats.progressionPhotos }}%
+            </span>
+          </div>
+        </div>
+
+        <div class="stat-card stat-warning">
+          <div class="stat-icon">
+            <i class="bi bi-camera-video-off"></i>
+          </div>
+          <div class="stat-details">
+            <div class="stat-value">{{ stats.elevesSansPhoto }}</div>
+            <div class="stat-label">Sans photo</div>
+          </div>
+          <div class="stat-trend">
+            <span class="trend-down">
+              <i class="bi bi-arrow-down"></i> En attente
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions & Recent Activity -->
+      <div class="content-grid">
+        <!-- Quick Actions -->
+        <div class="card quick-actions-card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <i class="bi bi-lightning-charge"></i>
+              Actions rapides
+            </h2>
+          </div>
+          <div class="card-body">
+            <div class="quick-actions-grid">
+              <div *ngFor="let action of quickActions"
+                   class="quick-action-item"
+                   [class]="'action-' + action.color"
+                   (click)="navigateTo(action.route)">
+                <div class="action-icon">
+                  <i [class]="action.icon"></i>
+                </div>
+                <div class="action-content">
+                  <div class="action-title">{{ action.title }}</div>
+                  <div class="action-description">{{ action.description }}</div>
+                </div>
+                <div class="action-arrow">
+                  <i class="bi bi-arrow-right"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="card recent-activity-card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <i class="bi bi-clock-history"></i>
+              Activité récente
+            </h2>
+          </div>
+          <div class="card-body">
+            <div class="activity-list">
+              <div *ngFor="let activity of recentActivities"
+                   class="activity-item"
+                   [ngClass]="getActivityClass(activity.type)">
+                <div class="activity-icon">
+                  <i [class]="activity.icon"></i>
+                </div>
+                <div class="activity-content">
+                  <div class="activity-title">{{ activity.title }}</div>
+                  <div class="activity-description">{{ activity.description }}</div>
+                </div>
+                <div class="activity-time">{{ activity.time }}</div>
+              </div>
+
+              <div *ngIf="recentActivities.length === 0" class="activity-empty">
+                <i class="bi bi-inbox"></i>
+                <p>Aucune activité récente</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress Section -->
+      <div class="card progress-card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <i class="bi bi-graph-up"></i>
+            Progression globale
+          </h2>
+        </div>
+        <div class="card-body">
+          <div class="progress-grid">
+            <div class="progress-item">
+              <div class="progress-header">
+                <span class="progress-label">Photos des élèves</span>
+                <span class="progress-value">{{ stats.progressionPhotos }}%</span>
+              </div>
+              <div class="progress-bar-container">
+                <div class="progress-bar" [style.width.%]="stats.progressionPhotos"></div>
+              </div>
+              <div class="progress-footer">
+                {{ stats.elevesAvecPhoto }} sur {{ stats.totalEleves }} élèves
+              </div>
+            </div>
+
+            <div class="progress-item">
+              <div class="progress-header">
+                <span class="progress-label">Cartes générées</span>
+                <span class="progress-value">{{ stats.progressionCartes }}%</span>
+              </div>
+              <div class="progress-bar-container">
+                <div class="progress-bar progress-bar-success" [style.width.%]="stats.progressionCartes"></div>
+              </div>
+              <div class="progress-footer">
+                {{ stats.cartesGenerees }} cartes créées
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,151 @@
+<div class="login-page">
+  <div class="container-fluid">
+    <div class="row min-vh-100">
+
+      <!-- 🎨 LEFT SIDE - Image/Illustration -->
+      <div class="col-lg-6 d-none d-lg-flex login-left">
+        <div class="login-illustration">
+          <div class="illustration-content">
+            <div class="brand-logo mb-4">
+              <i class="bi bi-credit-card-2-front"></i>
+            </div>
+            <h2 class="text-white mb-3">Bienvenue sur Cartes Scolaires</h2>
+            <p class="text-white-50 mb-4">
+              La solution moderne pour la gestion des cartes scolaires en Afrique
+            </p>
+            <div class="features-list">
+              <div class="feature-item">
+                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                <span>Prise de photo simplifiée</span>
+              </div>
+              <div class="feature-item">
+                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                <span>Génération automatique</span>
+              </div>
+              <div class="feature-item">
+                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                <span>Sécurité renforcée</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 📝 RIGHT SIDE - Form -->
+      <div class="col-lg-6 d-flex align-items-center justify-content-center login-right">
+        <div class="login-form-container">
+
+          <!-- Header -->
+          <div class="text-center mb-5">
+            <div class="login-icon mb-3">
+              <i class="bi bi-shield-lock"></i>
+            </div>
+            <h1 class="h3 fw-bold mb-2">Connexion</h1>
+            <p class="text-muted">Connectez-vous pour accéder à votre espace</p>
+          </div>
+
+          <!-- Error Alert -->
+          <div class="alert alert-danger alert-dismissible fade show" role="alert" *ngIf="errorMessage">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ errorMessage }}
+            <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+          </div>
+
+          <!-- Login Form -->
+          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
+            <!-- Email -->
+            <div class="mb-4">
+              <label for="email" class="form-label fw-medium">
+                <i class="bi bi-envelope me-2 text-success"></i>
+                Email
+              </label>
+              <input
+                type="email"
+                class="form-control form-control-lg"
+                [class.is-invalid]="email?.invalid && email?.touched"
+                id="email"
+                formControlName="email"
+                placeholder="exemple@ecole.cm"
+              >
+              <div class="invalid-feedback" *ngIf="email?.invalid && email?.touched">
+                <span *ngIf="email?.errors?.['required']">L'email est requis</span>
+                <span *ngIf="email?.errors?.['email']">Email invalide</span>
+              </div>
+            </div>
+
+            <!-- Password -->
+            <div class="mb-4">
+              <label for="password" class="form-label fw-medium">
+                <i class="bi bi-lock me-2 text-success"></i>
+                Mot de passe
+              </label>
+              <div class="input-group">
+                <input
+                  [type]="showPassword ? 'text' : 'password'"
+                  class="form-control form-control-lg"
+                  [class.is-invalid]="mot_de_passe?.invalid && mot_de_passe?.touched"
+                  id="password"
+                  formControlName="mot_de_passe"
+                  placeholder="••••••••"
+                >
+                <button
+                  class="btn btn-outline-secondary"
+                  type="button"
+                  (click)="togglePasswordVisibility()"
+                >
+                  <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+                </button>
+              </div>
+              <div class="invalid-feedback d-block" *ngIf="mot_de_passe?.invalid && mot_de_passe?.touched">
+                <span *ngIf="mot_de_passe?.errors?.['required']">Le mot de passe est requis</span>
+                <span *ngIf="mot_de_passe?.errors?.['minlength']">Minimum 6 caractères</span>
+              </div>
+            </div>
+
+            <!-- Remember & Forgot -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="remember">
+                <label class="form-check-label" for="remember">
+                  Se souvenir de moi
+                </label>
+              </div>
+              <a href="#" class="text-success text-decoration-none">Mot de passe oublié ?</a>
+            </div>
+
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              class="btn btn-success btn-lg w-100 mb-3"
+              [disabled]="isLoading"
+            >
+              <span *ngIf="!isLoading">
+                <i class="bi bi-box-arrow-in-right me-2"></i>
+                Se connecter
+              </span>
+              <span *ngIf="isLoading">
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Connexion en cours...
+              </span>
+            </button>
+
+            <!-- Register Link -->
+            <div class="text-center">
+              <p class="mb-0">
+                Pas encore de compte ?
+                <a (click)="navigateToRegister()" class="text-success fw-medium text-decoration-none" style="cursor: pointer;">
+                  Créer un compte proviseur
+                </a>
+              </p>
+            </div>
+
+          </form>
+
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

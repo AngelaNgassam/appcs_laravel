@@ -1,0 +1,304 @@
+<div class="landing-page">
+
+  <!-- 🎨 NAVBAR MODERNE -->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top" id="mainNav">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <div class="brand-icon">
+          <i class="bi bi-credit-card-2-front"></i>
+        </div>
+        <span class="brand-text">Cartes<span class="text-success">Scolaires</span></span>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto align-items-center">
+          <li class="nav-item">
+            <a class="nav-link" (click)="scrollToSection('fonctionnalites')" style="cursor: pointer;">
+              Fonctionnalités
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="scrollToSection('processus')" style="cursor: pointer;">
+              Comment ça marche
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" (click)="scrollToSection('contact')" style="cursor: pointer;">
+              Contact
+            </a>
+          </li>
+          <li class="nav-item ms-3">
+            <button class="btn btn-outline-light btn-sm me-2" (click)="navigateToLogin()">
+              <i class="bi bi-box-arrow-in-right me-2"></i>
+              Connexion
+            </button>
+            <button class="btn btn-success btn-sm" (click)="navigateToInscription()">
+              <i class="bi bi-rocket-takeoff me-2"></i>
+              Commencer
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 🚀 HERO SECTION ULTRA MODERNE -->
+  <section class="hero-section">
+    <div class="hero-shapes">
+      <div class="shape shape-1"></div>
+      <div class="shape shape-2"></div>
+      <div class="shape shape-3"></div>
+    </div>
+
+    <div class="container">
+      <div class="row align-items-center min-vh-100 py-5">
+        <div class="col-lg-6 hero-content">
+          <div class="badge bg-success bg-opacity-25 text-success px-3 py-2 mb-4">
+            <i class="bi bi-stars me-2"></i>
+            Solution N°1 en Afrique
+          </div>
+
+          <h1 class="hero-title mb-4">
+            Gestion Moderne des
+            <span class="gradient-text">Cartes Scolaires</span>
+          </h1>
+
+          <p class="hero-description mb-5">
+            Simplifiez la création, l'impression et la gestion des cartes scolaires
+            avec notre plateforme digitale complète. Rapide, sécurisé et efficace.
+          </p>
+
+          <div class="d-flex gap-3 flex-wrap mb-5">
+            <button class="btn btn-success btn-lg px-4 shadow-lg" (click)="navigateToInscription()">
+              <i class="bi bi-rocket-takeoff me-2"></i>
+              Commencer Gratuitement
+            </button>
+            <button class="btn btn-outline-light btn-lg px-4" (click)="scrollToSection('fonctionnalites')">
+              <i class="bi bi-play-circle me-2"></i>
+              Voir la démo
+            </button>
+          </div>
+
+          <!-- Stats Cards -->
+          <div class="row g-3">
+            <div class="col-4" *ngFor="let stat of stats">
+              <div class="stat-card">
+                <i class="{{ stat.icon }} stat-icon"></i>
+                <h3 class="stat-number">{{ stat.number }}</h3>
+                <p class="stat-label">{{ stat.label }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6 d-none d-lg-block">
+          <div class="hero-illustration">
+            <div class="floating-card card-1">
+              <i class="bi bi-credit-card-2-front"></i>
+            </div>
+            <div class="floating-card card-2">
+              <i class="bi bi-camera-fill"></i>
+            </div>
+            <div class="floating-card card-3">
+              <i class="bi bi-check-circle-fill text-success"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ✨ FEATURES SECTION -->
+  <section class="py-5 bg-light" id="fonctionnalites">
+    <div class="container py-5">
+      <div class="text-center mb-5 animate-on-scroll">
+        <div class="section-badge">
+          <i class="bi bi-lightning-charge-fill me-2"></i>
+          Fonctionnalités
+        </div>
+        <h2 class="section-title">Tout ce dont vous avez besoin</h2>
+        <p class="section-subtitle">Une solution complète et intuitive pour gérer vos cartes scolaires</p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-4 animate-on-scroll" *ngFor="let feature of features; let i = index"
+             [style.animation-delay.ms]="i * 100">
+          <div class="feature-card h-100">
+            <div class="feature-icon bg-{{ feature.color }} bg-opacity-10">
+              <i class="{{ feature.icon }} text-{{ feature.color }}"></i>
+            </div>
+            <h5 class="feature-title">{{ feature.title }}</h5>
+            <p class="feature-description">{{ feature.description }}</p>
+            <a href="#" class="feature-link text-{{ feature.color }}">
+              En savoir plus <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🔄 PROCESS SECTION -->
+  <section class="py-5 process-section" id="processus">
+    <div class="container py-5">
+      <div class="text-center mb-5 animate-on-scroll">
+        <div class="section-badge">
+          <i class="bi bi-arrow-repeat me-2"></i>
+          Processus
+        </div>
+        <h2 class="section-title text-white">Comment ça marche ?</h2>
+        <p class="section-subtitle text-white-50">Un processus simple et efficace en 4 étapes</p>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-md-6 col-lg-3 animate-on-scroll" *ngFor="let step of processSteps; let i = index"
+             [style.animation-delay.ms]="i * 150">
+          <div class="process-card">
+            <div class="process-number">{{ step.step }}</div>
+            <div class="process-icon">
+              <i class="{{ step.icon }}"></i>
+            </div>
+            <h5 class="process-title">{{ step.title }}</h5>
+            <p class="process-description">{{ step.description }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 📊 TESTIMONIALS / TRUST SECTION -->
+  <section class="py-5 bg-light">
+    <div class="container py-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-8 text-center animate-on-scroll">
+          <i class="bi bi-quote display-3 text-success mb-4"></i>
+          <h3 class="mb-4">"Une solution qui a révolutionné notre gestion administrative"</h3>
+          <p class="lead text-muted mb-4">
+            Depuis que nous utilisons Cartes Scolaires, nous avons gagné 80% de temps
+            sur la production des cartes et réduit les erreurs à zéro.
+          </p>
+          <div class="d-flex align-items-center justify-content-center gap-3">
+            <div class="rounded-circle bg-success" style="width: 50px; height: 50px;"></div>
+            <div class="text-start">
+              <strong>M. KAMGA Paul</strong>
+              <p class="mb-0 text-muted">Proviseur, Lycée Bilingue de Douala</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 📢 CTA SECTION -->
+  <section class="cta-section py-5">
+    <div class="container py-5">
+      <div class="row align-items-center">
+        <div class="col-lg-8 text-center text-lg-start mb-4 mb-lg-0">
+          <h2 class="display-5 fw-bold text-white mb-3">
+            Prêt à transformer votre gestion scolaire ?
+          </h2>
+          <p class="lead text-white-50 mb-0">
+            Rejoignez des centaines d'établissements qui nous font confiance
+          </p>
+        </div>
+        <div class="col-lg-4 text-center text-lg-end">
+          <button class="btn btn-light btn-lg px-5 shadow-lg" (click)="navigateToInscription()">
+            <i class="bi bi-rocket-takeoff me-2"></i>
+            Démarrer Maintenant
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 📞 CONTACT SECTION -->
+  <section class="py-5 bg-light" id="contact">
+    <div class="container py-5">
+      <div class="row">
+        <div class="col-lg-6 mx-auto text-center animate-on-scroll">
+          <div class="section-badge mb-4">
+            <i class="bi bi-headset me-2"></i>
+            Contact
+          </div>
+          <h3 class="fw-bold mb-4">Une question ? Contactez-nous</h3>
+          <p class="text-muted mb-5">Notre équipe est disponible pour vous accompagner</p>
+
+          <div class="d-flex flex-column gap-4">
+            <div class="contact-item">
+              <div class="contact-icon bg-success bg-opacity-10">
+                <i class="bi bi-envelope-fill text-success"></i>
+              </div>
+              <div>
+                <strong>Email</strong>
+                <p class="mb-0">{{ contactEmail }}</p>
+              </div>
+            </div>
+            <div class="contact-item">
+              <div class="contact-icon bg-primary bg-opacity-10">
+                <i class="bi bi-telephone-fill text-primary"></i>
+              </div>
+              <div>
+                <strong>Téléphone</strong>
+                <p class="mb-0">{{ contactPhone }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🔚 FOOTER -->
+  <footer class="footer-section py-5">
+    <div class="container">
+      <div class="row mb-4">
+        <div class="col-lg-4 mb-4 mb-lg-0">
+          <div class="d-flex align-items-center mb-3">
+            <div class="brand-icon me-2">
+              <i class="bi bi-credit-card-2-front"></i>
+            </div>
+            <span class="h5 mb-0 text-white">Cartes<span class="text-success">Scolaires</span></span>
+          </div>
+          <p class="text-white-50">
+            La solution moderne pour la gestion des cartes scolaires en Afrique.
+          </p>
+        </div>
+        <div class="col-lg-8">
+          <div class="row">
+            <div class="col-md-4">
+              <h6 class="text-white mb-3">Produit</h6>
+              <ul class="list-unstyled">
+                <li><a href="#" class="text-white-50 text-decoration-none">Fonctionnalités</a></li>
+                <li><a href="#" class="text-white-50 text-decoration-none">Tarifs</a></li>
+                <li><a href="#" class="text-white-50 text-decoration-none">Démo</a></li>
+              </ul>
+            </div>
+            <div class="col-md-4">
+              <h6 class="text-white mb-3">Support</h6>
+              <ul class="list-unstyled">
+                <li><a href="#" class="text-white-50 text-decoration-none">Documentation</a></li>
+                <li><a href="#" class="text-white-50 text-decoration-none">Tutoriels</a></li>
+                <li><a href="#" class="text-white-50 text-decoration-none">Contact</a></li>
+              </ul>
+            </div>
+            <div class="col-md-4">
+              <h6 class="text-white mb-3">Légal</h6>
+              <ul class="list-unstyled">
+                <li><a href="#" class="text-white-50 text-decoration-none">CGU</a></li>
+                <li><a href="#" class="text-white-50 text-decoration-none">Confidentialité</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="border-top border-secondary pt-4 text-center text-white-50">
+        <p class="mb-0">© 2025 Cartes Scolaires. Tous droits réservés.</p>
+      </div>
+    </div>
+  </footer>
+
+</div>

@@ -1,0 +1,149 @@
+<div class="modal-backdrop" *ngIf="isVisible" (click)="onBackdropClick($event)">
+  <div class="modal-content-wrapper" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">
+        <i class="bi bi-person-circle me-2"></i>
+        Détails de l'élève
+      </h3>
+      <button type="button" class="btn-close-modal" (click)="onClose()">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+
+    <div class="modal-body" *ngIf="eleve">
+      <div class="row g-4">
+        <!-- Photo de l'élève -->
+        <div class="col-md-4 text-center">
+          <div class="photo-container">
+            <img [src]="getPhotoUrl()" [alt]="eleve.nomComplet" class="student-photo">
+            <div class="photo-status-badge" [class.has-photo]="eleve.hasPhoto()">
+              <i class="bi" [ngClass]="eleve.hasPhoto() ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+              {{ eleve.hasPhoto() ? 'Photo validée' : 'Sans photo' }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Informations de l'élève -->
+        <div class="col-md-8">
+          <div class="info-section">
+            <h5 class="section-title">
+              <i class="bi bi-person-badge me-2"></i>
+              Informations personnelles
+            </h5>
+
+            <div class="info-grid">
+              <div class="info-item">
+                <span class="info-label">Matricule</span>
+                <span class="info-value">
+                  <span class="badge bg-secondary">{{ eleve.matricule }}</span>
+                </span>
+              </div>
+
+              <div class="info-item">
+                <span class="info-label">Nom complet</span>
+                <span class="info-value fw-bold">{{ eleve.nomComplet }}</span>
+              </div>
+
+              <div class="info-item">
+                <span class="info-label">Sexe</span>
+                <span class="info-value">
+                  <span class="badge"
+                        [class.bg-primary]="eleve.sexe === 'M'"
+                        [class.bg-danger]="eleve.sexe === 'F'">
+                    <i class="bi" [ngClass]="eleve.sexe === 'M' ? 'bi-gender-male' : 'bi-gender-female'"></i>
+                    {{ eleve.sexeLibelle }}
+                  </span>
+                </span>
+              </div>
+
+              <div class="info-item">
+                <span class="info-label">Date de naissance</span>
+                <span class="info-value">{{ eleve.getDateNaissanceFormatted() }}</span>
+              </div>
+
+              <div class="info-item">
+                <span class="info-label">Âge</span>
+                <span class="info-value">{{ eleve.age }} ans</span>
+              </div>
+
+              <div class="info-item" *ngIf="eleve.lieu_naissance">
+                <span class="info-label">Lieu de naissance</span>
+                <span class="info-value">{{ eleve.lieu_naissance }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Informations du parent -->
+          <div class="info-section mt-4" *ngIf="eleve.nom_parent || eleve.contact_parent">
+            <h5 class="section-title">
+              <i class="bi bi-people me-2"></i>
+              Informations du parent
+            </h5>
+
+            <div class="info-grid">
+              <div class="info-item" *ngIf="eleve.nom_parent">
+                <span class="info-label">Nom du parent</span>
+                <span class="info-value">{{ eleve.nom_parent }}</span>
+              </div>
+
+              <div class="info-item" *ngIf="eleve.contact_parent">
+                <span class="info-label">Contact</span>
+                <span class="info-value">
+                  <i class="bi bi-telephone me-2"></i>
+                  {{ eleve.contact_parent }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Statut -->
+          <div class="info-section mt-4">
+            <h5 class="section-title">
+              <i class="bi bi-card-checklist me-2"></i>
+              Statut
+            </h5>
+
+            <div class="status-grid">
+              <div class="status-card">
+                <i class="bi bi-camera-fill" [class.text-success]="eleve.hasPhoto()" [class.text-warning]="!eleve.hasPhoto()"></i>
+                <div class="status-info">
+                  <div class="status-label">Photo</div>
+                  <div class="status-value" [class.text-success]="eleve.hasPhoto()" [class.text-warning]="!eleve.hasPhoto()">
+                    {{ eleve.hasPhoto() ? 'Disponible' : 'En attente' }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="status-card">
+                <i class="bi bi-credit-card-fill" [class.text-success]="eleve.hasCarte()" [class.text-secondary]="!eleve.hasCarte()"></i>
+                <div class="status-info">
+                  <div class="status-label">Carte scolaire</div>
+                  <div class="status-value" [class.text-success]="eleve.hasCarte()" [class.text-secondary]="!eleve.hasCarte()">
+                    {{ eleve.hasCarte() ? 'Générée' : 'Non générée' }}
+                  </div>
+                </div>
+              </div>
+
+              <div class="status-card" *ngIf="eleve.isArchived()">
+                <i class="bi bi-archive-fill text-warning"></i>
+                <div class="status-info">
+                  <div class="status-label">Archivé</div>
+                  <div class="status-value text-warning">
+                    {{ eleve.date_archivage ? (eleve.date_archivage | date:'dd/MM/yyyy') : 'Oui' }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="onClose()">
+        <i class="bi bi-x-circle me-2"></i>
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>

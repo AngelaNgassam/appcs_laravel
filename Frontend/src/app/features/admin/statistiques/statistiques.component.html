@@ -1,0 +1,141 @@
+<div class="bg-light min-vh-100 py-4">
+  <div class="container-fluid">
+    
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="fw-bold mb-0">
+          <i class="bi bi-graph-up me-2 text-success"></i>
+          Statistiques Système
+        </h3>
+        <p class="text-muted mb-0">Statistiques avancées et performance</p>
+      </div>
+      <button class="btn btn-outline-secondary" (click)="retourDashboard()">
+        <i class="bi bi-arrow-left me-2"></i>
+        Retour au Dashboard
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="loading" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error && !loading" class="alert alert-danger">
+      <i class="bi bi-exclamation-triangle me-2"></i>
+      {{ error }}
+    </div>
+
+    <!-- Statistiques -->
+    <div *ngIf="!loading && !error && stats">
+      
+      <!-- Performance par établissement -->
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Performance par Établissement</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Établissement</th>
+                  <th>Ville</th>
+                  <th>Proviseur</th>
+                  <th class="text-center">Élèves</th>
+                  <th class="text-center">Classes</th>
+                  <th class="text-center">Utilisateurs</th>
+                  <th class="text-center">Cartes</th>
+                  <th class="text-center">Taux</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let etab of stats.performance_etablissements">
+                  <td class="fw-semibold">{{ etab.nom }}</td>
+                  <td>{{ etab.ville }}</td>
+                  <td>{{ etab.proviseur }}</td>
+                  <td class="text-center">{{ etab.eleves }}</td>
+                  <td class="text-center">{{ etab.classes }}</td>
+                  <td class="text-center">{{ etab.utilisateurs }}</td>
+                  <td class="text-center">{{ etab.cartes_generees }}</td>
+                  <td class="text-center">
+                    <span class="badge" [ngClass]="etab.taux_generation >= 80 ? 'bg-success' : etab.taux_generation >= 50 ? 'bg-warning' : 'bg-danger'">
+                      {{ etab.taux_generation }}%
+                    </span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistiques par rôle -->
+      <div class="row g-4 mb-4">
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white">
+              <h5 class="mb-0">Utilisateurs par Rôle</h5>
+            </div>
+            <div class="card-body">
+              <div *ngFor="let stat of stats.stats_par_role" class="d-flex justify-content-between align-items-center mb-3">
+                <span class="fw-semibold">{{ stat.role }}</span>
+                <span class="badge bg-primary">{{ stat.total }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white">
+              <h5 class="mb-0">Taux d'Utilisation</h5>
+            </div>
+            <div class="card-body">
+              <div class="text-center">
+                <h1 class="display-4 fw-bold text-primary">{{ stats.taux_utilisation.taux }}%</h1>
+                <p class="text-muted">
+                  {{ stats.taux_utilisation.cartes_generees }} cartes générées sur {{ stats.taux_utilisation.eleves_total }} élèves
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Activité journalière -->
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-white">
+          <h5 class="mb-0">Activité des 7 Derniers Jours</h5>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-sm mb-0">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th class="text-center">Actions</th>
+                  <th class="text-center">Cartes</th>
+                  <th class="text-center">Photos</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let jour of stats.activite_journaliere">
+                  <td>{{ jour.date }}</td>
+                  <td class="text-center">{{ jour.actions }}</td>
+                  <td class="text-center">{{ jour.cartes }}</td>
+                  <td class="text-center">{{ jour.photos }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>

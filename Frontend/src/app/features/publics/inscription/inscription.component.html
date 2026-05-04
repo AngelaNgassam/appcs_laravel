@@ -1,0 +1,461 @@
+<div class="inscription-page">
+  <div class="container-fluid">
+    <div class="row min-vh-100">
+
+      <!-- 🎨 LEFT SIDE - Image/Illustration -->
+      <div class="col-lg-5 d-none d-lg-flex inscription-left">
+        <div class="inscription-illustration">
+          <div class="illustration-content">
+            <div class="brand-logo mb-4">
+              <i class="bi bi-credit-card-2-front"></i>
+            </div>
+            <h2 class="text-white mb-3">Créez votre compte proviseur</h2>
+            <p class="text-white-50 mb-5">
+              Rejoignez des centaines d'établissements qui utilisent notre solution
+            </p>
+
+            <!-- Steps Preview -->
+            <div class="steps-preview">
+              <div class="step-preview" [class.active]="currentStep === 1" [class.completed]="currentStep > 1">
+                <div class="step-number">1</div>
+                <div class="step-info">
+                  <h6>Informations personnelles</h6>
+                  <p>Vos coordonnées</p>
+                </div>
+              </div>
+              <div class="step-preview" [class.active]="currentStep === 2" [class.completed]="currentStep > 2">
+                <div class="step-number">2</div>
+                <div class="step-info">
+                  <h6>Sécurité</h6>
+                  <p>Mot de passe sécurisé</p>
+                </div>
+              </div>
+              <div class="step-preview" [class.active]="currentStep === 3" [class.completed]="currentStep > 3">
+                <div class="step-number">3</div>
+                <div class="step-info">
+                  <h6>Établissement</h6>
+                  <p>Informations de l'école</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 📝 RIGHT SIDE - Form -->
+      <div class="col-lg-7 d-flex align-items-center justify-content-center inscription-right">
+        <div class="inscription-form-container">
+
+          <!-- Header -->
+          <div class="text-center mb-4">
+            <a (click)="router.navigate(['/'])" class="back-link" style="cursor: pointer;">
+              <i class="bi bi-arrow-left me-2"></i>
+              Retour à l'accueil
+            </a>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="progress-container mb-5">
+            <div class="progress" style="height: 8px;">
+              <div
+                class="progress-bar bg-success"
+                [style.width.%]="getProgressPercentage()"
+                style="transition: width 0.3s ease;"
+              ></div>
+            </div>
+            <div class="progress-label mt-2">
+              <span class="text-success fw-bold">Étape {{ currentStep }} sur {{ totalSteps }}</span>
+            </div>
+          </div>
+
+          <!-- Error Alert -->
+          <div class="alert alert-danger alert-dismissible fade show" role="alert" *ngIf="errorMessage">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            {{ errorMessage }}
+            <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+          </div>
+
+          <!-- Form -->
+          <form [formGroup]="inscriptionForm" (ngSubmit)="onSubmit()">
+
+            <!-- ========== ÉTAPE 1 : Informations personnelles ========== -->
+            <div class="form-step" *ngIf="currentStep === 1">
+              <div class="step-header mb-4">
+                <div class="step-icon">
+                  <i class="bi bi-person-circle"></i>
+                </div>
+                <h3 class="h4 fw-bold mb-2">Vos informations personnelles</h3>
+                <p class="text-muted">Commençons par vos coordonnées</p>
+              </div>
+
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="nom" class="form-label fw-medium">
+                    <i class="bi bi-person me-2 text-success"></i>
+                    Nom <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    class="form-control form-control-lg"
+                    [class.is-invalid]="nom?.invalid && nom?.touched"
+                    id="nom"
+                    formControlName="nom"
+                    placeholder="KAMGA"
+                  >
+                  <div class="invalid-feedback" *ngIf="nom?.invalid && nom?.touched">
+                    <span *ngIf="nom?.errors?.['required']">Le nom est requis</span>
+                    <span *ngIf="nom?.errors?.['minlength']">Minimum 2 caractères</span>
+                  </div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                  <label for="prenom" class="form-label fw-medium">
+                    <i class="bi bi-person me-2 text-success"></i>
+                    Prénom <span class="text-danger">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    class="form-control form-control-lg"
+                    [class.is-invalid]="prenom?.invalid && prenom?.touched"
+                    id="prenom"
+                    formControlName="prenom"
+                    placeholder="Paul"
+                  >
+                  <div class="invalid-feedback" *ngIf="prenom?.invalid && prenom?.touched">
+                    <span *ngIf="prenom?.errors?.['required']">Le prénom est requis</span>
+                    <span *ngIf="prenom?.errors?.['minlength']">Minimum 2 caractères</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="email" class="form-label fw-medium">
+                  <i class="bi bi-envelope me-2 text-success"></i>
+                  Email professionnel <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="email"
+                  class="form-control form-control-lg"
+                  [class.is-invalid]="email?.invalid && email?.touched"
+                  id="email"
+                  formControlName="email"
+                  placeholder="paul.kamga@lycee-douala.cm"
+                >
+                <div class="invalid-feedback" *ngIf="email?.invalid && email?.touched">
+                  <span *ngIf="email?.errors?.['required']">L'email est requis</span>
+                  <span *ngIf="email?.errors?.['email']">Email invalide</span>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label for="telephone" class="form-label fw-medium">
+                  <i class="bi bi-telephone me-2 text-success"></i>
+                  Téléphone
+                </label>
+                <input
+                  type="tel"
+                  class="form-control form-control-lg"
+                  [class.is-invalid]="telephone?.invalid && telephone?.touched"
+                  id="telephone"
+                  formControlName="telephone"
+                  placeholder="677123456"
+                >
+                <div class="invalid-feedback" *ngIf="telephone?.invalid && telephone?.touched">
+                  <span *ngIf="telephone?.errors?.['pattern']">Numéro de téléphone invalide</span>
+                </div>
+                <small class="text-muted">Format : 677123456 (sans indicatif)</small>
+              </div>
+
+              <button type="button" class="btn btn-success btn-lg w-100" (click)="nextStep()">
+                Suivant
+                <i class="bi bi-arrow-right ms-2"></i>
+              </button>
+            </div>
+
+            <!-- ========== ÉTAPE 2 : Sécurité ========== -->
+            <div class="form-step" *ngIf="currentStep === 2">
+              <div class="step-header mb-4">
+                <div class="step-icon">
+                  <i class="bi bi-shield-lock"></i>
+                </div>
+                <h3 class="h4 fw-bold mb-2">Sécurisez votre compte</h3>
+                <p class="text-muted">Choisissez un mot de passe fort</p>
+              </div>
+
+              <div class="mb-3">
+                <label for="mot_de_passe" class="form-label fw-medium">
+                  <i class="bi bi-lock me-2 text-success"></i>
+                  Mot de passe <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <input
+                    [type]="showPassword ? 'text' : 'password'"
+                    class="form-control form-control-lg"
+                    [class.is-invalid]="mot_de_passe?.invalid && mot_de_passe?.touched"
+                    id="mot_de_passe"
+                    formControlName="mot_de_passe"
+                    placeholder="••••••••"
+                  >
+                  <button
+                    class="btn btn-outline-secondary"
+                    type="button"
+                    (click)="togglePasswordVisibility()"
+                  >
+                    <i class="bi" [class.bi-eye]="!showPassword" [class.bi-eye-slash]="showPassword"></i>
+                  </button>
+                </div>
+                <div class="invalid-feedback d-block" *ngIf="mot_de_passe?.invalid && mot_de_passe?.touched">
+                  <span *ngIf="mot_de_passe?.errors?.['required']">Le mot de passe est requis</span>
+                  <span *ngIf="mot_de_passe?.errors?.['minlength']">Minimum 8 caractères</span>
+                </div>
+
+                <!-- Password Strength Indicator -->
+                <div class="password-strength mt-2" *ngIf="mot_de_passe?.value">
+                  <small class="text-muted">
+                    Force :
+                    <span [class]="mot_de_passe?.value?.length < 8 ? 'text-danger' : 'text-success'">
+                      {{ mot_de_passe?.value?.length < 8 ? 'Faible' : 'Forte' }}
+                    </span>
+                  </small>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <label for="confirm_password" class="form-label fw-medium">
+                  <i class="bi bi-lock-fill me-2 text-success"></i>
+                  Confirmer le mot de passe <span class="text-danger">*</span>
+                </label>
+                <div class="input-group">
+                  <input
+                    [type]="showConfirmPassword ? 'text' : 'password'"
+                    class="form-control form-control-lg"
+                    [class.is-invalid]="(confirm_password?.invalid && confirm_password?.touched) || (inscriptionForm.errors?.['passwordMismatch'] && confirm_password?.touched)"
+                    id="confirm_password"
+                    formControlName="confirm_password"
+                    placeholder="••••••••"
+                  >
+                  <button
+                    class="btn btn-outline-secondary"
+                    type="button"
+                    (click)="toggleConfirmPasswordVisibility()"
+                  >
+                    <i class="bi" [class.bi-eye]="!showConfirmPassword" [class.bi-eye-slash]="showConfirmPassword"></i>
+                  </button>
+                </div>
+                <div class="invalid-feedback d-block" *ngIf="confirm_password?.touched">
+                  <span *ngIf="confirm_password?.errors?.['required']">La confirmation est requise</span>
+                  <span *ngIf="inscriptionForm.errors?.['passwordMismatch']">Les mots de passe ne correspondent pas</span>
+                </div>
+              </div>
+
+              <div class="d-flex gap-3">
+                <button type="button" class="btn btn-outline-secondary btn-lg flex-fill" (click)="previousStep()">
+                  <i class="bi bi-arrow-left me-2"></i>
+                  Précédent
+                </button>
+                <button type="button" class="btn btn-success btn-lg flex-fill" (click)="nextStep()">
+                  Suivant
+                  <i class="bi bi-arrow-right ms-2"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- REMPLACE TOUT LE BLOC ÉTAPE 3 par ceci : -->
+
+<div class="form-step" *ngIf="currentStep === 3">
+  <div class="step-header mb-4">
+    <div class="step-icon">
+      <i class="bi bi-building"></i>
+    </div>
+    <h3 class="h4 fw-bold mb-2">Informations de l'établissement</h3>
+    <p class="text-muted">Décrivez votre établissement scolaire</p>
+  </div>
+
+  <!-- Nom établissement -->
+  <div class="mb-3">
+    <label for="nom_etablissement" class="form-label fw-medium">
+      <i class="bi bi-building me-2 text-success"></i>
+      Nom de l'établissement <span class="text-danger">*</span>
+    </label>
+    <input
+      type="text"
+      class="form-control form-control-lg"
+      [class.is-invalid]="nom_etablissement?.invalid && nom_etablissement?.touched"
+      id="nom_etablissement"
+      formControlName="nom_etablissement"
+      placeholder="Lycée Bilingue de Douala"
+    >
+    <div class="invalid-feedback" *ngIf="nom_etablissement?.invalid && nom_etablissement?.touched">
+      <span *ngIf="nom_etablissement?.errors?.['required']">Le nom est requis</span>
+      <span *ngIf="nom_etablissement?.errors?.['minlength']">Minimum 3 caractères</span>
+    </div>
+  </div>
+
+  <!-- Adresse -->
+  <div class="mb-3">
+    <label for="adresse_etablissement" class="form-label fw-medium">
+      <i class="bi bi-geo-alt me-2 text-success"></i>
+      Adresse complète <span class="text-danger">*</span>
+    </label>
+    <textarea
+      class="form-control"
+      [class.is-invalid]="adresse_etablissement?.invalid && adresse_etablissement?.touched"
+      id="adresse_etablissement"
+      formControlName="adresse_etablissement"
+      rows="3"
+      placeholder="Quartier Akwa, Rue des Écoles"
+    ></textarea>
+    <div class="invalid-feedback" *ngIf="adresse_etablissement?.invalid && adresse_etablissement?.touched">
+      <span *ngIf="adresse_etablissement?.errors?.['required']">L'adresse est requise</span>
+    </div>
+  </div>
+
+  <!-- Ville + Téléphone (row) -->
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label for="ville_etablissement" class="form-label fw-medium">
+        <i class="bi bi-map me-2 text-success"></i>
+        Ville <span class="text-danger">*</span>
+      </label>
+      <input
+        type="text"
+        class="form-control form-control-lg"
+        [class.is-invalid]="ville_etablissement?.invalid && ville_etablissement?.touched"
+        id="ville_etablissement"
+        formControlName="ville_etablissement"
+        placeholder="Douala"
+      >
+      <div class="invalid-feedback" *ngIf="ville_etablissement?.invalid && ville_etablissement?.touched">
+        <span *ngIf="ville_etablissement?.errors?.['required']">La ville est requise</span>
+      </div>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <label for="telephone_etablissement" class="form-label fw-medium">
+        <i class="bi bi-telephone me-2 text-success"></i>
+        Téléphone établissement
+      </label>
+      <input
+        type="tel"
+        class="form-control form-control-lg"
+        [class.is-invalid]="telephone_etablissement?.invalid && telephone_etablissement?.touched"
+        id="telephone_etablissement"
+        formControlName="telephone_etablissement"
+        placeholder="699123456"
+      >
+      <div class="invalid-feedback" *ngIf="telephone_etablissement?.invalid && telephone_etablissement?.touched">
+        <span *ngIf="telephone_etablissement?.errors?.['pattern']">Numéro invalide</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Email établissement -->
+  <div class="mb-4">
+    <label for="email_etablissement" class="form-label fw-medium">
+      <i class="bi bi-envelope me-2 text-success"></i>
+      Email établissement
+    </label>
+    <input
+      type="email"
+      class="form-control form-control-lg"
+      [class.is-invalid]="email_etablissement?.invalid && email_etablissement?.touched"
+      id="email_etablissement"
+      formControlName="email_etablissement"
+      placeholder="contact@lycee-douala.cm"
+    >
+    <div class="invalid-feedback" *ngIf="email_etablissement?.invalid && email_etablissement?.touched">
+      <span *ngIf="email_etablissement?.errors?.['email']">Email invalide</span>
+    </div>
+  </div>
+
+  <!-- ✅ CHAMP LOGO (VISIBLE ET FONCTIONNEL) -->
+  <div class="mb-4">
+    <label class="form-label fw-medium">
+      <i class="bi bi-image me-2 text-success"></i>
+      Logo de l'établissement
+      <span class="badge bg-success ms-2">Optionnel</span>
+    </label>
+
+    <div class="logo-upload-area" [class.has-preview]="!!logoPreview">
+      <!-- Zone de téléchargement (visible si pas de preview) -->
+      <div class="upload-zone" *ngIf="!logoPreview" (click)="fileInput.click()">
+        <i class="bi bi-cloud-upload display-4 text-success mb-3"></i>
+        <p class="mb-2 fw-medium">Cliquez ou glissez-déposez votre logo</p>
+        <small class="text-muted">PNG, JPG, JPEG • Max 2 Mo</small>
+        <!-- ✅ INPUT INVISIBLE MAIS FONCTIONNEL -->
+        <input
+          #fileInput
+          type="file"
+          accept="image/png,image/jpeg,image/jpg"
+          (change)="onLogoSelected($event)"
+          class="d-none"
+        >
+      </div>
+
+      <!-- Preview du logo -->
+      <div class="logo-preview" *ngIf="logoPreview">
+        <img [src]="logoPreview" [alt]="'Logo ' + (nom_etablissement?.value || 'établissement')" class="img-fluid">
+        <div class="preview-info">
+          <small class="text-muted">{{logoFile?.name}}</small>
+          <br>
+          <small class="text-success">
+            <i class="bi bi-check-circle"></i> {{formatFileSize()}}
+          </small>
+        </div>
+        <button
+          type="button"
+          class="btn btn-danger btn-sm remove-logo"
+          (click)="removeLogo()"
+        >
+          <i class="bi bi-x"></i> Supprimer
+        </button>
+      </div>
+    </div>
+
+    <!-- Message d'erreur -->
+    <div *ngIf="errorMessage" class="alert alert-danger mt-2">{{errorMessage}}</div>
+    <small class="text-muted d-block mt-1">Le logo apparaîtra sur vos cartes scolaires</small>
+  </div>
+
+  <!-- CGU -->
+  <div class="mb-4">
+    <div class="form-check">
+      <input
+        class="form-check-input"
+        [class.is-invalid]="acceptCGU?.invalid && acceptCGU?.touched"
+        type="checkbox"
+        id="acceptCGU"
+        formControlName="acceptCGU"
+      >
+      <label class="form-check-label" for="acceptCGU">
+        J'accepte les <a href="#" class="text-success fw-medium">conditions générales d'utilisation</a>
+        <span class="text-danger">*</span>
+      </label>
+      <div class="invalid-feedback d-block" *ngIf="acceptCGU?.invalid && acceptCGU?.touched">
+        Vous devez accepter les CGU pour continuer
+      </div>
+    </div>
+  </div>
+
+  <!-- Boutons -->
+  <div class="d-flex gap-3">
+    <button type="button" class="btn btn-outline-secondary btn-lg flex-fill" (click)="previousStep()" [disabled]="isLoading">
+      <i class="bi bi-arrow-left me-2"></i> Précédent
+    </button>
+    <button
+      type="button"
+      class="btn btn-success btn-lg flex-fill"
+      (click)="onSubmit()"
+      [disabled]="isLoading || !isStep3Valid()"
+    >
+      <span *ngIf="!isLoading">
+        <i class="bi bi-check-circle me-2"></i>
+        Créer mon compte
+      </span>
+      <span *ngIf="isLoading">
+        <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+        Création en cours...
+      </span>
+    </button>
+  </div>
+</div>

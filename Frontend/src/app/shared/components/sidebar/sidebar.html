@@ -1,0 +1,47 @@
+<aside class="sidebar">
+  <!-- Logo et Titre -->
+  <div class="sidebar-header">
+    <div class="d-flex align-items-center">
+      <div class="brand-icon me-2">
+        <i class="bi bi-credit-card-2-front"></i>
+      </div>
+      <span class="brand-text">Cartes<span class="text-success">Scolaires</span></span>
+    </div>
+  </div>
+
+  <!-- Profil Utilisateur -->
+  <div class="sidebar-profile" *ngIf="currentUser">
+    <div class="profile-avatar">
+      <i class="bi bi-person-circle"></i>
+    </div>
+    <div class="profile-info">
+      <h6 class="profile-name">{{ currentUser.prenom }} {{ currentUser.nom }}</h6>
+      <p class="profile-role">{{ role | titlecase }}</p>
+    </div>
+    <button class="btn-notification" title="Notifications">
+      <i class="bi bi-bell"></i>
+      <span class="notification-badge" *ngIf="notificationCount > 0">{{ notificationCount }}</span>
+    </button>
+  </div>
+
+  <!-- Menu de Navigation -->
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li *ngFor="let item of menuItems" class="nav-item">
+        <a [routerLink]="item.route" routerLinkActive="active" class="nav-link">
+          <i class="nav-icon {{ item.icon }}"></i>
+          <span class="nav-label">{{ item.label }}</span>
+          <span class="nav-badge" *ngIf="item.badge">{{ item.badge }}</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <!-- Bouton de Déconnexion -->
+  <div class="sidebar-footer">
+    <button class="btn-logout" (click)="logout()">
+      <i class="bi bi-box-arrow-right me-2"></i>
+      Déconnexion
+    </button>
+  </div>
+</aside>

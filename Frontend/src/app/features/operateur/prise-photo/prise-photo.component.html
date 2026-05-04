@@ -1,0 +1,209 @@
+<div class="prise-photo-page bg-light min-vh-100 py-4">
+  <div class="container">
+
+    <div class="d-flex align-items-center justify-content-between mb-4">
+      <div>
+        <h2 class="fw-bold mb-1">
+          <i class="bi bi-camera-fill text-primary me-2"></i>
+          Prise de photo
+        </h2>
+        <p class="text-muted mb-0">{{ totalEleves }} élève(s) trouvés</p>
+      </div>
+
+      <a class="btn btn-outline-secondary" routerLink="/operateur/dashboard">
+        <i class="bi bi-arrow-left me-2"></i>
+        Retour
+      </a>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-body">
+        <div class="row g-3 align-items-center">
+          <div class="col-md-8">
+            <div class="input-group">
+              <span class="input-group-text bg-white">
+                <i class="bi bi-search"></i>
+              </span>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Rechercher (nom, prénom, matricule)…"
+                [(ngModel)]="searchTerm"
+                (keyup.enter)="onSearch()">
+              <button class="btn btn-outline-primary" (click)="onSearch()">Rechercher</button>
+            </div>
+          </div>
+
+          <div class="col-md-4 text-md-end">
+            <button class="btn btn-outline-secondary" (click)="searchTerm=''; onSearch()">
+              <i class="bi bi-x-circle me-2"></i>
+              Réinitialiser
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status"></div>
+    </div>
+
+    <div *ngIf="error && !loading" class="alert alert-danger">
+      <i class="bi bi-exclamation-triangle-fill me-2"></i>
+      {{ error }}
+    </div>
+
+    <div *ngIf="!loading && !error" class="card border-0 shadow-sm">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th role="button" (click)="onSort('matricule')">
+                Matricule
+                <span *ngIf="sortKey==='matricule'">{{ sortDir==='asc' ? '▲' : '▼' }}</span>
+              </th>
+              <th role="button" (click)="onSort('nom')">
+                Nom
+                <span *ngIf="sortKey==='nom'">{{ sortDir==='asc' ? '▲' : '▼' }}</span>
+              </th>
+              <th role="button" (click)="onSort('prenom')">
+                Prénom
+                <span *ngIf="sortKey==='prenom'">{{ sortDir==='asc' ? '▲' : '▼' }}</span>
+              </th>
+              <th>Sexe</th>
+              <th>Date naissance</th>
+              <th>Classe</th>
+              <th>Statut photo</th>
+              <th class="text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let eleve of eleves">
+              <td class="fw-semibold">{{ eleve.matricule }}</td>
+              <td>{{ eleve.nom }}</td>
+              <td>{{ eleve.prenom }}</td>
+              <td>{{ eleve.sexe }}</td>
+              <td>{{ eleve.date_naissance | date:'dd/MM/yyyy' }}</td>
+              <td>{{ eleve?.classe?.nom || '-' }}</td>
+              <td>
+                <span *ngIf="!eleve?.photo_active" class="badge bg-secondary">Aucune</span>
+                <span *ngIf="eleve?.photo_active" class="badge"
+                      [class.bg-warning]="eleve?.photo_active?.statut === 'brouillon'"
+                      [class.bg-success]="eleve?.photo_active?.statut === 'validee'"
+                      [class.bg-danger]="eleve?.photo_active?.statut === 'refusee'"
+                      [class.bg-dark]="eleve?.photo_active?.statut === 'archivee'">
+                  {{ eleve?.photo_active?.statut }}
+                </span>
+              </td>
+              <td class="text-end">
+                <button class="btn btn-primary btn-sm" (click)="openCamera(eleve)">
+                  <i class="bi bi-camera me-2"></i>
+                  Prendre photo
+                </button>
+              </td>
+            </tr>
+
+            <tr *ngIf="eleves.length === 0">
+              <td colspan="8" class="text-center text-muted py-5">
+                Aucun élève trouvé
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card-body" *ngIf="totalPages > 1">
+        <nav>
+          <ul class="pagination justify-content-center mb-0">
+            <li class="page-item" [class.disabled]="currentPage === 1">
+              <button class="page-link" (click)="goToPage(currentPage - 1)">
+                <i class="bi bi-chevron-left"></i>
+              </button>
+            </li>
+            <li class="page-item" *ngFor="let page of [].constructor(totalPages); let i = index"
+                [class.active]="currentPage === (i + 1)">
+              <button class="page-link" (click)="goToPage(i + 1)">{{ i + 1 }}</button>
+            </li>
+            <li class="page-item" [class.disabled]="currentPage === totalPages">
+              <button class="page-link" (click)="goToPage(currentPage + 1)">
+                <i class="bi bi-chevron-right"></i>
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <div *ngIf="isCameraOpen" class="camera-overlay">
+      <div class="camera-modal shadow-lg">
+        <div class="d-flex align-items-start justify-content-between mb-3">
+          <div>
+            <h5 class="mb-1 fw-bold">Prendre une photo</h5>
+            <div class="text-muted small">{{ selectedEleve?.prenom }} {{ selectedEleve?.nom }} ({{ selectedEleve?.matricule }})</div>
+          </div>
+          <button class="btn btn-sm btn-outline-secondary" (click)="closeCamera()">
+            <i class="bi bi-x-lg"></i>
+          </button>
+        </div>
+
+        <div *ngIf="cameraError" class="alert alert-danger">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          {{ cameraError }}
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-7">
+            <div class="border rounded overflow-hidden bg-dark">
+              <webcam
+                [trigger]="triggerSnapshotObservable"
+                (imageCapture)="handleImage($event)">
+              </webcam>
+            </div>
+          </div>
+
+          <div class="col-md-5">
+            <div class="border rounded p-2 bg-light h-100">
+              <div class="fw-semibold mb-2">Recadrage (3:4)</div>
+
+              <div *ngIf="!imageBase64" class="text-muted small">
+                Cliquez sur <strong>Capturer</strong> pour prendre une photo, puis recadrez.
+              </div>
+
+              <image-cropper
+                *ngIf="imageBase64"
+                [imageBase64]="imageBase64"
+                [maintainAspectRatio]="true"
+                [aspectRatio]="3 / 4"
+                [resizeToWidth]="266"
+                [format]="'jpeg'"
+                (imageCropped)="imageCropped($event)">
+              </image-cropper>
+
+              <div class="fw-semibold mt-2 mb-2">Aperçu</div>
+              <div *ngIf="!croppedPreviewUrl" class="text-muted small">Aucun aperçu pour le moment.</div>
+              <img *ngIf="croppedPreviewUrl" [src]="croppedPreviewUrl" class="img-fluid rounded" alt="preview">
+            </div>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 justify-content-end mt-3">
+          <button class="btn btn-outline-primary" (click)="capture()" [disabled]="isUploading">
+            <i class="bi bi-camera me-2"></i>
+            Capturer
+          </button>
+          <button class="btn btn-primary" (click)="upload()" [disabled]="!croppedBlob || isUploading">
+            <span *ngIf="!isUploading">
+              <i class="bi bi-cloud-arrow-up me-2"></i>
+              Envoyer
+            </span>
+            <span *ngIf="isUploading">
+              <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+              Envoi...
+            </span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

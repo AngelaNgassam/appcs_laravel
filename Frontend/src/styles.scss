@@ -1,0 +1,73 @@
+/* Variables personnalisées */
+$primary-green: #10B981;
+$primary-dark: #059669;
+$text-primary: #111827;
+$text-secondary: #6B7280;
+
+/* Import Bootstrap (facultatif si déjà dans angular.json) */
+// @import '~bootstrap/scss/bootstrap';
+
+/* Styles globaux personnalisés */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: $text-primary;
+  background-color: #F9FAFB;
+}
+
+/* Couleurs personnalisées Bootstrap */
+.btn-success {
+  background-color: $primary-green !important;
+  border-color: $primary-green !important;
+
+  &:hover {
+    background-color: $primary-dark !important;
+    border-color: $primary-dark !important;
+  }
+}
+
+.text-success {
+  color: $primary-green !important;
+}
+
+.bg-success {
+  background-color: $primary-green !important;
+}
+
+/* Scrollbar personnalisée */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $primary-green;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: $primary-dark;
+}
+
+/* Animations globales */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+

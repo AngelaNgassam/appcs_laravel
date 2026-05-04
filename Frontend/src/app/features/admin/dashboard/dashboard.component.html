@@ -1,0 +1,370 @@
+<!-- Sidebar -->
+<app-sidebar [role]="'admin'"></app-sidebar>
+
+<div class="admin-dashboard with-sidebar">
+  <!-- Header avec profil et logout -->
+  <div class="dashboard-header">
+    <div class="container-fluid">
+      <div class="d-flex justify-content-between align-items-center py-3">
+        <div>
+          <h2 class="mb-0 fw-bold text-white">
+            <i class="bi bi-speedometer2 me-2"></i>
+            Dashboard Super Admin
+          </h2>
+          <p class="mb-0 text-white-50" *ngIf="currentUser">
+            Bienvenue, {{ currentUser.prenom }} {{ currentUser.nom }}
+          </p>
+        </div>
+        <div class="d-flex gap-2 align-items-center">
+          <button class="btn btn-outline-light" (click)="loadDashboard()">
+            <i class="bi bi-arrow-clockwise me-2"></i>
+            Actualiser
+          </button>
+          <button class="btn btn-danger" (click)="logout()">
+            <i class="bi bi-box-arrow-right me-2"></i>
+            Déconnexion
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading -->
+  <div *ngIf="loading" class="text-center py-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Chargement...</span>
+    </div>
+    <p class="mt-3 text-muted">Chargement du dashboard...</p>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error && !loading" class="container-fluid py-4">
+    <div class="alert alert-danger">
+      <i class="bi bi-exclamation-triangle me-2"></i>
+      {{ error }}
+    </div>
+  </div>
+
+  <!-- Dashboard Content -->
+  <div *ngIf="!loading && !error && statistiques" class="dashboard-content">
+    <div class="container-fluid py-4">
+      
+      <!-- Navigation rapide -->
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="card border-0 shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title mb-3">
+                <i class="bi bi-grid-3x3-gap me-2"></i>
+                Navigation Rapide
+              </h5>
+              <div class="row g-3">
+                <div class="col-md-3">
+                  <button class="btn btn-outline-primary w-100" (click)="navigateTo('/admin/etablissements')">
+                    <i class="bi bi-building me-2"></i>
+                    Établissements
+                  </button>
+                </div>
+                <div class="col-md-3">
+                  <button class="btn btn-outline-info w-100" (click)="navigateTo('/admin/utilisateurs')">
+                    <i class="bi bi-people me-2"></i>
+                    Utilisateurs
+                  </button>
+                </div>
+                <div class="col-md-3">
+                  <button class="btn btn-outline-success w-100" (click)="navigateTo('/admin/statistiques')">
+                    <i class="bi bi-graph-up me-2"></i>
+                    Statistiques
+                  </button>
+                </div>
+                <div class="col-md-3">
+                  <button class="btn btn-outline-warning w-100" (click)="navigateTo('/admin/rapports')">
+                    <i class="bi bi-file-earmark-text me-2"></i>
+                    Rapports
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistiques principales -->
+      <div class="row g-4 mb-4">
+        <!-- Établissements -->
+        <div class="col-md-3">
+          <div class="stat-card card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="stat-label text-muted small mb-1">Établissements</div>
+                  <h3 class="stat-value mb-0 fw-bold">{{ statistiques.etablissements.total || 0 }}</h3>
+                  <div class="stat-change text-success small mt-1" *ngIf="statistiques.etablissements.nouveau_mois">
+                    <i class="bi bi-arrow-up"></i>
+                    +{{ statistiques.etablissements.nouveau_mois }} ce mois
+                  </div>
+                </div>
+                <div class="stat-icon bg-primary bg-opacity-10 text-primary">
+                  <i class="bi bi-building"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Utilisateurs -->
+        <div class="col-md-3">
+          <div class="stat-card card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="stat-label text-muted small mb-1">Utilisateurs</div>
+                  <h3 class="stat-value mb-0 fw-bold">{{ statistiques.utilisateurs.total || 0 }}</h3>
+                  <div class="stat-change text-info small mt-1" *ngIf="statistiques.utilisateurs.actifs">
+                    <i class="bi bi-check-circle"></i>
+                    {{ statistiques.utilisateurs.actifs }} actifs
+                  </div>
+                </div>
+                <div class="stat-icon bg-info bg-opacity-10 text-info">
+                  <i class="bi bi-people"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Élèves -->
+        <div class="col-md-3">
+          <div class="stat-card card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="stat-label text-muted small mb-1">Élèves</div>
+                  <h3 class="stat-value mb-0 fw-bold">{{ statistiques.eleves.total || 0 }}</h3>
+                  <div class="stat-change text-success small mt-1" *ngIf="statistiques.eleves.actifs">
+                    <i class="bi bi-check-circle"></i>
+                    {{ statistiques.eleves.actifs }} actifs
+                  </div>
+                </div>
+                <div class="stat-icon bg-success bg-opacity-10 text-success">
+                  <i class="bi bi-person-badge"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Cartes -->
+        <div class="col-md-3">
+          <div class="stat-card card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start">
+                <div>
+                  <div class="stat-label text-muted small mb-1">Cartes Générées</div>
+                  <h3 class="stat-value mb-0 fw-bold">{{ statistiques.cartes.total || 0 }}</h3>
+                  <div class="stat-change text-warning small mt-1" *ngIf="statistiques.cartes.generees">
+                    <i class="bi bi-check-circle"></i>
+                    {{ statistiques.cartes.generees }} générées
+                  </div>
+                </div>
+                <div class="stat-icon bg-warning bg-opacity-10 text-warning">
+                  <i class="bi bi-credit-card"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graphiques et données -->
+      <div class="row g-4 mb-4">
+        <!-- Évolution des établissements -->
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0">
+              <h5 class="mb-0">
+                <i class="bi bi-graph-up me-2"></i>
+                Évolution des Établissements
+              </h5>
+            </div>
+            <div class="card-body">
+              <div *ngIf="evolutionEtablissements.length > 0" class="chart-container">
+                <div class="simple-bar-chart">
+                  <div class="bar-item" *ngFor="let item of evolutionEtablissements">
+                    <div class="bar-label">{{ item.mois }}</div>
+                    <div class="bar-wrapper">
+                      <div 
+                        class="bar bg-primary" 
+                        [style.height.%]="getBarHeight(item.total, getMaxValue(evolutionEtablissements, 'total'))">
+                      </div>
+                    </div>
+                    <div class="bar-value">{{ item.total }}</div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="evolutionEtablissements.length === 0" class="text-center text-muted py-4">
+                <i class="bi bi-inbox fs-1"></i>
+                <p class="mb-0 mt-2">Aucune donnée disponible</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Évolution des cartes -->
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0">
+              <h5 class="mb-0">
+                <i class="bi bi-graph-up me-2"></i>
+                Évolution des Cartes Générées
+              </h5>
+            </div>
+            <div class="card-body">
+              <div *ngIf="evolutionCartes.length > 0" class="chart-container">
+                <div class="simple-bar-chart">
+                  <div class="bar-item" *ngFor="let item of evolutionCartes">
+                    <div class="bar-label">{{ item.mois }}</div>
+                    <div class="bar-wrapper">
+                      <div 
+                        class="bar bg-success" 
+                        [style.height.%]="getBarHeight(item.total, getMaxValue(evolutionCartes, 'total'))">
+                      </div>
+                    </div>
+                    <div class="bar-value">{{ item.total }}</div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="evolutionCartes.length === 0" class="text-center text-muted py-4">
+                <i class="bi bi-inbox fs-1"></i>
+                <p class="mb-0 mt-2">Aucune donnée disponible</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top établissements et activités récentes -->
+      <div class="row g-4 mb-4">
+        <!-- Top établissements -->
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0">
+              <h5 class="mb-0">
+                <i class="bi bi-trophy me-2"></i>
+                Top Établissements
+              </h5>
+            </div>
+            <div class="card-body">
+              <div *ngIf="topEtablissements.length > 0" class="list-group list-group-flush">
+                <div 
+                  class="list-group-item border-0 px-0" 
+                  *ngFor="let etab of topEtablissements; let i = index">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                      <div class="rank-badge me-3" [class.rank-gold]="i === 0" [class.rank-silver]="i === 1" [class.rank-bronze]="i === 2">
+                        {{ i + 1 }}
+                      </div>
+                      <div>
+                        <div class="fw-semibold">{{ etab.nom }}</div>
+                        <div class="text-muted small">{{ etab.ville || 'N/A' }}</div>
+                      </div>
+                    </div>
+                    <div class="text-end">
+                      <div class="fw-bold text-primary">{{ etab.eleves_count || 0 }}</div>
+                      <div class="text-muted small">élèves</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="topEtablissements.length === 0" class="text-center text-muted py-4">
+                <i class="bi bi-inbox fs-1"></i>
+                <p class="mb-0 mt-2">Aucun établissement</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activités récentes -->
+        <div class="col-md-6">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0">
+              <h5 class="mb-0">
+                <i class="bi bi-clock-history me-2"></i>
+                Activités Récentes
+              </h5>
+            </div>
+            <div class="card-body">
+              <div *ngIf="activitesRecentes.length > 0" class="activity-list">
+                <div 
+                  class="activity-item" 
+                  *ngFor="let activite of activitesRecentes">
+                  <div class="activity-icon" [ngClass]="getActivityIconClass(activite.type)">
+                    <i class="bi" [ngClass]="getActivityIcon(activite.type)"></i>
+                  </div>
+                  <div class="activity-content">
+                    <div class="activity-title">{{ activite.description }}</div>
+                    <div class="activity-meta">
+                      <span class="text-muted small">
+                        <i class="bi bi-person me-1"></i>
+                        {{ activite.user }}
+                      </span>
+                      <span class="text-muted small ms-2">
+                        <i class="bi bi-clock me-1"></i>
+                        {{ activite.created_at }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="activitesRecentes.length === 0" class="text-center text-muted py-4">
+                <i class="bi bi-inbox fs-1"></i>
+                <p class="mb-0 mt-2">Aucune activité récente</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Répartition géographique -->
+      <div class="row g-4" *ngIf="repartitionGeographique.length > 0">
+        <div class="col-12">
+          <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0">
+              <h5 class="mb-0">
+                <i class="bi bi-geo-alt me-2"></i>
+                Répartition Géographique
+              </h5>
+            </div>
+            <div class="card-body">
+              <div class="row g-3">
+                <div 
+                  class="col-md-4" 
+                  *ngFor="let region of repartitionGeographique">
+                  <div class="region-card">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <h6 class="mb-0">{{ region.ville || region.region }}</h6>
+                      <span class="badge bg-primary">{{ region.total }}</span>
+                    </div>
+                    <div class="progress" style="height: 8px;">
+                      <div 
+                        class="progress-bar bg-primary" 
+                        [style.width.%]="(region.total / statistiques.etablissements.total) * 100">
+                      </div>
+                    </div>
+                    <div class="text-muted small mt-1">
+                      {{ ((region.total / statistiques.etablissements.total) * 100).toFixed(1) }}% du total
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<app-footer></app-footer>

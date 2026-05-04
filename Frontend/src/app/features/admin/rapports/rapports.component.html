@@ -1,0 +1,135 @@
+<div class="bg-light min-vh-100 py-4">
+  <div class="container-fluid">
+    
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="fw-bold mb-0">
+          <i class="bi bi-file-earmark-text me-2 text-warning"></i>
+          Rapports d'Activité
+        </h3>
+        <p class="text-muted mb-0">Générer des rapports personnalisés</p>
+      </div>
+      <button class="btn btn-outline-secondary" (click)="retourDashboard()">
+        <i class="bi bi-arrow-left me-2"></i>
+        Retour au Dashboard
+      </button>
+    </div>
+
+    <!-- Formulaire de génération -->
+    <div class="card border-0 shadow-sm mb-4">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">Paramètres du Rapport</h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Date de Début</label>
+            <input 
+              type="date" 
+              class="form-control" 
+              [(ngModel)]="dateDebut">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Date de Fin</label>
+            <input 
+              type="date" 
+              class="form-control" 
+              [(ngModel)]="dateFin">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label d-block">&nbsp;</label>
+            <button 
+              class="btn btn-primary w-100" 
+              (click)="genererRapport()"
+              [disabled]="loading">
+              <span *ngIf="!loading">
+                <i class="bi bi-file-earmark-bar-graph me-2"></i>
+                Générer le Rapport
+              </span>
+              <span *ngIf="loading">
+                <span class="spinner-border spinner-border-sm me-2"></span>
+                Génération...
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error" class="alert alert-danger">
+      <i class="bi bi-exclamation-triangle me-2"></i>
+      {{ error }}
+    </div>
+
+    <!-- Rapport -->
+    <div *ngIf="rapport" class="card border-0 shadow-sm">
+      <div class="card-header bg-white">
+        <h5 class="mb-0">
+          Rapport du {{ rapport.periode.debut }} au {{ rapport.periode.fin }}
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-4">
+          
+          <!-- Établissements créés -->
+          <div class="col-md-4">
+            <div class="stat-card text-center p-4 bg-light rounded">
+              <i class="bi bi-building fs-1 text-primary mb-3"></i>
+              <h3 class="fw-bold">{{ rapport.etablissements_crees }}</h3>
+              <p class="text-muted mb-0">Établissements Créés</p>
+            </div>
+          </div>
+
+          <!-- Utilisateurs créés -->
+          <div class="col-md-4">
+            <div class="stat-card text-center p-4 bg-light rounded">
+              <i class="bi bi-people fs-1 text-info mb-3"></i>
+              <h3 class="fw-bold">{{ rapport.utilisateurs_crees }}</h3>
+              <p class="text-muted mb-0">Utilisateurs Créés</p>
+            </div>
+          </div>
+
+          <!-- Élèves inscrits -->
+          <div class="col-md-4">
+            <div class="stat-card text-center p-4 bg-light rounded">
+              <i class="bi bi-person-badge fs-1 text-success mb-3"></i>
+              <h3 class="fw-bold">{{ rapport.eleves_inscrits }}</h3>
+              <p class="text-muted mb-0">Élèves Inscrits</p>
+            </div>
+          </div>
+
+          <!-- Cartes générées -->
+          <div class="col-md-4">
+            <div class="stat-card text-center p-4 bg-light rounded">
+              <i class="bi bi-credit-card fs-1 text-warning mb-3"></i>
+              <h3 class="fw-bold">{{ rapport.cartes_generees }}</h3>
+              <p class="text-muted mb-0">Cartes Générées</p>
+            </div>
+          </div>
+
+          <!-- Photos validées -->
+          <div class="col-md-4">
+            <div class="stat-card text-center p-4 bg-light rounded">
+              <i class="bi bi-camera fs-1 text-primary mb-3"></i>
+              <h3 class="fw-bold">{{ rapport.photos_validees }}</h3>
+              <p class="text-muted mb-0">Photos Validées</p>
+            </div>
+          </div>
+
+          <!-- Actions totales -->
+          <div class="col-md-4">
+            <div class="stat-card text-center p-4 bg-light rounded">
+              <i class="bi bi-activity fs-1 text-danger mb-3"></i>
+              <h3 class="fw-bold">{{ rapport.actions_total }}</h3>
+              <p class="text-muted mb-0">Actions Totales</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

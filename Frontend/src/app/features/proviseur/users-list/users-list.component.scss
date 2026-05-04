@@ -1,0 +1,25 @@
+.avatar-circle {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+}
+
+.table {
+  > tbody > tr {
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: rgba(16, 185, 129, 0.05);
+    }
+  }
+}
+
+.btn-group-sm {
+  .btn {
+    padding: 0.25rem 0.5rem;
+  }
+}

@@ -1,0 +1,208 @@
+<div class="add-eleve-page bg-light min-vh-100 py-5">
+  <div class="container">
+
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/proviseur/dashboard" class="text-decoration-none text-success">
+            <i class="bi bi-speedometer2 me-1"></i>
+            Dashboard
+          </a>
+        </li>
+        <li class="breadcrumb-item">
+          <a routerLink="/proviseur/classes" class="text-decoration-none text-success">
+            <i class="bi bi-grid-3x3 me-1"></i>
+            Classes
+          </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Ajouter un élève</li>
+      </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+
+        <!-- Card Formulaire -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-gradient-success text-white py-4">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-person-plus-fill fs-3 me-3"></i>
+              <div>
+                <h4 class="mb-0 fw-bold">Ajouter un Élève</h4>
+                <p class="mb-0 small opacity-75">Remplissez les informations de l'élève</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-body p-4">
+
+            <!-- Messages -->
+            <div *ngIf="success" class="alert alert-success alert-dismissible fade show">
+              <i class="bi bi-check-circle-fill me-2"></i>
+              {{ success }}
+              <button type="button" class="btn-close" (click)="success = null"></button>
+            </div>
+
+            <div *ngIf="error" class="alert alert-danger alert-dismissible fade show">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>
+              {{ error }}
+              <button type="button" class="btn-close" (click)="error = null"></button>
+            </div>
+
+            <!-- Formulaire -->
+            <form (ngSubmit)="onSubmit()" #eleveForm="ngForm">
+
+              <!-- Classe -->
+              <div class="mb-4">
+                <label for="classe" class="form-label fw-semibold">
+                  <i class="bi bi-grid-3x3 text-success me-2"></i>
+                  Classe <span class="text-danger">*</span>
+                </label>
+                <select class="form-select form-select-lg" id="classe"
+                        [(ngModel)]="formData.classe_id" name="classe_id" required
+                        [class.is-invalid]="errors.classe_id">
+                  <option value="0">-- Sélectionnez une classe --</option>
+                  <option *ngFor="let classe of classes" [value]="classe.id">
+                    {{ classe.nom }}
+                  </option>
+                </select>
+                <div *ngIf="errors.classe_id" class="invalid-feedback d-block">
+                  {{ errors.classe_id }}
+                </div>
+              </div>
+
+              <!-- Matricule -->
+              <div class="mb-3">
+                <label for="matricule" class="form-label fw-semibold">
+                  Matricule <span class="text-danger">*</span>
+                </label>
+                <input type="text" class="form-control" id="matricule"
+                       [(ngModel)]="formData.matricule" name="matricule" required
+                       [class.is-invalid]="errors.matricule"
+                       placeholder="Ex: MAT001">
+                <div *ngIf="errors.matricule" class="invalid-feedback d-block">
+                  {{ errors.matricule }}
+                </div>
+              </div>
+
+              <!-- Nom & Prénom -->
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label for="nom" class="form-label fw-semibold">
+                    Nom <span class="text-danger">*</span>
+                  </label>
+                  <input type="text" class="form-control" id="nom"
+                         [(ngModel)]="formData.nom" name="nom" required
+                         [class.is-invalid]="errors.nom"
+                         placeholder="Ex: KAMGA">
+                  <div *ngIf="errors.nom" class="invalid-feedback d-block">
+                    {{ errors.nom }}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label for="prenom" class="form-label fw-semibold">
+                    Prénom <span class="text-danger">*</span>
+                  </label>
+                  <input type="text" class="form-control" id="prenom"
+                         [(ngModel)]="formData.prenom" name="prenom" required
+                         [class.is-invalid]="errors.prenom"
+                         placeholder="Ex: Paul">
+                  <div *ngIf="errors.prenom" class="invalid-feedback d-block">
+                    {{ errors.prenom }}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Date de naissance & Sexe -->
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label for="date_naissance" class="form-label fw-semibold">
+                    Date de naissance <span class="text-danger">*</span>
+                  </label>
+                  <input type="date" class="form-control" id="date_naissance"
+                         [(ngModel)]="formData.date_naissance" name="date_naissance" required
+                         [class.is-invalid]="errors.date_naissance">
+                  <div *ngIf="errors.date_naissance" class="invalid-feedback d-block">
+                    {{ errors.date_naissance }}
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-semibold">
+                    Sexe <span class="text-danger">*</span>
+                  </label>
+                  <div class="btn-group w-100">
+                    <input type="radio" class="btn-check" name="sexe" id="sexeM"
+                           [(ngModel)]="formData.sexe" value="M" required>
+                    <label class="btn btn-outline-primary" for="sexeM">
+                      <i class="bi bi-gender-male me-2"></i>Masculin
+                    </label>
+
+                    <input type="radio" class="btn-check" name="sexe" id="sexeF"
+                           [(ngModel)]="formData.sexe" value="F" required>
+                    <label class="btn btn-outline-danger" for="sexeF">
+                      <i class="bi bi-gender-female me-2"></i>Féminin
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Lieu de naissance -->
+              <div class="mb-3">
+                <label for="lieu_naissance" class="form-label fw-semibold">
+                  Lieu de naissance
+                </label>
+                <input type="text" class="form-control" id="lieu_naissance"
+                       [(ngModel)]="formData.lieu_naissance" name="lieu_naissance"
+                       placeholder="Ex: Douala">
+              </div>
+
+              <!-- Parent -->
+              <div class="row g-3 mb-4">
+                <div class="col-md-6">
+                  <label for="nom_parent" class="form-label fw-semibold">
+                    Nom du parent/tuteur
+                  </label>
+                  <input type="text" class="form-control" id="nom_parent"
+                         [(ngModel)]="formData.nom_parent" name="nom_parent"
+                         placeholder="Ex: KAMGA Marie">
+                </div>
+                <div class="col-md-6">
+                  <label for="contact_parent" class="form-label fw-semibold">
+                    Contact parent
+                  </label>
+                  <input type="tel" class="form-control" id="contact_parent"
+                         [(ngModel)]="formData.contact_parent" name="contact_parent"
+                         placeholder="Ex: 677123456">
+                </div>
+              </div>
+
+              <!-- Boutons -->
+              <div class="d-flex gap-2 justify-content-end">
+                <button type="button" class="btn btn-outline-secondary"
+                        (click)="onCancel()" [disabled]="loading">
+                  <i class="bi bi-x-circle me-2"></i>
+                  Annuler
+                </button>
+                <button type="submit" class="btn btn-success" [disabled]="loading || !eleveForm.valid">
+                  <span *ngIf="!loading">
+                    <i class="bi bi-check-circle me-2"></i>
+                    Créer l'élève
+                  </span>
+                  <span *ngIf="loading">
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    Création en cours...
+                  </span>
+                </button>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

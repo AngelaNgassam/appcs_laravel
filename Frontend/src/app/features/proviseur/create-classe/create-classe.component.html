@@ -1,0 +1,167 @@
+<div class="create-classe-page bg-light min-vh-100 py-5">
+  <div class="container">
+
+    <!-- 🔙 Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item">
+          <a href="/proviseur/dashboard" class="text-decoration-none text-success">
+            <i class="bi bi-speedometer2 me-1"></i>
+            Dashboard
+          </a>
+        </li>
+        <li class="breadcrumb-item">
+          <a (click)="onCancel()" class="text-decoration-none text-success" style="cursor: pointer;">
+            <i class="bi bi-grid-3x3 me-1"></i>
+            Classes
+          </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">Créer une classe</li>
+      </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+
+        <!-- 📝 Card Formulaire -->
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-gradient-success text-white py-4">
+            <div class="d-flex align-items-center">
+              <i class="bi bi-plus-circle-fill fs-3 me-3"></i>
+              <div>
+                <h4 class="mb-0 fw-bold">Créer une Classe</h4>
+                <p class="mb-0 small opacity-75">Ajoutez une nouvelle classe à votre établissement</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="card-body p-4">
+
+            <!-- ✅ Message de succès -->
+            <div *ngIf="success" class="alert alert-success alert-dismissible fade show" role="alert">
+              <i class="bi bi-check-circle-fill me-2"></i>
+              {{ success }}
+              <button type="button" class="btn-close" (click)="success = null"></button>
+            </div>
+
+            <!-- ❌ Message d'erreur -->
+            <div *ngIf="error" class="alert alert-danger alert-dismissible fade show" role="alert">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i>
+              {{ error }}
+              <button type="button" class="btn-close" (click)="error = null"></button>
+            </div>
+
+            <!-- 📋 Formulaire -->
+            <form (ngSubmit)="onSubmit()" #classeForm="ngForm">
+
+              <!-- Niveau -->
+              <div class="mb-4">
+                <label for="niveau" class="form-label fw-semibold">
+                  <i class="bi bi-layers text-success me-2"></i>
+                  Niveau <span class="text-danger">*</span>
+                </label>
+                <select class="form-select form-select-lg" id="niveau"
+                        [(ngModel)]="formData.niveau" name="niveau" required
+                        (change)="onNiveauChange()"
+                        [class.is-invalid]="errors.niveau">
+                  <option value="">-- Sélectionnez un niveau --</option>
+                  <option *ngFor="let niveau of niveauxOptions" [value]="niveau.value">
+                    {{ niveau.label }}
+                  </option>
+                </select>
+                <div *ngIf="errors.niveau" class="invalid-feedback d-block">
+                  {{ errors.niveau }}
+                </div>
+              </div>
+
+              <!-- Série (si applicable) -->
+              <div *ngIf="showSerieField" class="mb-4">
+                <label for="serie" class="form-label fw-semibold">
+                  <i class="bi bi-bookmark text-success me-2"></i>
+                  Série <span class="text-danger">*</span>
+                </label>
+                <div class="btn-group w-100" role="group">
+                  <input type="radio" class="btn-check" name="serie" id="serieA"
+                         [(ngModel)]="formData.serie" value="A" required>
+                  <label class="btn btn-outline-success" for="serieA">
+                    <i class="bi bi-file-text me-2"></i>Série A
+                  </label>
+
+                  <input type="radio" class="btn-check" name="serie" id="serieC"
+                         [(ngModel)]="formData.serie" value="C" required>
+                  <label class="btn btn-outline-success" for="serieC">
+                    <i class="bi bi-calculator me-2"></i>Série C
+                  </label>
+
+                  <input type="radio" class="btn-check" name="serie" id="serieD"
+                         [(ngModel)]="formData.serie" value="D" required>
+                  <label class="btn btn-outline-success" for="serieD">
+                    <i class="bi bi-laptop me-2"></i>Série D
+                  </label>
+                </div>
+                <div *ngIf="errors.serie" class="text-danger small mt-2">
+                  {{ errors.serie }}
+                </div>
+              </div>
+
+              <!-- Nom de la classe -->
+              <div class="mb-4">
+                <label for="nom" class="form-label fw-semibold">
+                  <i class="bi bi-tag text-success me-2"></i>
+                  Nom de la classe <span class="text-danger">*</span>
+                </label>
+                <input type="text" class="form-control form-control-lg" id="nom"
+                      [(ngModel)]="formData.nom" name="nom" required
+                      [class.is-invalid]="errors.nom"
+                      placeholder="Ex: 6ème M2, 2nde AA3, Tle C1, etc.">
+                <div *ngIf="errors.nom" class="invalid-feedback d-block">
+                  {{ errors.nom }}
+                </div>
+                <small class="text-muted">
+                  <i class="bi bi-info-circle me-1"></i>
+                  <!-- ✅ MODIFIER LE MESSAGE -->
+                  Saisissez le nom complet de la classe (ex: 6ème M2, 2nde AA3, Tle C1)
+                </small>
+              </div>
+
+              <!-- ❌ SUPPRIMER LA SECTION APERÇU qui génère automatiquement -->
+              <!-- Ou la modifier ainsi : -->
+              <div *ngIf="formData.nom" class="alert alert-info">
+                <h6 class="fw-bold mb-2">
+                  <i class="bi bi-eye me-2"></i>Aperçu
+                </h6>
+                <p class="mb-0">
+                  La classe sera nommée :
+                  <strong class="text-primary">{{ formData.nom }}</strong>
+                </p>
+              </div>
+
+              <!-- Boutons -->
+              <div class="d-flex gap-2 justify-content-end mt-4">
+                <button type="button" class="btn btn-outline-secondary"
+                        (click)="onCancel()" [disabled]="loading">
+                  <i class="bi bi-x-circle me-2"></i>
+                  Annuler
+                </button>
+                <button type="submit" class="btn btn-success" [disabled]="loading || !classeForm.valid">
+                  <span *ngIf="!loading">
+                    <i class="bi bi-check-circle me-2"></i>
+                    Créer la classe
+                  </span>
+                  <span *ngIf="loading">
+                    <span class="spinner-border spinner-border-sm me-2"></span>
+                    Création en cours...
+                  </span>
+                </button>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>

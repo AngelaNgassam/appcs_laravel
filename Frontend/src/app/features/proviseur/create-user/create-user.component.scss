@@ -1,0 +1,67 @@
+// Variables
+$primary-green: #10B981;
+$success-dark: #059669;
+
+// Gradient
+.bg-gradient-success {
+  background: linear-gradient(135deg, $primary-green, $success-dark) !important;
+}
+
+// Form check cards (sélection de rôle)
+.form-check-card {
+  .form-check-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .form-check-label {
+    cursor: pointer;
+
+    .card {
+      transition: all 0.3s ease;
+      cursor: pointer;
+
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+}
+
+// Input groups
+.input-group {
+  .btn {
+    border-color: #dee2e6;
+  }
+}
+
+// Animation des alertes
+.alert {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .form-check-card {
+    .card-body {
+      padding: 1rem !important;
+
+      i {
+        font-size: 2rem !important;
+      }
+    }
+  }
+}

@@ -1,0 +1,183 @@
+// Variables
+$primary-green: #10B981;
+$success-dark: #059669;
+$border-color: #E5E7EB;
+
+// Gradient
+.bg-gradient-success {
+  background: linear-gradient(135deg, $primary-green, $success-dark) !important;
+}
+
+// Steps Progress
+.steps-progress {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 30px;
+    left: 25%;
+    right: 25%;
+    height: 2px;
+    background-color: $border-color;
+    z-index: 0;
+  }
+
+  .step {
+    position: relative;
+    z-index: 1;
+
+    .step-icon {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 10px;
+      background-color: white;
+      border: 3px solid $border-color;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      color: #9CA3AF;
+      transition: all 0.3s ease;
+    }
+
+    .step-label {
+      font-size: 0.875rem;
+      color: #6B7280;
+      font-weight: 500;
+    }
+
+    &.active {
+      .step-icon {
+        background-color: $primary-green;
+        border-color: $primary-green;
+        color: white;
+        transform: scale(1.1);
+      }
+
+      .step-label {
+        color: $primary-green;
+        font-weight: 700;
+      }
+    }
+
+    &.completed {
+      .step-icon {
+        background-color: $primary-green;
+        border-color: $primary-green;
+        color: white;
+      }
+
+      .step-label {
+        color: $primary-green;
+      }
+    }
+  }
+}
+
+// Boutons de classe
+.btn-classe {
+  border: 2px solid $border-color;
+  background: white;
+  transition: all 0.3s ease;
+  border-radius: 12px;
+
+  &:hover {
+    border-color: $primary-green;
+    background-color: rgba(16, 185, 129, 0.05);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+}
+
+.classe-icon {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Zone d'upload
+.upload-zone {
+  border: 3px dashed $border-color;
+  border-radius: 16px;
+  background-color: #F9FAFB;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-color: $primary-green;
+    background-color: rgba(16, 185, 129, 0.05);
+  }
+
+  &.has-file {
+    border-color: $primary-green;
+    background-color: rgba(16, 185, 129, 0.1);
+    border-style: solid;
+  }
+}
+
+// Stat cards
+.stat-card {
+  padding: 2rem;
+  border-radius: 12px;
+  text-align: center;
+  border: 2px solid;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: translateY(-5px);
+  }
+}
+
+// Liste d'erreurs
+.erreurs-list {
+  .erreur-item {
+    font-size: 0.875rem;
+    border-left: 3px solid #F59E0B;
+  }
+}
+
+// Alert customization
+.alert-info {
+  background-color: rgba(59, 130, 246, 0.1);
+  border-left: 4px solid #3B82F6;
+  border-radius: 8px;
+
+  ol {
+    padding-left: 1.5rem;
+  }
+}
+
+// Animations
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  animation: slideIn 0.4s ease-out;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .steps-progress::before {
+    display: none;
+  }
+
+  .step {
+    margin-bottom: 1rem;
+  }
+
+  .upload-zone {
+    padding: 2rem 1rem !important;
+  }
+}

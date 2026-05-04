@@ -1,0 +1,38 @@
+// Variables
+$primary-green: #10B981;
+$dark-bg: #0F172A;
+$text-light: #94A3B8;
+
+// ===== FOOTER =====
+.footer-section {
+  background: $dark-bg;
+  
+  .brand-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, $primary-green, #059669);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+      font-size: 1.5rem;
+      color: white;
+    }
+  }
+
+  ul {
+    li {
+      margin-bottom: 0.5rem;
+      
+      a {
+        transition: color 0.3s;
+        
+        &:hover {
+          color: $primary-green !important;
+        }
+      }
+    }
+  }
+}

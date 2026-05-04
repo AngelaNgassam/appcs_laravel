@@ -1,0 +1,265 @@
+// Variables
+$primary-green: #10B981;
+$dark-bg: #0F172A;
+$sidebar-width: 280px;
+$sidebar-bg: #1E293B;
+$text-light: #94A3B8;
+$text-white: #F8FAFC;
+
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  width: $sidebar-width;
+  background: $sidebar-bg;
+  display: flex;
+  flex-direction: column;
+  z-index: 1000;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+
+  // Scrollbar personnalisée
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
+}
+
+// Header
+.sidebar-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+
+  .brand-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, $primary-green, #059669);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    i {
+      font-size: 1.5rem;
+      color: white;
+    }
+  }
+
+  .brand-text {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: $text-white;
+  }
+}
+
+// Profil
+.sidebar-profile {
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  .profile-avatar {
+    i {
+      font-size: 3rem;
+      color: $primary-green;
+    }
+  }
+
+  .profile-info {
+    flex: 1;
+
+    .profile-name {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: $text-white;
+      margin-bottom: 0.25rem;
+    }
+
+    .profile-role {
+      font-size: 0.8rem;
+      color: $text-light;
+      margin: 0;
+      text-transform: capitalize;
+    }
+  }
+
+  .btn-notification {
+    position: relative;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    i {
+      font-size: 1.25rem;
+      color: $text-white;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    .notification-badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #EF4444;
+      color: white;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.15rem 0.4rem;
+      border-radius: 10px;
+      min-width: 20px;
+      text-align: center;
+    }
+  }
+}
+
+// Navigation
+.sidebar-nav {
+  flex: 1;
+  padding: 1rem 0;
+  overflow-y: auto;
+
+  .nav-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .nav-item {
+    margin-bottom: 0.25rem;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 0.875rem 1.5rem;
+    color: $text-light;
+    text-decoration: none;
+    transition: all 0.3s;
+    position: relative;
+
+    &::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 4px;
+      background: $primary-green;
+      transform: scaleY(0);
+      transition: transform 0.3s;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: $text-white;
+
+      .nav-icon {
+        color: $primary-green;
+      }
+    }
+
+    &.active {
+      background: rgba(16, 185, 129, 0.1);
+      color: $text-white;
+
+      &::before {
+        transform: scaleY(1);
+      }
+
+      .nav-icon {
+        color: $primary-green;
+      }
+    }
+
+    .nav-icon {
+      font-size: 1.25rem;
+      margin-right: 1rem;
+      transition: color 0.3s;
+    }
+
+    .nav-label {
+      flex: 1;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+
+    .nav-badge {
+      background: $primary-green;
+      color: white;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      border-radius: 12px;
+      min-width: 24px;
+      text-align: center;
+    }
+  }
+}
+
+// Footer
+.sidebar-footer {
+  padding: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  .btn-logout {
+    width: 100%;
+    padding: 0.875rem;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 10px;
+    color: #EF4444;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover {
+      background: #EF4444;
+      color: white;
+      border-color: #EF4444;
+    }
+
+    i {
+      font-size: 1.1rem;
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 991px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s;
+
+    &.show {
+      transform: translateX(0);
+    }
+  }
+}

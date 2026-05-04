@@ -1,0 +1,375 @@
+// Styles pour le composant de gestion des cartes
+
+.table {
+  th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    color: #6c757d;
+    border-bottom: 2px solid #dee2e6;
+  }
+
+  tbody tr {
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: #f8f9fa;
+      transform: translateX(2px);
+    }
+
+    &.table-active {
+      background-color: #e7f3ff;
+      border-left: 3px solid #0d6efd;
+    }
+  }
+
+  td {
+    vertical-align: middle;
+    padding: 1rem 0.75rem;
+  }
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.35em 0.65em;
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.btn-group-sm .btn {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  
+  i {
+    font-size: 1rem;
+  }
+}
+
+.alert {
+  border-left: 4px solid;
+  
+  &.alert-info {
+    border-left-color: #0dcaf0;
+  }
+  
+  &.alert-success {
+    border-left-color: #198754;
+  }
+  
+  &.alert-danger {
+    border-left-color: #dc3545;
+  }
+}
+
+.card {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+  }
+}
+
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+.form-check-input {
+  cursor: pointer;
+  width: 1.2em;
+  height: 1.2em;
+  
+  &:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+  }
+}
+
+.modele-card {
+  cursor: pointer;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    border-color: #0d6efd !important;
+    transform: translateY(-2px);
+  }
+  
+  &.modele-selected {
+    border: 2px solid #0d6efd !important;
+    background-color: #e7f3ff;
+  }
+}
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card, .alert {
+  animation: fadeIn 0.3s ease;
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .table {
+    font-size: 0.875rem;
+    
+    th, td {
+      padding: 0.5rem;
+    }
+  }
+  
+  .btn-group-sm .btn {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.75rem;
+  }
+}
+
+// Statistiques cards
+.card-body {
+  .fs-1 {
+    font-size: 3rem !important;
+  }
+  
+  h4 {
+    font-size: 2rem;
+  }
+}
+
+// Pagination
+.pagination {
+  .page-link {
+    color: #0d6efd;
+    border-color: #dee2e6;
+    
+    &:hover {
+      background-color: #e7f3ff;
+      border-color: #0d6efd;
+    }
+  }
+  
+  .page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+  }
+  
+  .page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    background-color: #fff;
+    border-color: #dee2e6;
+  }
+}
+
+// Loader
+.spinner-border {
+  &.text-primary {
+    color: #0d6efd !important;
+  }
+}
+
+// Empty state
+.bi-inbox {
+  opacity: 0.3;
+}
+
+// ✨ NOUVEAU : Vue grille des modèles de cartes
+.modeles-grid {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+}
+
+.modele-card {
+  background: white;
+  border: 2px solid #dee2e6;
+  border-radius: 8px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  height: 100%;
+  
+  &:hover {
+    border-color: #0d6efd;
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+  }
+  
+  &.selected {
+    border-color: #0d6efd;
+    border-width: 3px;
+    background: linear-gradient(135deg, #e7f3ff 0%, #ffffff 100%);
+    box-shadow: 0 4px 16px rgba(13, 110, 253, 0.3);
+    
+    .modele-info {
+      background: #0d6efd;
+      color: white;
+      
+      .modele-name {
+        color: white;
+        font-weight: 700;
+      }
+      
+      .badge {
+        background: white !important;
+        color: #0d6efd !important;
+      }
+    }
+  }
+}
+
+.modele-preview {
+  width: 100%;
+  height: 140px;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  position: relative;
+  
+  .preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .preview-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #6c757d;
+    padding: 1rem;
+    text-align: center;
+    
+    i {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      opacity: 0.5;
+    }
+    
+    .preview-text {
+      font-size: 0.75rem;
+      font-weight: 500;
+      word-break: break-word;
+    }
+    
+    &.cameroun-preview {
+      background: linear-gradient(to bottom, 
+        #007a3d 0%, #007a3d 33%, 
+        #ce1126 33%, #ce1126 66%, 
+        #fcd116 66%, #fcd116 100%);
+      color: white;
+      
+      i {
+        color: #fcd116;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        opacity: 1;
+      }
+      
+      .preview-text {
+        color: white;
+        font-weight: 700;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+      }
+    }
+  }
+}
+
+.modele-info {
+  padding: 0.75rem;
+  background: white;
+  transition: all 0.3s ease;
+  
+  .modele-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #212529;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    
+    i {
+      font-size: 0.75rem;
+    }
+  }
+  
+  .modele-badge {
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+    
+    .badge {
+      font-size: 0.65rem;
+      padding: 0.25em 0.5em;
+    }
+  }
+}
+
+// Scrollbar personnalisée pour la grille
+.modeles-grid::-webkit-scrollbar {
+  width: 8px;
+}
+
+.modeles-grid::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.modeles-grid::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+  
+  &:hover {
+    background: #555;
+  }
+}
+
+// Animation d'entrée pour les cartes
+.modele-card {
+  animation: slideInUp 0.3s ease;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive pour la vue grille
+@media (max-width: 768px) {
+  .modeles-grid {
+    max-height: 300px;
+  }
+  
+  .modele-preview {
+    height: 100px;
+  }
+  
+  .modele-info {
+    padding: 0.5rem;
+    
+    .modele-name {
+      font-size: 0.75rem;
+    }
+  }
+}

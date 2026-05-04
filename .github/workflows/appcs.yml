@@ -96,12 +96,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Log de diagnostic pour vérifier le chemin exact
+      - name: "🔍 Debug: List files"
+        run: |
+          echo "Dossier actuel :"
+          ls -R Frontend | grep package-lock.json || echo "Fichier non trouvé dans Frontend/"
+
       - name: "⚙️ Setup Node.js"
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
-          cache-dependency-path: './Frontend/package-lock.json'
+          # On utilise une wildcard pour éviter les erreurs de chemin relatif strict
+          cache-dependency-path: '**/Frontend/package-lock.json'
 
       - name: "🏗️ Build Production"
         working-directory: ./Frontend

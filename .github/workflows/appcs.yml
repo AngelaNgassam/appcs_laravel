@@ -96,23 +96,33 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Log de diagnostic pour vérifier le chemin exact
-      - name: "🔍 Debug: List files"
+      # --- DEBUG SECTION ---
+      - name: "🔍 Deep Debug: File System Check"
         run: |
-          echo "Dossier actuel :"
-          ls -R Frontend | grep package-lock.json || echo "Fichier non trouvé dans Frontend/"
+          echo "--- 1. Chemin de travail actuel ---"
+          pwd
+          echo "--- 2. Contenu de la racine ---"
+          ls -F
+          echo "--- 3. Recherche précise du lockfile ---"
+          find . -name "package-lock.json" -print
+          echo "--- 4. Vérification de la casse du dossier Frontend ---"
+          ls -d [Ff]rontend/
+          echo "--- 5. Contenu détaillé de Frontend ---"
+          ls -la Frontend/ || echo "Erreur: Dossier Frontend introuvable"
 
       - name: "⚙️ Setup Node.js"
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
-          # On utilise une wildcard pour éviter les erreurs de chemin relatif strict
-          cache-dependency-path: '**/Frontend/package-lock.json'
+          # Utilisation du chemin relatif direct sans point au début
+          cache-dependency-path: Frontend/package-lock.json
 
       - name: "🏗️ Build Production"
         working-directory: ./Frontend
         run: |
+          echo "Vérification locale avant npm ci..."
+          ls -la package-lock.json
           npm ci
           npm run build -- --configuration=production
 

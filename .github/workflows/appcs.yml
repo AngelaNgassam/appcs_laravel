@@ -67,6 +67,11 @@ jobs:
           pwd
           ls -R Backend | head -n 20
 
+      # CORRECTION : Installation indispensable pour avoir le dossier vendor/autoload.php
+      - name: "📥 Install Dependencies"
+        working-directory: ./Backend
+        run: composer install --no-interaction --prefer-dist
+
       - name: "🧪 Run Migrations & Tests"
         working-directory: ./Backend
         run: |
@@ -102,14 +107,12 @@ jobs:
       - name: "🔍 Debug: Verify Frontend Path"
         run: |
           echo "📍 Current Directory: $(pwd)"
-          echo "📂 Listing Root Files:"
           ls -F
-          echo "📂 Checking for package-lock.json in Frontend:"
           if [ -f "Frontend/package-lock.json" ]; then
             echo "✅ package-lock.json found!"
           else
-            echo "❌ package-lock.json NOT found at Frontend/package-lock.json"
-            ls -R Frontend
+            echo "❌ package-lock.json NOT found"
+            ls -R Frontend | head -n 20
           fi
 
       - name: "⚙️ Setup Node.js"
@@ -166,9 +169,6 @@ jobs:
         with:
           name: frontend-dist
           path: ./dist-frontend
-
-      - name: "🔍 Debug: Check Downloaded Artifact"
-        run: ls -R ./dist-frontend
 
       - name: "🚀 FTP Deploy Backend"
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5

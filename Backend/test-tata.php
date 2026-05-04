@@ -13,7 +13,7 @@ echo "==================================\n\n";
 
 $eleve = Eleve::with(['classe', 'etablissement', 'photoActive'])->find(6);
 
-if (!$eleve) {
+if (! $eleve) {
     echo "❌ Élève non trouvé\n";
     exit(1);
 }
@@ -25,7 +25,7 @@ echo "   Classe : {$eleve->classe->nom}\n\n";
 // Forcer le modèle Cameroun
 $modeleCameroun = ModeleCarte::where('fichier_template', 'cartes.modele-cameroun')->first();
 
-if (!$modeleCameroun) {
+if (! $modeleCameroun) {
     echo "❌ Modèle Cameroun non trouvé\n";
     exit(1);
 }
@@ -37,13 +37,13 @@ $pdfService = app(PDFService::class);
 
 try {
     $carte = $pdfService->genererCarte($eleve, $modeleCameroun->id);
-    
+
     echo "✅ Carte générée !\n";
     echo "   Fichier : {$carte->chemin_pdf}\n";
-    
-    $fullPath = storage_path('app/public/' . $carte->chemin_pdf);
+
+    $fullPath = storage_path('app/public/'.$carte->chemin_pdf);
     echo "   Chemin : {$fullPath}\n";
-    
+
 } catch (\Exception $e) {
     echo "❌ Erreur : {$e->getMessage()}\n";
     echo "   Trace : {$e->getTraceAsString()}\n";

@@ -62,6 +62,6 @@ class ModeleCarte extends Model
     // Accessors
     public function getApercuUrlAttribute()
     {
-        return $this->apercu ? asset('storage/' . $this->apercu) : null;
+        return $this->apercu ? asset('storage/'.$this->apercu) : null;
     }
 }

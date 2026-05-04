@@ -17,11 +17,11 @@ class PhotoService
         int $operateurId
     ): Photo {
         // Générer un nom unique
-        $filename = 'photo_' . $eleveId . '_' . time() . '.jpg';
+        $filename = 'photo_'.$eleveId.'_'.time().'.jpg';
 
         // Chemins
-        $cheminOriginal = 'photos/originales/' . $filename;
-        $cheminTraitee = 'photos/traitees/' . $filename;
+        $cheminOriginal = 'photos/originales/'.$filename;
+        $cheminTraitee = 'photos/traitees/'.$filename;
 
         // Sauvegarder l'original
         Storage::disk('public')->putFileAs(dirname($cheminOriginal), $file, basename($cheminOriginal));
@@ -54,7 +54,7 @@ class PhotoService
             throw new \RuntimeException('Impossible de lire le fichier image.');
         }
 
-        if (!extension_loaded('gd')) {
+        if (! extension_loaded('gd')) {
             return $contenu;
         }
 

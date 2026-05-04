@@ -24,27 +24,34 @@ class UserController extends Controller
      *     tags={"Users"},
      *     summary="Liste des utilisateurs (avec pagination)",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="page",
      *         in="query",
      *         description="Numéro de la page",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="per_page",
      *         in="query",
      *         description="Nombre d'éléments par page",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="role",
      *         in="query",
      *         description="Filtrer par rôle",
      *         required=false,
+     *
      *         @OA\Schema(type="string", enum={"admin", "proviseur", "surveillant", "operateur"})
      *     ),
+     *
      *     @OA\Response(response=200, description="Liste des utilisateurs")
      * )
      */
@@ -56,7 +63,7 @@ class UserController extends Controller
         $query = User::with(['etablissement', 'createurDuCompte']);
 
         // Filtrer par établissement si pas admin
-        if (!$user->isAdmin()) {
+        if (! $user->isAdmin()) {
             $query->where('etablissement_id', $user->etablissement_id);
         }
 
@@ -68,10 +75,10 @@ class UserController extends Controller
         // Recherche
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nom', 'like', "%{$search}%")
-                  ->orWhere('prenom', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('prenom', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -87,7 +94,7 @@ class UserController extends Controller
                 'last_page' => $users->lastPage(),
                 'from' => $users->firstItem(),
                 'to' => $users->lastItem(),
-            ]
+            ],
         ], 200);
     }
 
@@ -97,10 +104,13 @@ class UserController extends Controller
      *     tags={"Users"},
      *     summary="Créer un utilisateur (surveillant ou opérateur par le proviseur)",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"nom", "prenom", "email", "password", "role"},
+     *
      *             @OA\Property(property="nom", type="string"),
      *             @OA\Property(property="prenom", type="string"),
      *             @OA\Property(property="email", type="string"),
@@ -109,6 +119,7 @@ class UserController extends Controller
      *             @OA\Property(property="telephone", type="string")
      *         )
      *     ),
+     *
      *     @OA\Response(response=201, description="Utilisateur créé"),
      *     @OA\Response(response=403, description="Accès refusé")
      * )
@@ -118,10 +129,10 @@ class UserController extends Controller
         $currentUser = $request->user();
 
         // Seuls le proviseur et l'admin peuvent créer des utilisateurs
-        if (!$currentUser->isProviseur() && !$currentUser->isAdmin()) {
+        if (! $currentUser->isProviseur() && ! $currentUser->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Vous n\'avez pas les droits pour créer un utilisateur'
+                'message' => 'Vous n\'avez pas les droits pour créer un utilisateur',
             ], 403);
         }
 
@@ -138,7 +149,7 @@ class UserController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur de validation',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -166,14 +177,14 @@ class UserController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Utilisateur créé avec succès',
-                'data' => $user
+                'data' => $user,
             ], 201);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la création',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -184,12 +195,15 @@ class UserController extends Controller
      *     tags={"Users"},
      *     summary="Détails d'un utilisateur",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Détails de l'utilisateur")
      * )
      */
@@ -198,24 +212,24 @@ class UserController extends Controller
         $currentUser = $request->user();
         $user = User::with(['etablissement', 'createurDuCompte'])->find($id);
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'success' => false,
-                'message' => 'Utilisateur non trouvé'
+                'message' => 'Utilisateur non trouvé',
             ], 404);
         }
 
         // Vérifier les droits
-        if (!$currentUser->isAdmin() && $user->etablissement_id !== $currentUser->etablissement_id) {
+        if (! $currentUser->isAdmin() && $user->etablissement_id !== $currentUser->etablissement_id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
         return response()->json([
             'success' => true,
-            'data' => $user
+            'data' => $user,
         ], 200);
     }
 
@@ -225,21 +239,27 @@ class UserController extends Controller
      *     tags={"Users"},
      *     summary="Mettre à jour un utilisateur",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="nom", type="string"),
      *             @OA\Property(property="prenom", type="string"),
      *             @OA\Property(property="telephone", type="string"),
      *             @OA\Property(property="actif", type="boolean")
      *         )
      *     ),
+     *
      *     @OA\Response(response=200, description="Utilisateur mis à jour")
      * )
      */
@@ -248,18 +268,18 @@ class UserController extends Controller
         $currentUser = $request->user();
         $user = User::find($id);
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'success' => false,
-                'message' => 'Utilisateur non trouvé'
+                'message' => 'Utilisateur non trouvé',
             ], 404);
         }
 
         // Vérifier les droits
-        if (!$currentUser->isAdmin() && !$currentUser->isProviseur()) {
+        if (! $currentUser->isAdmin() && ! $currentUser->isProviseur()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -274,7 +294,7 @@ class UserController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur de validation',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -294,14 +314,14 @@ class UserController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Utilisateur mis à jour avec succès',
-                'data' => $user
+                'data' => $user,
             ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -312,12 +332,15 @@ class UserController extends Controller
      *     tags={"Users"},
      *     summary="Activer/Désactiver un utilisateur",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Statut modifié")
      * )
      */
@@ -326,22 +349,22 @@ class UserController extends Controller
         $currentUser = $request->user();
         $user = User::find($id);
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'success' => false,
-                'message' => 'Utilisateur non trouvé'
+                'message' => 'Utilisateur non trouvé',
             ], 404);
         }
 
         // Seuls le proviseur et l'admin peuvent activer/désactiver
-        if (!$currentUser->isProviseur() && !$currentUser->isAdmin()) {
+        if (! $currentUser->isProviseur() && ! $currentUser->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
-        $user->actif = !$user->actif;
+        $user->actif = ! $user->actif;
         $user->save();
 
         $action = $user->actif ? 'activation' : 'desactivation';
@@ -357,7 +380,7 @@ class UserController extends Controller
         return response()->json([
             'success' => true,
             'message' => $user->actif ? 'Utilisateur activé' : 'Utilisateur désactivé',
-            'data' => $user
+            'data' => $user,
         ], 200);
     }
 
@@ -367,12 +390,15 @@ class UserController extends Controller
      *     tags={"Users"},
      *     summary="Supprimer un utilisateur (soft delete)",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Utilisateur supprimé")
      * )
      */
@@ -381,18 +407,18 @@ class UserController extends Controller
         $currentUser = $request->user();
         $user = User::find($id);
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'success' => false,
-                'message' => 'Utilisateur non trouvé'
+                'message' => 'Utilisateur non trouvé',
             ], 404);
         }
 
         // Seul l'admin peut supprimer
-        if (!$currentUser->isAdmin()) {
+        if (! $currentUser->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Seul l\'administrateur peut supprimer un utilisateur'
+                'message' => 'Seul l\'administrateur peut supprimer un utilisateur',
             ], 403);
         }
 
@@ -408,7 +434,7 @@ class UserController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Utilisateur supprimé avec succès'
+            'message' => 'Utilisateur supprimé avec succès',
         ], 200);
     }
 }

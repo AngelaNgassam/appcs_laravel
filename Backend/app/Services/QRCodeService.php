@@ -8,7 +8,8 @@ class QRCodeService
 {
     /**
      * Générer un QR Code
-     * @param array|string $data - Données à encoder (array ou string simple)
+     *
+     * @param  array|string  $data  - Données à encoder (array ou string simple)
      */
     public function generer($data): string
     {
@@ -29,7 +30,7 @@ class QRCodeService
     {
         $qrCode = $this->generer($data);
 
-        $path = 'qrcodes/' . $filename . '.svg';
+        $path = 'qrcodes/'.$filename.'.svg';
 
         \Storage::disk('public')->put($path, $qrCode);
 

@@ -18,8 +18,8 @@ if ($modeles->isEmpty()) {
         echo "ID: {$modele->id}\n";
         echo "Nom: {$modele->nom_modele}\n";
         echo "Template: {$modele->fichier_template}\n";
-        echo "Actif: " . ($modele->actif ? '✅ OUI' : '❌ NON') . "\n";
-        echo "Défaut: " . ($modele->est_defaut ? '✅ OUI' : '❌ NON') . "\n";
+        echo 'Actif: '.($modele->actif ? '✅ OUI' : '❌ NON')."\n";
+        echo 'Défaut: '.($modele->est_defaut ? '✅ OUI' : '❌ NON')."\n";
         echo "---\n";
     }
 }

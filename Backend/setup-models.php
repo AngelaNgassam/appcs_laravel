@@ -48,7 +48,7 @@ foreach ($modeles as $modele) {
     $created = ModeleCarte::create($modele);
     echo "✅ {$modele['nom_modele']}\n";
     echo "   Template: {$modele['fichier_template']}\n";
-    echo "   Défaut: " . ($modele['est_defaut'] ? 'OUI' : 'NON') . "\n\n";
+    echo '   Défaut: '.($modele['est_defaut'] ? 'OUI' : 'NON')."\n\n";
 }
 
 echo "✅ Tous les modèles ont été configurés !\n";

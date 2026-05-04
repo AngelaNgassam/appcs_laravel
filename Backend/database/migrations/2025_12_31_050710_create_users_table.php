@@ -25,14 +25,14 @@ return new class extends Migration
             $table->softDeletes();
 
             $table->foreign('etablissement_id')
-                  ->references('id')
-                  ->on('etablissements')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('etablissements')
+                ->onDelete('cascade');
 
             $table->foreign('cree_par')
-                  ->references('id')
-                  ->on('users')
-                  ->onDelete('set null');
+                ->references('id')
+                ->on('users')
+                ->onDelete('set null');
 
             $table->index('email');
             $table->index('role');

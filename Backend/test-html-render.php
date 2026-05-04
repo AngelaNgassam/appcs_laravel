@@ -5,7 +5,6 @@ $app = require_once __DIR__.'/bootstrap/app.php';
 $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
 
 use App\Models\Eleve;
-use App\Models\ModeleCarte;
 use App\Services\PDFService;
 use App\Services\QRCodeService;
 
@@ -14,12 +13,12 @@ echo "====================================\n\n";
 
 // Trouver un élève avec photo
 $eleve = Eleve::with(['classe', 'etablissement', 'photoActive'])
-    ->whereHas('photoActive', function($q) {
+    ->whereHas('photoActive', function ($q) {
         $q->where('statut', 'validee');
     })
     ->first();
 
-if (!$eleve) {
+if (! $eleve) {
     echo "❌ Aucun élève avec photo validée trouvé\n";
     exit(1);
 }
@@ -42,7 +41,7 @@ $data = [
     'qrCode' => $qrCode,
     'etablissement' => $eleve->etablissement,
     'classe' => $eleve->classe,
-    'anneeAcademique' => optional($eleve->etablissement->anneeActive)->annee ?? date('Y') . '-' . (date('Y') + 1),
+    'anneeAcademique' => optional($eleve->etablissement->anneeActive)->annee ?? date('Y').'-'.(date('Y') + 1),
 ];
 
 // Générer le HTML pour chaque modèle
@@ -54,18 +53,18 @@ $modeles = [
 
 foreach ($modeles as $view => $name) {
     echo "🎨 Génération HTML: {$name}\n";
-    
+
     try {
         $html = view($view, $data)->render();
-        $filename = "test_" . str_replace('.', '_', $view) . ".html";
+        $filename = 'test_'.str_replace('.', '_', $view).'.html';
         file_put_contents($filename, $html);
-        
+
         $size = strlen($html);
         echo "   ✅ HTML généré\n";
         echo "   📄 Fichier: {$filename}\n";
-        echo "   📊 Taille: " . round($size / 1024, 2) . " KB\n";
-        echo "   🔗 Ouvrir: file:///" . realpath($filename) . "\n\n";
-        
+        echo '   📊 Taille: '.round($size / 1024, 2)." KB\n";
+        echo '   🔗 Ouvrir: file:///'.realpath($filename)."\n\n";
+
     } catch (\Exception $e) {
         echo "   ❌ Erreur: {$e->getMessage()}\n\n";
     }

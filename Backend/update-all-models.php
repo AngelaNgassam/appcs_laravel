@@ -14,11 +14,11 @@ $modeles = ModeleCarte::all();
 foreach ($modeles as $modele) {
     echo "Modèle: {$modele->nom_modele}\n";
     echo "  Ancien template: {$modele->fichier_template}\n";
-    
+
     // Mettre à jour pour utiliser le nouveau template
     $modele->fichier_template = 'cartes.template';
     $modele->save();
-    
+
     echo "  ✅ Nouveau template: {$modele->fichier_template}\n\n";
 }
 

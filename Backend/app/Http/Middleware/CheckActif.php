@@ -13,17 +13,17 @@ class CheckActif
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$request->user()) {
+        if (! $request->user()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Non authentifié'
+                'message' => 'Non authentifié',
             ], 401);
         }
 
-        if (!$request->user()->actif) {
+        if (! $request->user()->actif) {
             return response()->json([
                 'success' => false,
-                'message' => 'Votre compte a été désactivé. Contactez l\'administrateur.'
+                'message' => 'Votre compte a été désactivé. Contactez l\'administrateur.',
             ], 403);
         }
 

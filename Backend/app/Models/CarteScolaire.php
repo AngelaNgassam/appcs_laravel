@@ -78,7 +78,7 @@ class CarteScolaire extends Model
     // Accessors
     public function getPdfUrlAttribute()
     {
-        return $this->chemin_pdf ? asset('storage/' . $this->chemin_pdf) : null;
+        return $this->chemin_pdf ? asset('storage/'.$this->chemin_pdf) : null;
     }
 
     // Helpers

@@ -3,16 +3,17 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Photo;
 use App\Models\Eleve;
-use App\Services\PhotoService;
+use App\Models\Photo;
 use App\Services\HistoriqueService;
+use App\Services\PhotoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class PhotoController extends Controller
 {
     protected $photoService;
+
     protected $historiqueService;
 
     public function __construct(
@@ -29,20 +30,25 @@ class PhotoController extends Controller
      *     tags={"Photos"},
      *     summary="Liste des photos avec pagination",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="eleve_id",
      *         in="query",
      *         description="Filtrer par élève",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="statut",
      *         in="query",
      *         description="Filtrer par statut",
      *         required=false,
+     *
      *         @OA\Schema(type="string", enum={"brouillon", "validee", "refusee", "archivee"})
      *     ),
+     *
      *     @OA\Response(response=200, description="Liste des photos")
      * )
      */
@@ -54,8 +60,8 @@ class PhotoController extends Controller
         $query = Photo::with(['eleve.classe', 'operateur']);
 
         // Filtrer par établissement
-        if (!$user->isAdmin()) {
-            $query->whereHas('eleve', function($q) use ($user) {
+        if (! $user->isAdmin()) {
+            $query->whereHas('eleve', function ($q) use ($user) {
                 $q->where('etablissement_id', $user->etablissement_id);
             });
         }
@@ -76,7 +82,7 @@ class PhotoController extends Controller
         }
 
         // Seulement les photos actives par défaut
-        if (!$request->get('include_archived', false)) {
+        if (! $request->get('include_archived', false)) {
             $query->where('active', true);
         }
 
@@ -90,7 +96,7 @@ class PhotoController extends Controller
                 'per_page' => $photos->perPage(),
                 'current_page' => $photos->currentPage(),
                 'last_page' => $photos->lastPage(),
-            ]
+            ],
         ], 200);
     }
 
@@ -100,17 +106,22 @@ class PhotoController extends Controller
      *     tags={"Photos"},
      *     summary="Uploader une photo d'élève",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
+     *
      *             @OA\Schema(
      *                 required={"photo", "eleve_id"},
+     *
      *                 @OA\Property(property="photo", type="string", format="binary"),
      *                 @OA\Property(property="eleve_id", type="integer")
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(response=201, description="Photo uploadée")
      * )
      */
@@ -119,10 +130,10 @@ class PhotoController extends Controller
         $user = $request->user();
 
         // Seul l'opérateur peut uploader des photos
-        if (!$user->isOperateur() && !$user->isAdmin()) {
+        if (! $user->isOperateur() && ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Seul un opérateur photo peut uploader des photos'
+                'message' => 'Seul un opérateur photo peut uploader des photos',
             ], 403);
         }
 
@@ -135,7 +146,7 @@ class PhotoController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur de validation',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -143,10 +154,10 @@ class PhotoController extends Controller
             // Vérifier que l'élève appartient au même établissement
             $eleve = Eleve::find($request->eleve_id);
 
-            if (!$user->isAdmin() && $eleve->etablissement_id !== $user->etablissement_id) {
+            if (! $user->isAdmin() && $eleve->etablissement_id !== $user->etablissement_id) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Cet élève n\'appartient pas à votre établissement'
+                    'message' => 'Cet élève n\'appartient pas à votre établissement',
                 ], 403);
             }
 
@@ -173,14 +184,14 @@ class PhotoController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Photo uploadée et traitée avec succès',
-                'data' => $photo->load(['eleve', 'operateur'])
+                'data' => $photo->load(['eleve', 'operateur']),
             ], 201);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'upload',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -191,12 +202,15 @@ class PhotoController extends Controller
      *     tags={"Photos"},
      *     summary="Détails d'une photo",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Détails de la photo")
      * )
      */
@@ -206,24 +220,24 @@ class PhotoController extends Controller
 
         $photo = Photo::with(['eleve.classe', 'operateur'])->find($id);
 
-        if (!$photo) {
+        if (! $photo) {
             return response()->json([
                 'success' => false,
-                'message' => 'Photo non trouvée'
+                'message' => 'Photo non trouvée',
             ], 404);
         }
 
         // Vérifier les droits
-        if (!$user->isAdmin() && $photo->eleve->etablissement_id !== $user->etablissement_id) {
+        if (! $user->isAdmin() && $photo->eleve->etablissement_id !== $user->etablissement_id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
         return response()->json([
             'success' => true,
-            'data' => $photo
+            'data' => $photo,
         ], 200);
     }
 
@@ -233,12 +247,15 @@ class PhotoController extends Controller
      *     tags={"Photos"},
      *     summary="Valider une photo",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Photo validée")
      * )
      */
@@ -248,18 +265,18 @@ class PhotoController extends Controller
 
         $photo = Photo::find($id);
 
-        if (!$photo) {
+        if (! $photo) {
             return response()->json([
                 'success' => false,
-                'message' => 'Photo non trouvée'
+                'message' => 'Photo non trouvée',
             ], 404);
         }
 
         // Seuls le surveillant et le proviseur peuvent valider
-        if (!$user->isSurveillant() && !$user->isProviseur() && !$user->isAdmin()) {
+        if (! $user->isSurveillant() && ! $user->isProviseur() && ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Vous n\'avez pas les droits pour valider une photo'
+                'message' => 'Vous n\'avez pas les droits pour valider une photo',
             ], 403);
         }
 
@@ -276,7 +293,7 @@ class PhotoController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Photo validée avec succès',
-            'data' => $photo
+            'data' => $photo,
         ], 200);
     }
 
@@ -286,19 +303,25 @@ class PhotoController extends Controller
      *     tags={"Photos"},
      *     summary="Refuser une photo",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"motif"},
+     *
      *             @OA\Property(property="motif", type="string")
      *         )
      *     ),
+     *
      *     @OA\Response(response=200, description="Photo refusée")
      * )
      */
@@ -308,18 +331,18 @@ class PhotoController extends Controller
 
         $photo = Photo::find($id);
 
-        if (!$photo) {
+        if (! $photo) {
             return response()->json([
                 'success' => false,
-                'message' => 'Photo non trouvée'
+                'message' => 'Photo non trouvée',
             ], 404);
         }
 
         // Seuls le surveillant et le proviseur peuvent refuser
-        if (!$user->isSurveillant() && !$user->isProviseur() && !$user->isAdmin()) {
+        if (! $user->isSurveillant() && ! $user->isProviseur() && ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Vous n\'avez pas les droits pour refuser une photo'
+                'message' => 'Vous n\'avez pas les droits pour refuser une photo',
             ], 403);
         }
 
@@ -331,7 +354,7 @@ class PhotoController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Le motif du refus est requis',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -348,7 +371,7 @@ class PhotoController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Photo refusée',
-            'data' => $photo
+            'data' => $photo,
         ], 200);
     }
 
@@ -358,12 +381,15 @@ class PhotoController extends Controller
      *     tags={"Photos"},
      *     summary="Supprimer une photo",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Photo supprimée")
      * )
      */
@@ -373,18 +399,18 @@ class PhotoController extends Controller
 
         $photo = Photo::find($id);
 
-        if (!$photo) {
+        if (! $photo) {
             return response()->json([
                 'success' => false,
-                'message' => 'Photo non trouvée'
+                'message' => 'Photo non trouvée',
             ], 404);
         }
 
         // Seul l'admin peut supprimer définitivement
-        if (!$user->isAdmin()) {
+        if (! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Seul l\'administrateur peut supprimer définitivement une photo'
+                'message' => 'Seul l\'administrateur peut supprimer définitivement une photo',
             ], 403);
         }
 
@@ -400,7 +426,7 @@ class PhotoController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Photo supprimée avec succès'
+            'message' => 'Photo supprimée avec succès',
         ], 200);
     }
 
@@ -410,6 +436,7 @@ class PhotoController extends Controller
      *     tags={"Photos"},
      *     summary="Statistiques des photos",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(response=200, description="Statistiques")
      * )
      */
@@ -420,8 +447,8 @@ class PhotoController extends Controller
         $query = Photo::query();
 
         // Filtrer par établissement
-        if (!$user->isAdmin()) {
-            $query->whereHas('eleve', function($q) use ($user) {
+        if (! $user->isAdmin()) {
+            $query->whereHas('eleve', function ($q) use ($user) {
                 $q->where('etablissement_id', $user->etablissement_id);
             });
         }
@@ -443,7 +470,7 @@ class PhotoController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $stats
+            'data' => $stats,
         ], 200);
     }
 }

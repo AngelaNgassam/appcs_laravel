@@ -53,57 +53,58 @@ class Photo extends Model
     public function scopeValidee($query)
     {
         return $query->where('statut', 'validee');
-}
-public function scopeActive($query)
-{
-    return $query->where('active', true);
-}
+    }
 
-public function scopeEleve($query, $eleveId)
-{
-    return $query->where('eleve_id', $eleveId);
-}
+    public function scopeActive($query)
+    {
+        return $query->where('active', true);
+    }
 
-public function scopeOperateur($query, $operateurId)
-{
-    return $query->where('operateur_id', $operateurId);
-}
+    public function scopeEleve($query, $eleveId)
+    {
+        return $query->where('eleve_id', $eleveId);
+    }
 
-// Accessors
-public function getPhotoUrlAttribute()
-{
-    return $this->chemin_photo ? asset('storage/' . $this->chemin_photo) : null;
-}
+    public function scopeOperateur($query, $operateurId)
+    {
+        return $query->where('operateur_id', $operateurId);
+    }
 
-public function getPhotoOriginaleUrlAttribute()
-{
-    return $this->photo_originale ? asset('storage/' . $this->photo_originale) : null;
-}
+    // Accessors
+    public function getPhotoUrlAttribute()
+    {
+        return $this->chemin_photo ? asset('storage/'.$this->chemin_photo) : null;
+    }
 
-public function getPhotoTraiteeUrlAttribute()
-{
-    return $this->photo_traitee ? asset('storage/' . $this->photo_traitee) : null;
-}
+    public function getPhotoOriginaleUrlAttribute()
+    {
+        return $this->photo_originale ? asset('storage/'.$this->photo_originale) : null;
+    }
 
-// Helpers
-public function valider()
-{
-    $this->update(['statut' => 'validee']);
-}
+    public function getPhotoTraiteeUrlAttribute()
+    {
+        return $this->photo_traitee ? asset('storage/'.$this->photo_traitee) : null;
+    }
 
-public function refuser($motif)
-{
-    $this->update([
-        'statut' => 'refusee',
-        'motif_refus' => $motif,
-    ]);
-}
+    // Helpers
+    public function valider()
+    {
+        $this->update(['statut' => 'validee']);
+    }
 
-public function archiver()
-{
-    $this->update([
-        'statut' => 'archivee',
-        'active' => false,
-    ]);
-}
+    public function refuser($motif)
+    {
+        $this->update([
+            'statut' => 'refusee',
+            'motif_refus' => $motif,
+        ]);
+    }
+
+    public function archiver()
+    {
+        $this->update([
+            'statut' => 'archivee',
+            'active' => false,
+        ]);
+    }
 }

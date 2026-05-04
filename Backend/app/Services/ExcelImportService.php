@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use App\Models\Eleve;
 use App\Models\Classe;
+use App\Models\Eleve;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Maatwebsite\Excel\Facades\Excel;
-use Carbon\Carbon;
 
 class ExcelImportService
 {
@@ -32,8 +32,9 @@ class ExcelImportService
                 // ✅ Convertir la date de naissance
                 $dateNaissance = $this->parseDate($row[3]);
 
-                if (!$dateNaissance) {
+                if (! $dateNaissance) {
                     $erreurs[] = "Ligne {$ligne}: Format de date invalide. Utilisez JJ/MM/AAAA (ex: 05/11/2011)";
+
                     continue;
                 }
 
@@ -53,7 +54,8 @@ class ExcelImportService
                 ]);
 
                 if ($validator->fails()) {
-                    $erreurs[] = "Ligne {$ligne}: " . implode(', ', $validator->errors()->all());
+                    $erreurs[] = "Ligne {$ligne}: ".implode(', ', $validator->errors()->all());
+
                     continue;
                 }
 
@@ -62,6 +64,7 @@ class ExcelImportService
 
                 if ($eleveExistant) {
                     $erreurs[] = "Ligne {$ligne}: Matricule {$row[0]} existe déjà";
+
                     continue;
                 }
 
@@ -82,7 +85,7 @@ class ExcelImportService
                 $importes++;
 
             } catch (\Exception $e) {
-                $erreurs[] = "Ligne {$ligne}: " . $e->getMessage();
+                $erreurs[] = "Ligne {$ligne}: ".$e->getMessage();
             }
         }
 

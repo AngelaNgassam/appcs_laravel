@@ -18,9 +18,9 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('etablissement_id')
-                  ->references('id')
-                  ->on('etablissements')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('etablissements')
+                ->onDelete('cascade');
 
             $table->index('etablissement_id');
             $table->index('active');

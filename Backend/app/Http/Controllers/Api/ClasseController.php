@@ -3,13 +3,11 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Classe;
-use App\Models\Eleve;
 use App\Models\AnneeAcademique;
+use App\Models\Classe;
 use App\Services\HistoriqueService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
 
 class ClasseController extends Controller
 {
@@ -31,7 +29,7 @@ class ClasseController extends Controller
         $query = Classe::with(['etablissement', 'anneeAcademique']);
 
         // Filtrer par établissement
-        if (!$user->isAdmin()) {
+        if (! $user->isAdmin()) {
             $query->where('etablissement_id', $user->etablissement_id);
         }
 
@@ -42,7 +40,7 @@ class ClasseController extends Controller
 
         // Filtrer par année académique active
         if ($request->get('annee_active', false)) {
-            $query->whereHas('anneeAcademique', function($q) {
+            $query->whereHas('anneeAcademique', function ($q) {
                 $q->where('active', true);
             });
         }
@@ -50,9 +48,9 @@ class ClasseController extends Controller
         // Recherche
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nom', 'like', "%{$search}%")
-                  ->orWhere('niveau', 'like', "%{$search}%");
+                    ->orWhere('niveau', 'like', "%{$search}%");
             });
         }
 
@@ -66,7 +64,7 @@ class ClasseController extends Controller
                 'per_page' => $classes->perPage(),
                 'current_page' => $classes->currentPage(),
                 'last_page' => $classes->lastPage(),
-            ]
+            ],
         ], 200);
     }
 
@@ -78,10 +76,10 @@ class ClasseController extends Controller
         $user = $request->user();
 
         // Seuls le proviseur et l'admin peuvent créer
-        if (!$user->isProviseur() && !$user->isAdmin()) {
+        if (! $user->isProviseur() && ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -95,7 +93,7 @@ class ClasseController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur de validation',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -105,10 +103,10 @@ class ClasseController extends Controller
                 ->where('active', true)
                 ->first();
 
-            if (!$anneeActive) {
+            if (! $anneeActive) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Aucune année académique active trouvée'
+                    'message' => 'Aucune année académique active trouvée',
                 ], 400);
             }
 
@@ -121,7 +119,7 @@ class ClasseController extends Controller
             if ($classeExiste) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Une classe avec ce nom existe déjà pour cette année'
+                    'message' => 'Une classe avec ce nom existe déjà pour cette année',
                 ], 422);
             }
 
@@ -145,91 +143,89 @@ class ClasseController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Classe créée avec succès',
-                'data' => $classe->load(['etablissement', 'anneeAcademique'])
+                'data' => $classe->load(['etablissement', 'anneeAcademique']),
             ], 201);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la création',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
 
-
-
     /**
- * 🔍 Détails d'une classe
- */
-public function show(Request $request, $id)
-{
-    $user = $request->user();
+     * 🔍 Détails d'une classe
+     */
+    public function show(Request $request, $id)
+    {
+        $user = $request->user();
 
-    $classe = Classe::find($id);
+        $classe = Classe::find($id);
 
-    if (!$classe) {
+        if (! $classe) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Classe non trouvée',
+            ], 404);
+        }
+
+        // Vérifier les droits
+        if (! $user->isAdmin() && $classe->etablissement_id !== $user->etablissement_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Accès refusé',
+            ], 403);
+        }
+
+        // Charger les élèves actifs
+        $elevesActifs = $classe->eleves()
+            ->where('archive', false)
+            ->with(['photoActive', 'carteActive'])
+            ->orderBy('nom')
+            ->orderBy('prenom')
+            ->get();
+
+        // Charger les élèves archivés
+        $elevesArchives = $classe->eleves()
+            ->where('archive', true)
+            ->with(['photoActive', 'carteActive'])
+            ->orderBy('date_archivage', 'desc')
+            ->get();
+
+        // Statistiques
+        $statistiques = [
+            'total_eleves' => $classe->eleves()->count(),
+            'eleves_actifs' => $elevesActifs->count(),
+            'eleves_archives' => $elevesArchives->count(),
+            'eleves_avec_photo' => $classe->eleves()
+                ->whereHas('photoActive', function ($q) {
+                    $q->where('statut', 'validee');
+                })
+                ->count(),
+            'eleves_sans_photo' => $classe->eleves()
+                ->whereDoesntHave('photoActive', function ($q) {
+                    $q->where('statut', 'validee');
+                })
+                ->count(),
+        ];
+
         return response()->json([
-            'success' => false,
-            'message' => 'Classe non trouvée'
-        ], 404);
+            'success' => true,
+            'data' => [
+                'id' => $classe->id,
+                'nom' => $classe->nom,
+                'niveau' => $classe->niveau,
+                'serie' => $classe->serie,
+                'effectif' => $classe->effectif,
+                'etablissement_id' => $classe->etablissement_id,
+                'elevesActifs' => $elevesActifs,      // ✅ IMPORTANT
+                'elevesArchives' => $elevesArchives,  // ✅ IMPORTANT
+            ],
+            'statistiques' => $statistiques,
+        ], 200);
     }
-
-    // Vérifier les droits
-    if (!$user->isAdmin() && $classe->etablissement_id !== $user->etablissement_id) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Accès refusé'
-        ], 403);
-    }
-
-    // Charger les élèves actifs
-    $elevesActifs = $classe->eleves()
-        ->where('archive', false)
-        ->with(['photoActive', 'carteActive'])
-        ->orderBy('nom')
-        ->orderBy('prenom')
-        ->get();
-
-    // Charger les élèves archivés
-    $elevesArchives = $classe->eleves()
-        ->where('archive', true)
-        ->with(['photoActive', 'carteActive'])
-        ->orderBy('date_archivage', 'desc')
-        ->get();
-
-    // Statistiques
-    $statistiques = [
-        'total_eleves' => $classe->eleves()->count(),
-        'eleves_actifs' => $elevesActifs->count(),
-        'eleves_archives' => $elevesArchives->count(),
-        'eleves_avec_photo' => $classe->eleves()
-            ->whereHas('photoActive', function($q) {
-                $q->where('statut', 'validee');
-            })
-            ->count(),
-        'eleves_sans_photo' => $classe->eleves()
-            ->whereDoesntHave('photoActive', function($q) {
-                $q->where('statut', 'validee');
-            })
-            ->count(),
-    ];
-
-    return response()->json([
-        'success' => true,
-        'data' => [
-            'id' => $classe->id,
-            'nom' => $classe->nom,
-            'niveau' => $classe->niveau,
-            'serie' => $classe->serie,
-            'effectif' => $classe->effectif,
-            'etablissement_id' => $classe->etablissement_id,
-            'elevesActifs' => $elevesActifs,      // ✅ IMPORTANT
-            'elevesArchives' => $elevesArchives,  // ✅ IMPORTANT
-        ],
-        'statistiques' => $statistiques
-    ], 200);
-}
 
     /**
      * ✏️ Modifier une classe
@@ -240,18 +236,18 @@ public function show(Request $request, $id)
 
         $classe = Classe::find($id);
 
-        if (!$classe) {
+        if (! $classe) {
             return response()->json([
                 'success' => false,
-                'message' => 'Classe non trouvée'
+                'message' => 'Classe non trouvée',
             ], 404);
         }
 
         // Vérifier les droits
-        if (!$user->isProviseur() && !$user->isAdmin()) {
+        if (! $user->isProviseur() && ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -265,7 +261,7 @@ public function show(Request $request, $id)
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur de validation',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -283,14 +279,14 @@ public function show(Request $request, $id)
             return response()->json([
                 'success' => true,
                 'message' => 'Classe mise à jour avec succès',
-                'data' => $classe
+                'data' => $classe,
             ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -304,10 +300,10 @@ public function show(Request $request, $id)
 
         $classe = Classe::find($id);
 
-        if (!$classe) {
+        if (! $classe) {
             return response()->json([
                 'success' => false,
-                'message' => 'Classe non trouvée'
+                'message' => 'Classe non trouvée',
             ], 404);
         }
 
@@ -315,7 +311,7 @@ public function show(Request $request, $id)
         if ($classe->eleves()->count() > 0) {
             return response()->json([
                 'success' => false,
-                'message' => 'Impossible de supprimer une classe contenant des élèves'
+                'message' => 'Impossible de supprimer une classe contenant des élèves',
             ], 422);
         }
 
@@ -331,7 +327,7 @@ public function show(Request $request, $id)
 
         return response()->json([
             'success' => true,
-            'message' => 'Classe supprimée avec succès'
+            'message' => 'Classe supprimée avec succès',
         ], 200);
     }
 }

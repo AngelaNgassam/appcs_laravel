@@ -32,6 +32,7 @@ class NotificationService
 
         if ($notification) {
             $notification->marquerCommeLue();
+
             return true;
         }
 

@@ -38,7 +38,7 @@ class CarteTest extends TestCase
      */
     public function test_php_version_meets_requirement(): void
     {
-        $currentVersion = PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION;
+        $currentVersion = PHP_MAJOR_VERSION.'.'.PHP_MINOR_VERSION;
 
         $this->assertGreaterThanOrEqual(
             8.4,
@@ -86,9 +86,9 @@ class CarteTest extends TestCase
     public function test_full_name_concatenation(): void
     {
         $firstName = 'Angela';
-        $lastName  = 'Ngassam';
+        $lastName = 'Ngassam';
 
-        $fullName = trim($firstName . ' ' . $lastName);
+        $fullName = trim($firstName.' '.$lastName);
 
         $this->assertEquals('Angela Ngassam', $fullName);
         $this->assertStringContainsString($firstName, $fullName);
@@ -101,7 +101,7 @@ class CarteTest extends TestCase
      */
     public function test_school_year_format_is_valid(): void
     {
-        $validYear   = '2024-2025';
+        $validYear = '2024-2025';
         $invalidYear = '2024';
 
         $this->assertMatchesRegularExpression(
@@ -128,7 +128,7 @@ class CarteTest extends TestCase
     public function test_html_special_chars_are_escaped(): void
     {
         $maliciousInput = '<script>alert("xss")</script>';
-        $escaped        = htmlspecialchars($maliciousInput, ENT_QUOTES, 'UTF-8');
+        $escaped = htmlspecialchars($maliciousInput, ENT_QUOTES, 'UTF-8');
 
         $this->assertStringNotContainsString('<script>', $escaped);
         $this->assertStringContainsString('&lt;script&gt;', $escaped);
@@ -140,7 +140,7 @@ class CarteTest extends TestCase
      */
     public function test_password_is_hashed_not_plain(): void
     {
-        $plainPassword  = 'monMotDePasse123';
+        $plainPassword = 'monMotDePasse123';
         $hashedPassword = password_hash($plainPassword, PASSWORD_BCRYPT);
 
         $this->assertNotEquals($plainPassword, $hashedPassword);
@@ -153,7 +153,7 @@ class CarteTest extends TestCase
      */
     public function test_invalid_email_is_detected(): void
     {
-        $validEmail   = 'angela@example.com';
+        $validEmail = 'angela@example.com';
         $invalidEmail = 'pas-un-email';
 
         $this->assertNotFalse(filter_var($validEmail, FILTER_VALIDATE_EMAIL));
@@ -170,6 +170,6 @@ class CarteTest extends TestCase
      */
     private function isValidStudentId(string $id): bool
     {
-        return !empty($id) && strlen($id) >= 3;
+        return ! empty($id) && strlen($id) >= 3;
     }
 }

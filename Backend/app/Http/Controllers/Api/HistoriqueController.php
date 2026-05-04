@@ -14,20 +14,25 @@ class HistoriqueController extends Controller
      *     tags={"Historique"},
      *     summary="Historique des actions avec pagination",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="action",
      *         in="query",
      *         description="Filtrer par type d'action",
      *         required=false,
+     *
      *         @OA\Schema(type="string")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="user_id",
      *         in="query",
      *         description="Filtrer par utilisateur",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Historique des actions")
      * )
      */
@@ -39,8 +44,8 @@ class HistoriqueController extends Controller
         $query = HistoriqueAction::with('user');
 
         // Filtrer par établissement si pas admin
-        if (!$user->isAdmin()) {
-            $query->whereHas('user', function($q) use ($user) {
+        if (! $user->isAdmin()) {
+            $query->whereHas('user', function ($q) use ($user) {
                 $q->where('etablissement_id', $user->etablissement_id);
             });
         }
@@ -79,7 +84,7 @@ class HistoriqueController extends Controller
                 'per_page' => $historique->perPage(),
                 'current_page' => $historique->currentPage(),
                 'last_page' => $historique->lastPage(),
-            ]
+            ],
         ], 200);
     }
 
@@ -89,12 +94,15 @@ class HistoriqueController extends Controller
      *     tags={"Historique"},
      *     summary="Détails d'une action",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Détails de l'action")
      * )
      */
@@ -104,24 +112,24 @@ class HistoriqueController extends Controller
 
         $action = HistoriqueAction::with('user')->find($id);
 
-        if (!$action) {
+        if (! $action) {
             return response()->json([
                 'success' => false,
-                'message' => 'Action non trouvée'
+                'message' => 'Action non trouvée',
             ], 404);
         }
 
         // Vérifier les droits
-        if (!$user->isAdmin() && !$user->isProviseur()) {
+        if (! $user->isAdmin() && ! $user->isProviseur()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
         return response()->json([
             'success' => true,
-            'data' => $action
+            'data' => $action,
         ], 200);
     }
 
@@ -131,6 +139,7 @@ class HistoriqueController extends Controller
      *     tags={"Historique"},
      *     summary="Statistiques des actions",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(response=200, description="Statistiques")
      * )
      */
@@ -141,8 +150,8 @@ class HistoriqueController extends Controller
         $query = HistoriqueAction::query();
 
         // Filtrer par établissement
-        if (!$user->isAdmin()) {
-            $query->whereHas('user', function($q) use ($user) {
+        if (! $user->isAdmin()) {
+            $query->whereHas('user', function ($q) use ($user) {
                 $q->where('etablissement_id', $user->etablissement_id);
             });
         }
@@ -161,7 +170,7 @@ class HistoriqueController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $stats
+            'data' => $stats,
         ], 200);
     }
 }

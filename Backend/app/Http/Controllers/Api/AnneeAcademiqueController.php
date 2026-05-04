@@ -23,20 +23,25 @@ class AnneeAcademiqueController extends Controller
      *     tags={"Années Académiques"},
      *     summary="Liste des années académiques",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="etablissement_id",
      *         in="query",
      *         description="Filtrer par établissement",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Parameter(
      *         name="active",
      *         in="query",
      *         description="Filtrer par statut actif",
      *         required=false,
+     *
      *         @OA\Schema(type="boolean")
      *     ),
+     *
      *     @OA\Response(response=200, description="Liste des années académiques")
      * )
      */
@@ -50,7 +55,7 @@ class AnneeAcademiqueController extends Controller
         // Filtrer par établissement
         if ($user->isAdmin() && $request->has('etablissement_id')) {
             $query->where('etablissement_id', $request->etablissement_id);
-        } elseif (!$user->isAdmin()) {
+        } elseif (! $user->isAdmin()) {
             $query->where('etablissement_id', $user->etablissement_id);
         }
 
@@ -69,7 +74,7 @@ class AnneeAcademiqueController extends Controller
                 'per_page' => $annees->perPage(),
                 'current_page' => $annees->currentPage(),
                 'last_page' => $annees->lastPage(),
-            ]
+            ],
         ], 200);
     }
 
@@ -79,16 +84,20 @@ class AnneeAcademiqueController extends Controller
      *     tags={"Années Académiques"},
      *     summary="Créer une année académique",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"libelle", "date_debut", "date_fin"},
+     *
      *             @OA\Property(property="libelle", type="string", example="2024-2025"),
      *             @OA\Property(property="date_debut", type="string", format="date", example="2024-09-01"),
      *             @OA\Property(property="date_fin", type="string", format="date", example="2025-07-31"),
      *             @OA\Property(property="active", type="boolean", example=true)
      *         )
      *     ),
+     *
      *     @OA\Response(response=201, description="Année académique créée")
      * )
      */
@@ -97,10 +106,10 @@ class AnneeAcademiqueController extends Controller
         $user = $request->user();
 
         // Seuls le proviseur et l'admin peuvent créer
-        if (!$user->isProviseur() && !$user->isAdmin()) {
+        if (! $user->isProviseur() && ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -115,7 +124,7 @@ class AnneeAcademiqueController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur de validation',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -132,7 +141,7 @@ class AnneeAcademiqueController extends Controller
             if ($existe) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Une année académique avec ce libellé existe déjà'
+                    'message' => 'Une année académique avec ce libellé existe déjà',
                 ], 422);
             }
 
@@ -161,14 +170,14 @@ class AnneeAcademiqueController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Année académique créée avec succès',
-                'data' => $annee->load('etablissement')
+                'data' => $annee->load('etablissement'),
             ], 201);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la création',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -179,12 +188,15 @@ class AnneeAcademiqueController extends Controller
      *     tags={"Années Académiques"},
      *     summary="Détails d'une année académique",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Détails de l'année")
      * )
      */
@@ -194,18 +206,18 @@ class AnneeAcademiqueController extends Controller
 
         $annee = AnneeAcademique::with(['etablissement', 'classes'])->find($id);
 
-        if (!$annee) {
+        if (! $annee) {
             return response()->json([
                 'success' => false,
-                'message' => 'Année académique non trouvée'
+                'message' => 'Année académique non trouvée',
             ], 404);
         }
 
         // Vérifier les droits
-        if (!$user->isAdmin() && $annee->etablissement_id !== $user->etablissement_id) {
+        if (! $user->isAdmin() && $annee->etablissement_id !== $user->etablissement_id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -218,7 +230,7 @@ class AnneeAcademiqueController extends Controller
         return response()->json([
             'success' => true,
             'data' => $annee,
-            'statistiques' => $stats
+            'statistiques' => $stats,
         ], 200);
     }
 
@@ -228,20 +240,26 @@ class AnneeAcademiqueController extends Controller
      *     tags={"Années Académiques"},
      *     summary="Mettre à jour une année académique",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="libelle", type="string"),
      *             @OA\Property(property="date_debut", type="string", format="date"),
      *             @OA\Property(property="date_fin", type="string", format="date")
      *         )
      *     ),
+     *
      *     @OA\Response(response=200, description="Année mise à jour")
      * )
      */
@@ -251,25 +269,25 @@ class AnneeAcademiqueController extends Controller
 
         $annee = AnneeAcademique::find($id);
 
-        if (!$annee) {
+        if (! $annee) {
             return response()->json([
                 'success' => false,
-                'message' => 'Année académique non trouvée'
+                'message' => 'Année académique non trouvée',
             ], 404);
         }
 
         // Vérifier les droits
-        if (!$user->isProviseur() && !$user->isAdmin()) {
+        if (! $user->isProviseur() && ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
-        if (!$user->isAdmin() && $annee->etablissement_id !== $user->etablissement_id) {
+        if (! $user->isAdmin() && $annee->etablissement_id !== $user->etablissement_id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -283,7 +301,7 @@ class AnneeAcademiqueController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur de validation',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -301,14 +319,14 @@ class AnneeAcademiqueController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Année académique mise à jour avec succès',
-                'data' => $annee
+                'data' => $annee,
             ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -319,12 +337,15 @@ class AnneeAcademiqueController extends Controller
      *     tags={"Années Académiques"},
      *     summary="Activer une année académique",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Année activée")
      * )
      */
@@ -334,18 +355,18 @@ class AnneeAcademiqueController extends Controller
 
         $annee = AnneeAcademique::find($id);
 
-        if (!$annee) {
+        if (! $annee) {
             return response()->json([
                 'success' => false,
-                'message' => 'Année académique non trouvée'
+                'message' => 'Année académique non trouvée',
             ], 404);
         }
 
         // Vérifier les droits
-        if (!$user->isProviseur() && !$user->isAdmin()) {
+        if (! $user->isProviseur() && ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -370,14 +391,14 @@ class AnneeAcademiqueController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Année académique activée avec succès',
-                'data' => $annee
+                'data' => $annee,
             ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'activation',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -388,6 +409,7 @@ class AnneeAcademiqueController extends Controller
      *     tags={"Années Académiques"},
      *     summary="Obtenir l'année académique active",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(response=200, description="Année active")
      * )
      */
@@ -400,16 +422,16 @@ class AnneeAcademiqueController extends Controller
             ->with(['etablissement', 'classes'])
             ->first();
 
-        if (!$annee) {
+        if (! $annee) {
             return response()->json([
                 'success' => false,
-                'message' => 'Aucune année académique active'
+                'message' => 'Aucune année académique active',
             ], 404);
         }
 
         return response()->json([
             'success' => true,
-            'data' => $annee
+            'data' => $annee,
         ], 200);
     }
 
@@ -419,12 +441,15 @@ class AnneeAcademiqueController extends Controller
      *     tags={"Années Académiques"},
      *     summary="Supprimer une année académique",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Année supprimée")
      * )
      */
@@ -434,18 +459,18 @@ class AnneeAcademiqueController extends Controller
 
         $annee = AnneeAcademique::find($id);
 
-        if (!$annee) {
+        if (! $annee) {
             return response()->json([
                 'success' => false,
-                'message' => 'Année académique non trouvée'
+                'message' => 'Année académique non trouvée',
             ], 404);
         }
 
         // Seuls le proviseur et l'admin peuvent supprimer
-        if (!$user->isProviseur() && !$user->isAdmin()) {
+        if (! $user->isProviseur() && ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -453,7 +478,7 @@ class AnneeAcademiqueController extends Controller
         if ($annee->classes()->count() > 0) {
             return response()->json([
                 'success' => false,
-                'message' => 'Impossible de supprimer une année académique contenant des classes'
+                'message' => 'Impossible de supprimer une année académique contenant des classes',
             ], 422);
         }
 
@@ -469,7 +494,7 @@ class AnneeAcademiqueController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Année académique supprimée avec succès'
+            'message' => 'Année académique supprimée avec succès',
         ], 200);
     }
 }

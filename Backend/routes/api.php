@@ -1,22 +1,20 @@
 <?php
 
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-
-// ✅ Imports des controllers
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\ClasseController;
-use App\Http\Controllers\Api\EleveController;
-use App\Http\Controllers\Api\DashboardController;
-use App\Http\Controllers\Api\EtablissementController;
-use App\Http\Controllers\Api\AnneeAcademiqueController;
-use App\Http\Controllers\Api\PhotoController;
-use App\Http\Controllers\Api\CarteController;
-use App\Http\Controllers\Api\ModeleCarteController;
-use App\Http\Controllers\Api\HistoriqueController;
-use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\AdminController;
+// ✅ Imports des controllers
+use App\Http\Controllers\Api\AnneeAcademiqueController;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\CarteController;
+use App\Http\Controllers\Api\ClasseController;
+use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\EleveController;
+use App\Http\Controllers\Api\EtablissementController;
+use App\Http\Controllers\Api\HistoriqueController;
+use App\Http\Controllers\Api\ModeleCarteController;
+use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\PhotoController;
+use App\Http\Controllers\Api\UserController;
+use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,8 +31,6 @@ Route::prefix('v1')->group(function () {
     // Prévisualisation de carte (authentification manuelle via token en paramètre)
     Route::get('/cartes/{id}/previsualiser', [CarteController::class, 'previsualiser']);
 });
-
-
 
 // ==================== ROUTES PROTÉGÉES (SANCTUM) ====================
 Route::prefix('v1')->middleware(['auth:sanctum', 'actif'])->group(function () {
@@ -99,7 +95,6 @@ Route::prefix('v1')->middleware(['auth:sanctum', 'actif'])->group(function () {
     Route::patch('/eleves/{id}/desarchiver', [EleveController::class, 'desarchiver'])
         ->middleware('role:admin,proviseur');
 
-
     // ========== PHOTOS ==========
     Route::apiResource('photos', PhotoController::class);
     Route::patch('/photos/{id}/valider', [PhotoController::class, 'valider'])
@@ -150,6 +145,6 @@ Route::get('/test', function () {
     return response()->json([
         'message' => 'API Cartes Scolaires fonctionne !',
         'version' => '1.0.0',
-        'timestamp' => now()
+        'timestamp' => now(),
     ]);
 });

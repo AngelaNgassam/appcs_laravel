@@ -25,14 +25,14 @@ return new class extends Migration
             $table->softDeletes();
 
             $table->foreign('eleve_id')
-                  ->references('id')
-                  ->on('eleves')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('eleves')
+                ->onDelete('cascade');
 
             $table->foreign('photo_id')
-                  ->references('id')
-                  ->on('photos')
-                  ->onDelete('cascade');
+                ->references('id')
+                ->on('photos')
+                ->onDelete('cascade');
 
             // $table->foreign('modele_id')
             //       ->references('id')
@@ -40,9 +40,9 @@ return new class extends Migration
             //       ->onDelete('set null');
 
             $table->foreign('imprimee_par')
-                  ->references('id')
-                  ->on('users')
-                  ->onDelete('set null');
+                ->references('id')
+                ->on('users')
+                ->onDelete('set null');
 
             $table->index('eleve_id');
             $table->index('statut');

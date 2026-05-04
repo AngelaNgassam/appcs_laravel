@@ -26,8 +26,8 @@ echo "Élèves retournés par la requête backend:\n";
 echo "----------------------------------------\n";
 foreach ($elevesActifs as $e) {
     echo "ID: {$e->id} | {$e->nom} {$e->prenom}\n";
-    echo "  Photo Active: " . ($e->photoActive ? 'OUI' : 'NON') . "\n";
-    echo "  Carte Active: " . ($e->carteActive ? 'OUI' : 'NON') . "\n";
+    echo '  Photo Active: '.($e->photoActive ? 'OUI' : 'NON')."\n";
+    echo '  Carte Active: '.($e->carteActive ? 'OUI' : 'NON')."\n";
 }
 
 echo "\n\nTous les élèves de la classe (sans filtre):\n";

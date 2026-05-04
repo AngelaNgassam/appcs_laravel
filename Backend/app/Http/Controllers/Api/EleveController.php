@@ -3,17 +3,18 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Eleve;
 use App\Models\Classe;
-use App\Services\HistoriqueService;
+use App\Models\Eleve;
 use App\Services\ExcelImportService;
+use App\Services\HistoriqueService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class EleveController extends Controller
 {
     protected $historiqueService;
+
     protected $excelImportService;
 
     public function __construct(
@@ -35,7 +36,7 @@ class EleveController extends Controller
         $query = Eleve::with(['classe', 'etablissement', 'photoActive', 'carteActive']);
 
         // Filtrer par établissement
-        if (!$user->isAdmin()) {
+        if (! $user->isAdmin()) {
             $query->where('etablissement_id', $user->etablissement_id);
         }
 
@@ -51,10 +52,10 @@ class EleveController extends Controller
         // Recherche
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nom', 'like', "%{$search}%")
-                  ->orWhere('prenom', 'like', "%{$search}%")
-                  ->orWhere('matricule', 'like', "%{$search}%");
+                    ->orWhere('prenom', 'like', "%{$search}%")
+                    ->orWhere('matricule', 'like', "%{$search}%");
             });
         }
 
@@ -68,7 +69,7 @@ class EleveController extends Controller
                 'per_page' => $eleves->perPage(),
                 'current_page' => $eleves->currentPage(),
                 'last_page' => $eleves->lastPage(),
-            ]
+            ],
         ], 200);
     }
 
@@ -80,10 +81,10 @@ class EleveController extends Controller
         $user = $request->user();
 
         // Seuls le proviseur et le surveillant peuvent créer des élèves
-        if (!$user->isProviseur() && !$user->isSurveillant() && !$user->isAdmin()) {
+        if (! $user->isProviseur() && ! $user->isSurveillant() && ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -103,7 +104,7 @@ class EleveController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur de validation',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -111,10 +112,10 @@ class EleveController extends Controller
             // Vérifier que la classe appartient à l'établissement
             $classe = Classe::find($request->classe_id);
 
-            if (!$user->isAdmin() && $classe->etablissement_id !== $user->etablissement_id) {
+            if (! $user->isAdmin() && $classe->etablissement_id !== $user->etablissement_id) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Cette classe n\'appartient pas à votre établissement'
+                    'message' => 'Cette classe n\'appartient pas à votre établissement',
                 ], 403);
             }
 
@@ -145,14 +146,14 @@ class EleveController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Élève créé avec succès',
-                'data' => $eleve->load(['classe', 'etablissement'])
+                'data' => $eleve->load(['classe', 'etablissement']),
             ], 201);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la création',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -170,27 +171,27 @@ class EleveController extends Controller
             'photos',
             'photoActive',
             'cartes',
-            'carteActive'
+            'carteActive',
         ])->find($id);
 
-        if (!$eleve) {
+        if (! $eleve) {
             return response()->json([
                 'success' => false,
-                'message' => 'Élève non trouvé'
+                'message' => 'Élève non trouvé',
             ], 404);
         }
 
         // Vérifier les droits
-        if (!$user->isAdmin() && $eleve->etablissement_id !== $user->etablissement_id) {
+        if (! $user->isAdmin() && $eleve->etablissement_id !== $user->etablissement_id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
         return response()->json([
             'success' => true,
-            'data' => $eleve
+            'data' => $eleve,
         ], 200);
     }
 
@@ -203,24 +204,24 @@ class EleveController extends Controller
 
         $eleve = Eleve::find($id);
 
-        if (!$eleve) {
+        if (! $eleve) {
             return response()->json([
                 'success' => false,
-                'message' => 'Élève non trouvé'
+                'message' => 'Élève non trouvé',
             ], 404);
         }
 
         // Vérifier les droits
-        if (!$user->isAdmin() && $eleve->etablissement_id !== $user->etablissement_id) {
+        if (! $user->isAdmin() && $eleve->etablissement_id !== $user->etablissement_id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
         $validator = Validator::make($request->all(), [
             'classe_id' => 'sometimes|exists:classes,id',
-            'matricule' => 'sometimes|string|max:50|unique:eleves,matricule,' . $id,
+            'matricule' => 'sometimes|string|max:50|unique:eleves,matricule,'.$id,
             'nom' => 'sometimes|string|max:100',
             'prenom' => 'sometimes|string|max:100',
             'date_naissance' => 'sometimes|date|before:today',
@@ -234,7 +235,7 @@ class EleveController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur de validation',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -248,7 +249,7 @@ class EleveController extends Controller
                 'lieu_naissance',
                 'sexe',
                 'contact_parent',
-                'nom_parent'
+                'nom_parent',
             ]));
 
             // Historique
@@ -262,14 +263,14 @@ class EleveController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Élève mis à jour avec succès',
-                'data' => $eleve->load(['classe', 'etablissement'])
+                'data' => $eleve->load(['classe', 'etablissement']),
             ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -283,25 +284,25 @@ class EleveController extends Controller
 
         $eleve = Eleve::find($id);
 
-        if (!$eleve) {
+        if (! $eleve) {
             return response()->json([
                 'success' => false,
-                'message' => 'Élève non trouvé'
+                'message' => 'Élève non trouvé',
             ], 404);
         }
 
         // Vérifier les droits (seul admin ou proviseur)
-        if (!$user->isAdmin() && !$user->isProviseur()) {
+        if (! $user->isAdmin() && ! $user->isProviseur()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
-        if (!$user->isAdmin() && $eleve->etablissement_id !== $user->etablissement_id) {
+        if (! $user->isAdmin() && $eleve->etablissement_id !== $user->etablissement_id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -327,14 +328,14 @@ class EleveController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Élève supprimé avec succès'
+                'message' => 'Élève supprimé avec succès',
             ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la suppression',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -350,18 +351,18 @@ class EleveController extends Controller
             // Rechercher l'élève
             $eleve = Eleve::find($id);
 
-            if (!$eleve) {
+            if (! $eleve) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Élève non trouvé'
+                    'message' => 'Élève non trouvé',
                 ], 404);
             }
 
             // Vérifier les droits
-            if (!$user->isAdmin() && $eleve->etablissement_id !== $user->etablissement_id) {
+            if (! $user->isAdmin() && $eleve->etablissement_id !== $user->etablissement_id) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès refusé'
+                    'message' => 'Accès refusé',
                 ], 403);
             }
 
@@ -369,7 +370,7 @@ class EleveController extends Controller
             if ($eleve->archive) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Cet élève est déjà archivé'
+                    'message' => 'Cet élève est déjà archivé',
                 ], 400);
             }
 
@@ -390,20 +391,20 @@ class EleveController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Élève archivé avec succès',
-                'data' => $eleve
+                'data' => $eleve,
             ], 200);
 
         } catch (\Exception $e) {
             // Logger l'erreur
-            Log::error('Erreur archivage élève: ' . $e->getMessage(), [
+            Log::error('Erreur archivage élève: '.$e->getMessage(), [
                 'eleve_id' => $id,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'archivage de l\'élève',
-                'error' => config('app.debug') ? $e->getMessage() : 'Une erreur est survenue'
+                'error' => config('app.debug') ? $e->getMessage() : 'Une erreur est survenue',
             ], 500);
         }
     }
@@ -419,26 +420,26 @@ class EleveController extends Controller
             // Rechercher l'élève
             $eleve = Eleve::find($id);
 
-            if (!$eleve) {
+            if (! $eleve) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Élève non trouvé'
+                    'message' => 'Élève non trouvé',
                 ], 404);
             }
 
             // Vérifier les droits
-            if (!$user->isAdmin() && $eleve->etablissement_id !== $user->etablissement_id) {
+            if (! $user->isAdmin() && $eleve->etablissement_id !== $user->etablissement_id) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès refusé'
+                    'message' => 'Accès refusé',
                 ], 403);
             }
 
             // Vérifier que l'élève est bien archivé
-            if (!$eleve->archive) {
+            if (! $eleve->archive) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Cet élève n\'est pas archivé'
+                    'message' => 'Cet élève n\'est pas archivé',
                 ], 400);
             }
 
@@ -459,20 +460,20 @@ class EleveController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Élève désarchivé avec succès',
-                'data' => $eleve
+                'data' => $eleve,
             ], 200);
 
         } catch (\Exception $e) {
             // Logger l'erreur
-            Log::error('Erreur désarchivage élève: ' . $e->getMessage(), [
+            Log::error('Erreur désarchivage élève: '.$e->getMessage(), [
                 'eleve_id' => $id,
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du désarchivage de l\'élève',
-                'error' => config('app.debug') ? $e->getMessage() : 'Une erreur est survenue'
+                'error' => config('app.debug') ? $e->getMessage() : 'Une erreur est survenue',
             ], 500);
         }
     }
@@ -485,10 +486,10 @@ class EleveController extends Controller
         $user = $request->user();
 
         // Seul le proviseur peut importer
-        if (!$user->isProviseur() && !$user->isAdmin()) {
+        if (! $user->isProviseur() && ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -501,7 +502,7 @@ class EleveController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur de validation',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -509,10 +510,10 @@ class EleveController extends Controller
             // Vérifier que la classe appartient à l'établissement
             $classe = Classe::find($request->classe_id);
 
-            if (!$user->isAdmin() && $classe->etablissement_id !== $user->etablissement_id) {
+            if (! $user->isAdmin() && $classe->etablissement_id !== $user->etablissement_id) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Cette classe n\'appartient pas à votre établissement'
+                    'message' => 'Cette classe n\'appartient pas à votre établissement',
                 ], 403);
             }
 
@@ -534,14 +535,14 @@ class EleveController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => "Import terminé : {$resultat['importes']} élèves importés sur {$resultat['total']}",
-                'data' => $resultat
+                'data' => $resultat,
             ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'import',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

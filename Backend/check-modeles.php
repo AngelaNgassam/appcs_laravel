@@ -10,11 +10,11 @@ echo "📋 Modèles de cartes en base:\n";
 echo "=============================\n\n";
 
 $modeles = ModeleCarte::all();
-echo "Total: " . $modeles->count() . "\n\n";
+echo 'Total: '.$modeles->count()."\n\n";
 
 foreach ($modeles as $m) {
     echo "ID: {$m->id} | {$m->nom_modele}\n";
     echo "  Template: {$m->fichier_template}\n";
-    echo "  Actif: " . ($m->actif ? 'OUI' : 'NON') . "\n";
-    echo "  Défaut: " . ($m->est_defaut ? 'OUI' : 'NON') . "\n\n";
+    echo '  Actif: '.($m->actif ? 'OUI' : 'NON')."\n";
+    echo '  Défaut: '.($m->est_defaut ? 'OUI' : 'NON')."\n\n";
 }

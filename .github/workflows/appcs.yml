@@ -46,7 +46,7 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_DATABASE: cartes_scolaires
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes # Pas de mot de passe ici
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -69,11 +69,29 @@ jobs:
 
       - name: "🧪 Run Tests"
         working-directory: ./Backend
+        # On force les variables DB directement dans la commande pour écraser le .env
         run: |
           cp .env.example .env
           php artisan key:generate
           php artisan migrate --force
-          php artisan test
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: cartes_scolaires
+          DB_USERNAME: root
+          DB_PASSWORD: "" # On laisse vide pour correspondre au service MySQL ci-dessus
+
+      - name: "🏃 Execute Pest/PHPUnit"
+        working-directory: ./Backend
+        run: php artisan test
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: cartes_scolaires
+          DB_USERNAME: root
+          DB_PASSWORD: ""
       
       - name: "🛡️ Scan SonarCloud"
         uses: sonarsource/sonarqube-scan-action@v3

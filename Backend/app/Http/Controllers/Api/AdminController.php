@@ -3,18 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Models\Etablissement;
-use App\Models\Eleve;
 use App\Models\CarteScolaire;
-use App\Models\Photo;
+use App\Models\Eleve;
+use App\Models\Etablissement;
 use App\Models\HistoriqueAction;
-use App\Models\AnneeAcademique;
-use App\Models\Classe;
+use App\Models\Photo;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
 
 class AdminController extends Controller
 {
@@ -25,10 +22,10 @@ class AdminController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->isAdmin()) {
+        if (! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -37,7 +34,7 @@ class AdminController extends Controller
             $stats = [
                 'etablissements' => [
                     'total' => Etablissement::count(),
-                    'actifs' => Etablissement::whereHas('utilisateurs', function($q) {
+                    'actifs' => Etablissement::whereHas('utilisateurs', function ($q) {
                         $q->where('actif', true);
                     })->count(),
                     'archives' => Etablissement::onlyTrashed()->count(),
@@ -103,7 +100,7 @@ class AdminController extends Controller
                 ->orderBy('eleves_count', 'desc')
                 ->limit(10)
                 ->get()
-                ->map(function($etab) {
+                ->map(function ($etab) {
                     return [
                         'id' => $etab->id,
                         'nom' => $etab->nom,
@@ -117,7 +114,7 @@ class AdminController extends Controller
                 ->latest()
                 ->limit(50)
                 ->get()
-                ->map(function($action) {
+                ->map(function ($action) {
                     return [
                         'id' => $action->id,
                         'action' => $action->action,
@@ -143,18 +140,18 @@ class AdminController extends Controller
                     'top_etablissements' => $topEtablissements,
                     'activites_recentes' => $activitesRecentes,
                     'repartition_geographique' => $repartitionGeographique,
-                ]
+                ],
             ]);
 
         } catch (\Throwable $e) {
             Log::error('Erreur dashboard admin', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors du chargement du dashboard'
+                'message' => 'Erreur lors du chargement du dashboard',
             ], 500);
         }
     }
@@ -166,10 +163,10 @@ class AdminController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->isAdmin()) {
+        if (! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -186,10 +183,10 @@ class AdminController extends Controller
         }
 
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nom', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('ville', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('ville', 'like', "%{$search}%");
             });
         }
 
@@ -207,7 +204,7 @@ class AdminController extends Controller
                 'per_page' => $etablissements->perPage(),
                 'current_page' => $etablissements->currentPage(),
                 'last_page' => $etablissements->lastPage(),
-            ]
+            ],
         ]);
     }
 
@@ -218,19 +215,19 @@ class AdminController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->isAdmin()) {
+        if (! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
         $etablissement = Etablissement::find($id);
 
-        if (!$etablissement) {
+        if (! $etablissement) {
             return response()->json([
                 'success' => false,
-                'message' => 'Établissement non trouvé'
+                'message' => 'Établissement non trouvé',
             ], 404);
         }
 
@@ -243,18 +240,18 @@ class AdminController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Établissement archivé avec succès'
+                'message' => 'Établissement archivé avec succès',
             ]);
 
         } catch (\Throwable $e) {
             Log::error('Erreur archivage établissement', [
                 'etablissement_id' => $id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de l\'archivage'
+                'message' => 'Erreur lors de l\'archivage',
             ], 500);
         }
     }
@@ -266,19 +263,19 @@ class AdminController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->isAdmin()) {
+        if (! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
         $etablissement = Etablissement::onlyTrashed()->find($id);
 
-        if (!$etablissement) {
+        if (! $etablissement) {
             return response()->json([
                 'success' => false,
-                'message' => 'Établissement archivé non trouvé'
+                'message' => 'Établissement archivé non trouvé',
             ], 404);
         }
 
@@ -287,18 +284,18 @@ class AdminController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Établissement restauré avec succès'
+                'message' => 'Établissement restauré avec succès',
             ]);
 
         } catch (\Throwable $e) {
             Log::error('Erreur restauration établissement', [
                 'etablissement_id' => $id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la restauration'
+                'message' => 'Erreur lors de la restauration',
             ], 500);
         }
     }
@@ -310,10 +307,10 @@ class AdminController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->isAdmin()) {
+        if (! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -326,10 +323,10 @@ class AdminController extends Controller
         $query = User::with(['etablissement:id,nom,ville']);
 
         if ($search) {
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nom', 'like', "%{$search}%")
-                  ->orWhere('prenom', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('prenom', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -355,7 +352,7 @@ class AdminController extends Controller
                 'per_page' => $utilisateurs->perPage(),
                 'current_page' => $utilisateurs->currentPage(),
                 'last_page' => $utilisateurs->lastPage(),
-            ]
+            ],
         ]);
     }
 
@@ -366,10 +363,10 @@ class AdminController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->isAdmin()) {
+        if (! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -383,12 +380,12 @@ class AdminController extends Controller
                 ])
                 ->with(['proviseur:id,nom,prenom'])
                 ->get()
-                ->map(function($etab) {
-                    $cartesGenerees = CarteScolaire::whereHas('eleve', function($q) use ($etab) {
+                ->map(function ($etab) {
+                    $cartesGenerees = CarteScolaire::whereHas('eleve', function ($q) use ($etab) {
                         $q->where('etablissement_id', $etab->id);
                     })->count();
 
-                    $tauxGeneration = $etab->eleves_count > 0 
+                    $tauxGeneration = $etab->eleves_count > 0
                         ? round(($cartesGenerees / $etab->eleves_count) * 100, 2)
                         : 0;
 
@@ -427,7 +424,7 @@ class AdminController extends Controller
             $tauxUtilisation = [
                 'cartes_generees' => CarteScolaire::count(),
                 'eleves_total' => Eleve::count(),
-                'taux' => Eleve::count() > 0 
+                'taux' => Eleve::count() > 0
                     ? round((CarteScolaire::count() / Eleve::count()) * 100, 2)
                     : 0,
             ];
@@ -439,17 +436,17 @@ class AdminController extends Controller
                     'stats_par_role' => $statsParRole,
                     'activite_journaliere' => $activiteJournaliere,
                     'taux_utilisation' => $tauxUtilisation,
-                ]
+                ],
             ]);
 
         } catch (\Throwable $e) {
             Log::error('Erreur statistiques système', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors du chargement des statistiques'
+                'message' => 'Erreur lors du chargement des statistiques',
             ], 500);
         }
     }
@@ -461,10 +458,10 @@ class AdminController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->isAdmin()) {
+        if (! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -489,17 +486,17 @@ class AdminController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $rapport
+                'data' => $rapport,
             ]);
 
         } catch (\Throwable $e) {
             Log::error('Erreur rapport activité', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la génération du rapport'
+                'message' => 'Erreur lors de la génération du rapport',
             ], 500);
         }
     }

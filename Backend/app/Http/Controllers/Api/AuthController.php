@@ -3,16 +3,16 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Models\Etablissement;
 use App\Models\AnneeAcademique;
+use App\Models\Etablissement;
+use App\Models\User;
 use App\Services\HistoriqueService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
@@ -28,12 +28,16 @@ class AuthController extends Controller
      *     path="/api/v1/register",
      *     tags={"Authentication"},
      *     summary="Inscription d'un proviseur avec création automatique de l'établissement",
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
+     *
      *             @OA\Schema(
      *                 required={"nom", "prenom", "email", "mot_de_passe", "nom_etablissement", "adresse_etablissement", "ville_etablissement"},
+     *
      *                 @OA\Property(property="nom", type="string", example="KAMGA"),
      *                 @OA\Property(property="prenom", type="string", example="Paul"),
      *                 @OA\Property(property="email", type="string", example="paul.kamga@lycee.cm"),
@@ -48,6 +52,7 @@ class AuthController extends Controller
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(response=201, description="Inscription réussie"),
      *     @OA\Response(response=422, description="Erreur de validation")
      * )
@@ -76,7 +81,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur de validation',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -165,7 +170,7 @@ class AuthController extends Controller
                     'telephone' => $etablissement->telephone,
                     'email' => $etablissement->email,
                     'logo_url' => $etablissement->logo_url,
-                ]
+                ],
             ], 201);
 
         } catch (\Exception $e) {
@@ -174,13 +179,13 @@ class AuthController extends Controller
             // ✅ Logger l'erreur détaillée
             Log::error('Erreur lors de l\'inscription', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de l\'inscription',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -190,14 +195,18 @@ class AuthController extends Controller
      *     path="/api/v1/login",
      *     tags={"Authentication"},
      *     summary="Connexion avec identification automatique du rôle",
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
      *             required={"email", "mot_de_passe"},
+     *
      *             @OA\Property(property="email", type="string", example="admin@example.com"),
      *             @OA\Property(property="mot_de_passe", type="string", example="password123")
      *         )
      *     ),
+     *
      *     @OA\Response(response=200, description="Connexion réussie"),
      *     @OA\Response(response=401, description="Identifiants incorrects")
      * )
@@ -213,7 +222,7 @@ class AuthController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur de validation',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -221,18 +230,18 @@ class AuthController extends Controller
             // Chercher l'utilisateur
             $user = User::where('email', $request->email)->first();
 
-            if (!$user || !Hash::check($request->mot_de_passe, $user->password)) {
+            if (! $user || ! Hash::check($request->mot_de_passe, $user->password)) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Email ou mot de passe incorrect'
+                    'message' => 'Email ou mot de passe incorrect',
                 ], 401);
             }
 
             // Vérifier si le compte est actif
-            if (!$user->actif) {
+            if (! $user->actif) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Votre compte a été désactivé. Contactez l\'administrateur.'
+                    'message' => 'Votre compte a été désactivé. Contactez l\'administrateur.',
                 ], 403);
             }
 
@@ -265,7 +274,7 @@ class AuthController extends Controller
                     'telephone' => $user->telephone,
                     'etablissement_id' => $user->etablissement_id,
                     'actif' => $user->actif,
-                ]
+                ],
             ];
 
             // ✅ Ajouter les infos de l'établissement avec TOUTES les données
@@ -288,13 +297,13 @@ class AuthController extends Controller
             // ✅ Logger l'erreur détaillée
             Log::error('Erreur lors de la connexion', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la connexion',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -305,6 +314,7 @@ class AuthController extends Controller
      *     tags={"Authentication"},
      *     summary="Déconnexion",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(response=200, description="Déconnexion réussie")
      * )
      */
@@ -324,18 +334,18 @@ class AuthController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Déconnexion réussie'
+                'message' => 'Déconnexion réussie',
             ], 200);
 
         } catch (\Exception $e) {
             Log::error('Erreur lors de la déconnexion', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la déconnexion',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -346,6 +356,7 @@ class AuthController extends Controller
      *     tags={"Authentication"},
      *     summary="Obtenir les informations de l'utilisateur connecté",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(response=200, description="Informations utilisateur")
      * )
      */
@@ -366,7 +377,7 @@ class AuthController extends Controller
                     'telephone' => $user->telephone,
                     'etablissement_id' => $user->etablissement_id,
                     'actif' => $user->actif,
-                ]
+                ],
             ];
 
             // ✅ Ajouter toutes les infos de l'établissement
@@ -387,13 +398,13 @@ class AuthController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Erreur lors de la récupération des infos utilisateur', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la récupération des informations',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }

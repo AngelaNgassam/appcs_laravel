@@ -13,7 +13,7 @@ echo "====================================\n\n";
 
 $eleve = Eleve::with(['classe', 'etablissement', 'photoActive'])->find(2);
 
-if (!$eleve) {
+if (! $eleve) {
     echo "❌ Élève non trouvé\n";
     exit(1);
 }
@@ -26,20 +26,20 @@ $photoBase64 = null;
 $logoBase64 = null;
 
 if ($photo) {
-    $photoPath = storage_path('app/public/' . ($photo->photo_traitee ?: $photo->chemin_photo));
+    $photoPath = storage_path('app/public/'.($photo->photo_traitee ?: $photo->chemin_photo));
     if (file_exists($photoPath)) {
         $photoData = file_get_contents($photoPath);
         $mimeType = mime_content_type($photoPath);
-        $photoBase64 = 'data:' . $mimeType . ';base64,' . base64_encode($photoData);
+        $photoBase64 = 'data:'.$mimeType.';base64,'.base64_encode($photoData);
     }
 }
 
 if ($eleve->etablissement->logo) {
-    $logoPath = storage_path('app/public/' . $eleve->etablissement->logo);
+    $logoPath = storage_path('app/public/'.$eleve->etablissement->logo);
     if (file_exists($logoPath)) {
         $logoData = file_get_contents($logoPath);
         $mimeType = mime_content_type($logoPath);
-        $logoBase64 = 'data:' . $mimeType . ';base64,' . base64_encode($logoData);
+        $logoBase64 = 'data:'.$mimeType.';base64,'.base64_encode($logoData);
     }
 }
 
@@ -51,7 +51,7 @@ $data = [
     'qrCode' => $qrCode,
     'etablissement' => $eleve->etablissement,
     'classe' => $eleve->classe,
-    'anneeAcademique' => date('Y') . '-' . (date('Y') + 1),
+    'anneeAcademique' => date('Y').'-'.(date('Y') + 1),
 ];
 
 $html = view('cartes.template', $data)->render();

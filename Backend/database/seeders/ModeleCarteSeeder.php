@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Seeder;
 use App\Models\ModeleCarte;
+use Illuminate\Database\Seeder;
 
 class ModeleCarteSeeder extends Seeder
 {
@@ -22,7 +22,7 @@ class ModeleCarteSeeder extends Seeder
             'fichier_template' => 'cartes.modele-cameroun',
             'configuration' => json_encode([
                 'description' => 'Design officiel avec drapeau du Cameroun',
-                'features' => ['Drapeau tricolore', 'Devise nationale', 'Design professionnel']
+                'features' => ['Drapeau tricolore', 'Devise nationale', 'Design professionnel'],
             ]),
             'actif' => true,
             'est_defaut' => true,
@@ -35,7 +35,7 @@ class ModeleCarteSeeder extends Seeder
             'fichier_template' => 'cartes.modele-standard',
             'configuration' => json_encode([
                 'description' => 'Design professionnel avec dégradé bleu',
-                'features' => ['Dégradé bleu', 'Design épuré', 'Moderne']
+                'features' => ['Dégradé bleu', 'Design épuré', 'Moderne'],
             ]),
             'actif' => true,
             'est_defaut' => false,
@@ -48,7 +48,7 @@ class ModeleCarteSeeder extends Seeder
             'fichier_template' => 'cartes.modele-premium',
             'configuration' => json_encode([
                 'description' => 'Design premium avec gradients modernes',
-                'features' => ['Gradients cyan', 'Design contemporain', 'Ombre élégante']
+                'features' => ['Gradients cyan', 'Design contemporain', 'Ombre élégante'],
             ]),
             'actif' => true,
             'est_defaut' => false,

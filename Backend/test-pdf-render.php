@@ -13,19 +13,19 @@ echo "====================\n\n";
 
 // Trouver un élève avec photo
 $eleve = Eleve::with(['classe', 'etablissement', 'photoActive'])
-    ->whereHas('photoActive', function($q) {
+    ->whereHas('photoActive', function ($q) {
         $q->where('statut', 'validee');
     })
     ->first();
 
-if (!$eleve) {
+if (! $eleve) {
     echo "❌ Aucun élève avec photo validée trouvé\n";
-    
+
     // Afficher les élèves disponibles
     $eleves = Eleve::with('photoActive')->limit(10)->get();
     echo "\n📋 Élèves disponibles:\n";
     foreach ($eleves as $e) {
-        $photo = $e->photoActive ? "✓ ({$e->photoActive->statut})" : "✗";
+        $photo = $e->photoActive ? "✓ ({$e->photoActive->statut})" : '✗';
         echo "   ID: {$e->id} - {$e->nom} {$e->prenom} - Photo: {$photo}\n";
     }
     exit(1);
@@ -39,21 +39,21 @@ echo "   Photo: {$eleve->photoActive->chemin_photo}\n\n";
 $pdfService = app(PDFService::class);
 $modeles = ModeleCarte::where('actif', true)->get();
 
-echo "📊 Modèles disponibles: " . count($modeles) . "\n\n";
+echo '📊 Modèles disponibles: '.count($modeles)."\n\n";
 
 foreach ($modeles as $modele) {
     echo "🎨 Génération: {$modele->nom_modele}\n";
-    
+
     try {
         $carte = $pdfService->genererCarte($eleve, $modele->id);
-        $fullPath = storage_path('app/public/' . $carte->chemin_pdf);
+        $fullPath = storage_path('app/public/'.$carte->chemin_pdf);
         $fileSize = filesize($fullPath);
-        
+
         echo "   ✅ PDF généré\n";
         echo "   📄 Chemin: {$carte->chemin_pdf}\n";
-        echo "   📊 Taille: " . round($fileSize / 1024, 2) . " KB\n";
+        echo '   📊 Taille: '.round($fileSize / 1024, 2)." KB\n";
         echo "   🔗 URL: http://localhost:8000/storage/{$carte->chemin_pdf}\n\n";
-        
+
     } catch (\Exception $e) {
         echo "   ❌ Erreur: {$e->getMessage()}\n\n";
     }

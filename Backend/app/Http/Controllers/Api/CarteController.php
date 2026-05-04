@@ -4,17 +4,17 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\CarteScolaire;
-use App\Models\Eleve;
 use App\Models\Classe;
-use App\Services\PDFService;
+use App\Models\Eleve;
 use App\Services\HistoriqueService;
+use App\Services\PDFService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class CarteController extends Controller
 {
     protected $pdfService;
+
     protected $historiqueService;
 
     public function __construct(
@@ -31,12 +31,15 @@ class CarteController extends Controller
      *     tags={"Cartes"},
      *     summary="Obtenir les élèves d'une classe avec leurs cartes",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="classe_id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Élèves avec cartes")
      * )
      */
@@ -46,17 +49,17 @@ class CarteController extends Controller
 
         // Vérifier les droits
         $classe = Classe::find($classeId);
-        if (!$classe) {
+        if (! $classe) {
             return response()->json([
                 'success' => false,
-                'message' => 'Classe non trouvée'
+                'message' => 'Classe non trouvée',
             ], 404);
         }
 
-        if (!$user->isAdmin() && $classe->etablissement_id !== $user->etablissement_id) {
+        if (! $user->isAdmin() && $classe->etablissement_id !== $user->etablissement_id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -69,8 +72,9 @@ class CarteController extends Controller
             ->get();
 
         // Transformer les données pour le frontend
-        $data = $eleves->map(function($eleve) {
+        $data = $eleves->map(function ($eleve) {
             $carte = $eleve->carteActive;
+
             return [
                 'id' => $eleve->id,
                 'matricule' => $eleve->matricule,
@@ -97,7 +101,7 @@ class CarteController extends Controller
         return response()->json([
             'success' => true,
             'data' => $data,
-            'total' => $data->count()
+            'total' => $data->count(),
         ], 200);
     }
 
@@ -107,20 +111,25 @@ class CarteController extends Controller
      *     tags={"Cartes"},
      *     summary="Liste des cartes scolaires avec pagination",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="statut",
      *         in="query",
      *         description="Filtrer par statut",
      *         required=false,
+     *
      *         @OA\Schema(type="string", enum={"en_attente", "generee", "imprimee", "distribuee"})
      *     ),
+     *
      *     @OA\Parameter(
      *         name="classe_id",
      *         in="query",
      *         description="Filtrer par classe",
      *         required=false,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Liste des cartes")
      * )
      */
@@ -132,8 +141,8 @@ class CarteController extends Controller
         $query = CarteScolaire::with(['eleve.classe', 'photo', 'modele', 'imprimeur']);
 
         // Filtrer par établissement
-        if (!$user->isAdmin()) {
-            $query->whereHas('eleve', function($q) use ($user) {
+        if (! $user->isAdmin()) {
+            $query->whereHas('eleve', function ($q) use ($user) {
                 $q->where('etablissement_id', $user->etablissement_id);
             });
         }
@@ -145,7 +154,7 @@ class CarteController extends Controller
 
         // Filtrer par classe
         if ($request->has('classe_id')) {
-            $query->whereHas('eleve', function($q) use ($request) {
+            $query->whereHas('eleve', function ($q) use ($request) {
                 $q->where('classe_id', $request->classe_id);
             });
         }
@@ -160,7 +169,7 @@ class CarteController extends Controller
                 'per_page' => $cartes->perPage(),
                 'current_page' => $cartes->currentPage(),
                 'last_page' => $cartes->lastPage(),
-            ]
+            ],
         ], 200);
     }
 
@@ -170,12 +179,15 @@ class CarteController extends Controller
      *     tags={"Cartes"},
      *     summary="Générer une carte pour un élève",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="eleve_id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=201, description="Carte générée")
      * )
      */
@@ -184,36 +196,36 @@ class CarteController extends Controller
         $user = $request->user();
 
         // Seuls le proviseur et l'admin peuvent générer des cartes
-        if (!$user->isProviseur() && !$user->isAdmin()) {
+        if (! $user->isProviseur() && ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
         try {
             $eleve = Eleve::find($eleveId);
 
-            if (!$eleve) {
+            if (! $eleve) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Élève non trouvé'
+                    'message' => 'Élève non trouvé',
                 ], 404);
             }
 
             // Vérifier les droits
-            if (!$user->isAdmin() && $eleve->etablissement_id !== $user->etablissement_id) {
+            if (! $user->isAdmin() && $eleve->etablissement_id !== $user->etablissement_id) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès refusé'
+                    'message' => 'Accès refusé',
                 ], 403);
             }
 
             // Vérifier que l'élève a une photo
-            if (!$eleve->hasPhoto()) {
+            if (! $eleve->hasPhoto()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'L\'élève n\'a pas de photo'
+                    'message' => 'L\'élève n\'a pas de photo',
                 ], 400);
             }
 
@@ -236,14 +248,14 @@ class CarteController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Carte générée avec succès',
-                'data' => $carte->load(['eleve', 'photo', 'modele'])
+                'data' => $carte->load(['eleve', 'photo', 'modele']),
             ], 201);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la génération',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -254,12 +266,15 @@ class CarteController extends Controller
      *     tags={"Cartes"},
      *     summary="Générer les cartes pour toute une classe",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="classe_id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Cartes générées")
      * )
      */
@@ -268,28 +283,28 @@ class CarteController extends Controller
         $user = $request->user();
 
         // Seuls le proviseur et l'admin peuvent générer des cartes
-        if (!$user->isProviseur() && !$user->isAdmin()) {
+        if (! $user->isProviseur() && ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
         try {
             $classe = Classe::find($classeId);
 
-            if (!$classe) {
+            if (! $classe) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Classe non trouvée'
+                    'message' => 'Classe non trouvée',
                 ], 404);
             }
 
             // Vérifier les droits
-            if (!$user->isAdmin() && $classe->etablissement_id !== $user->etablissement_id) {
+            if (! $user->isAdmin() && $classe->etablissement_id !== $user->etablissement_id) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès refusé'
+                    'message' => 'Accès refusé',
                 ], 403);
             }
 
@@ -312,14 +327,14 @@ class CarteController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => "Génération terminée : {$resultats['success']} cartes générées",
-                'data' => $resultats
+                'data' => $resultats,
             ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la génération',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -330,12 +345,16 @@ class CarteController extends Controller
      *     tags={"Cartes"},
      *     summary="Générer une planche d'impression (10 cartes par page A4)",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="eleve_ids", type="array", @OA\Items(type="integer"))
      *         )
      *     ),
+     *
      *     @OA\Response(response=200, description="Planche générée")
      * )
      */
@@ -344,17 +363,17 @@ class CarteController extends Controller
         $user = $request->user();
 
         // Seuls le proviseur et l'admin peuvent générer des planches
-        if (!$user->isProviseur() && !$user->isAdmin()) {
+        if (! $user->isProviseur() && ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
         $request->validate([
             'eleve_ids' => 'required|array|min:1',
             'eleve_ids.*' => 'integer|exists:eleves,id',
-            'modele_id' => 'nullable|integer|exists:modele_cartes,id'
+            'modele_id' => 'nullable|integer|exists:modele_cartes,id',
         ]);
 
         try {
@@ -365,7 +384,7 @@ class CarteController extends Controller
                 'generation_planche',
                 'CarteScolaire',
                 null,
-                "Génération d'une planche de " . count($request->eleve_ids) . " cartes"
+                "Génération d'une planche de ".count($request->eleve_ids).' cartes'
             );
 
             return response()->json([
@@ -373,16 +392,16 @@ class CarteController extends Controller
                 'message' => 'Planche générée avec succès',
                 'data' => [
                     'path' => $path,
-                    'url' => asset('storage/' . $path),
-                    'nombre_cartes' => count($request->eleve_ids)
-                ]
+                    'url' => asset('storage/'.$path),
+                    'nombre_cartes' => count($request->eleve_ids),
+                ],
             ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la génération de la planche',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -393,12 +412,15 @@ class CarteController extends Controller
      *     tags={"Cartes"},
      *     summary="Détails d'une carte",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Détails de la carte")
      * )
      */
@@ -408,24 +430,24 @@ class CarteController extends Controller
 
         $carte = CarteScolaire::with(['eleve.classe', 'photo', 'modele', 'imprimeur'])->find($id);
 
-        if (!$carte) {
+        if (! $carte) {
             return response()->json([
                 'success' => false,
-                'message' => 'Carte non trouvée'
+                'message' => 'Carte non trouvée',
             ], 404);
         }
 
         // Vérifier les droits
-        if (!$user->isAdmin() && $carte->eleve->etablissement_id !== $user->etablissement_id) {
+        if (! $user->isAdmin() && $carte->eleve->etablissement_id !== $user->etablissement_id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
         return response()->json([
             'success' => true,
-            'data' => $carte
+            'data' => $carte,
         ], 200);
     }
 
@@ -435,12 +457,15 @@ class CarteController extends Controller
      *     tags={"Cartes"},
      *     summary="Télécharger le PDF d'une carte",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="PDF téléchargé")
      * )
      */
@@ -450,25 +475,25 @@ class CarteController extends Controller
 
         $carte = CarteScolaire::with('eleve')->find($id);
 
-        if (!$carte) {
+        if (! $carte) {
             return response()->json([
                 'success' => false,
-                'message' => 'Carte non trouvée'
+                'message' => 'Carte non trouvée',
             ], 404);
         }
 
         // Vérifier les droits
-        if (!$user->isAdmin() && $carte->eleve->etablissement_id !== $user->etablissement_id) {
+        if (! $user->isAdmin() && $carte->eleve->etablissement_id !== $user->etablissement_id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
-        if (!$carte->chemin_pdf || !Storage::disk('public')->exists($carte->chemin_pdf)) {
+        if (! $carte->chemin_pdf || ! Storage::disk('public')->exists($carte->chemin_pdf)) {
             return response()->json([
                 'success' => false,
-                'message' => 'PDF non disponible'
+                'message' => 'PDF non disponible',
             ], 404);
         }
 
@@ -485,12 +510,15 @@ class CarteController extends Controller
      *     tags={"Cartes"},
      *     summary="Prévisualiser le PDF d'une carte dans le navigateur",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="PDF affiché")
      * )
      */
@@ -498,57 +526,57 @@ class CarteController extends Controller
     {
         // Gérer l'authentification par token en paramètre GET (pour ouverture dans nouvel onglet)
         $token = $request->query('token');
-        
+
         if ($token) {
             // Extraire l'ID du token (format: "id|hash")
             $tokenParts = explode('|', $token, 2);
             if (count($tokenParts) === 2) {
                 $tokenId = $tokenParts[0];
                 $tokenHash = $tokenParts[1];
-                
+
                 // Chercher le token dans la base
                 $personalAccessToken = \Laravel\Sanctum\PersonalAccessToken::findToken($token);
-                
+
                 if ($personalAccessToken) {
                     $user = $personalAccessToken->tokenable;
-                    
+
                     // Authentifier l'utilisateur pour cette requête
                     auth()->setUser($user);
                 } else {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Token invalide'
+                        'message' => 'Token invalide',
                     ], 401);
                 }
             }
         } else {
             // Utiliser l'authentification normale (header Authorization)
             $user = $request->user();
-            
-            if (!$user) {
+
+            if (! $user) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Non authentifié'
+                    'message' => 'Non authentifié',
                 ], 401);
             }
         }
-        
+
         $user = auth()->user();
 
         $carte = CarteScolaire::with('eleve')->find($id);
 
-        if (!$carte) {
+        if (! $carte) {
             return response()->json([
                 'success' => false,
-                'message' => 'Carte non trouvée'
+                'message' => 'Carte non trouvée',
             ], 404);
         }
 
         // Vérifier les droits
-        if (!$user->isAdmin() && $carte->eleve->etablissement_id !== $user->etablissement_id) {
+        if (! $user->isAdmin() && $carte->eleve->etablissement_id !== $user->etablissement_id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -556,10 +584,10 @@ class CarteController extends Controller
             $eleve = $carte->eleve;
             $photo = $eleve->photoActive;
 
-            if (!$photo || $photo->statut !== 'validee') {
+            if (! $photo || $photo->statut !== 'validee') {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Aucune photo validée'
+                    'message' => 'Aucune photo validée',
                 ], 400);
             }
 
@@ -579,13 +607,13 @@ class CarteController extends Controller
                 'qrCode' => $qrCode,
                 'etablissement' => $eleve->etablissement,
                 'classe' => $eleve->classe,
-                'anneeAcademique' => optional($eleve->etablissement->anneeActive)->annee ?? date('Y') . '-' . (date('Y') + 1),
+                'anneeAcademique' => optional($eleve->etablissement->anneeActive)->annee ?? date('Y').'-'.(date('Y') + 1),
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la génération de la prévisualisation',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -596,12 +624,15 @@ class CarteController extends Controller
      *     tags={"Cartes"},
      *     summary="Marquer une carte comme imprimée",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Carte marquée comme imprimée")
      * )
      */
@@ -611,18 +642,18 @@ class CarteController extends Controller
 
         $carte = CarteScolaire::find($id);
 
-        if (!$carte) {
+        if (! $carte) {
             return response()->json([
                 'success' => false,
-                'message' => 'Carte non trouvée'
+                'message' => 'Carte non trouvée',
             ], 404);
         }
 
         // Seuls le proviseur et l'admin peuvent marquer comme imprimée
-        if (!$user->isProviseur() && !$user->isAdmin()) {
+        if (! $user->isProviseur() && ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -639,7 +670,7 @@ class CarteController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Carte marquée comme imprimée',
-            'data' => $carte
+            'data' => $carte,
         ], 200);
     }
 
@@ -649,12 +680,15 @@ class CarteController extends Controller
      *     tags={"Cartes"},
      *     summary="Marquer une carte comme distribuée",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Carte marquée comme distribuée")
      * )
      */
@@ -664,18 +698,18 @@ class CarteController extends Controller
 
         $carte = CarteScolaire::find($id);
 
-        if (!$carte) {
+        if (! $carte) {
             return response()->json([
                 'success' => false,
-                'message' => 'Carte non trouvée'
+                'message' => 'Carte non trouvée',
             ], 404);
         }
 
         // Seuls le surveillant et le proviseur peuvent marquer comme distribuée
-        if (!$user->isSurveillant() && !$user->isProviseur() && !$user->isAdmin()) {
+        if (! $user->isSurveillant() && ! $user->isProviseur() && ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -692,7 +726,7 @@ class CarteController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Carte marquée comme distribuée',
-            'data' => $carte
+            'data' => $carte,
         ], 200);
     }
 
@@ -702,6 +736,7 @@ class CarteController extends Controller
      *     tags={"Cartes"},
      *     summary="Statistiques des cartes",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(response=200, description="Statistiques")
      * )
      */
@@ -712,8 +747,8 @@ class CarteController extends Controller
         $query = CarteScolaire::query();
 
         // Filtrer par établissement
-        if (!$user->isAdmin()) {
-            $query->whereHas('eleve', function($q) use ($user) {
+        if (! $user->isAdmin()) {
+            $query->whereHas('eleve', function ($q) use ($user) {
                 $q->where('etablissement_id', $user->etablissement_id);
             });
         }
@@ -729,7 +764,7 @@ class CarteController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $stats
+            'data' => $stats,
         ], 200);
     }
 }

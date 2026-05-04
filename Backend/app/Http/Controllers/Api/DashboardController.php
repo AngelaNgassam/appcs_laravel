@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Eleve;
-use App\Models\Classe;
-use App\Models\User;
-use App\Models\Photo;
 use App\Models\CarteScolaire;
+use App\Models\Classe;
+use App\Models\Eleve;
 use App\Models\HistoriqueAction;
+use App\Models\Photo;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -23,10 +23,10 @@ class DashboardController extends Controller
         try {
             $user = $request->user();
 
-            if (!$user->isProviseur() && !$user->isAdmin()) {
+            if (! $user->isProviseur() && ! $user->isAdmin()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Accès refusé'
+                    'message' => 'Accès refusé',
                 ], 403);
             }
 
@@ -50,19 +50,19 @@ class DashboardController extends Controller
 
             // ✅ GESTION SÉCURISÉE DES CARTES (peut ne pas exister encore)
             try {
-                $cartesGenerees = CarteScolaire::whereHas('eleve', function($q) use ($etablissementId) {
+                $cartesGenerees = CarteScolaire::whereHas('eleve', function ($q) use ($etablissementId) {
                     $q->where('etablissement_id', $etablissementId);
                 })->whereIn('statut', ['generee', 'imprimee', 'distribuee'])->count();
 
-                $cartesImprimees = CarteScolaire::whereHas('eleve', function($q) use ($etablissementId) {
+                $cartesImprimees = CarteScolaire::whereHas('eleve', function ($q) use ($etablissementId) {
                     $q->where('etablissement_id', $etablissementId);
                 })->whereIn('statut', ['imprimee', 'distribuee'])->count();
 
-                $cartesDistribuees = CarteScolaire::whereHas('eleve', function($q) use ($etablissementId) {
+                $cartesDistribuees = CarteScolaire::whereHas('eleve', function ($q) use ($etablissementId) {
                     $q->where('etablissement_id', $etablissementId);
                 })->where('statut', 'distribuee')->count();
             } catch (\Exception $e) {
-                Log::warning('Table cartes_scolaires non accessible : ' . $e->getMessage());
+                Log::warning('Table cartes_scolaires non accessible : '.$e->getMessage());
                 $cartesGenerees = 0;
                 $cartesImprimees = 0;
                 $cartesDistribuees = 0;
@@ -80,25 +80,25 @@ class DashboardController extends Controller
             ];
 
             // Photos par statut
-            $photosParStatut = Photo::whereHas('eleve', function($q) use ($etablissementId) {
+            $photosParStatut = Photo::whereHas('eleve', function ($q) use ($etablissementId) {
                 $q->where('etablissement_id', $etablissementId);
             })->where('active', true)
-            ->select('statut', DB::raw('count(*) as total'))
-            ->groupBy('statut')
-            ->get()
-            ->pluck('total', 'statut')
-            ->toArray();
-
-            // Cartes par statut (avec gestion d'erreur)
-            $cartesParStatut = [];
-            try {
-                $cartesParStatut = CarteScolaire::whereHas('eleve', function($q) use ($etablissementId) {
-                    $q->where('etablissement_id', $etablissementId);
-                })->select('statut', DB::raw('count(*) as total'))
+                ->select('statut', DB::raw('count(*) as total'))
                 ->groupBy('statut')
                 ->get()
                 ->pluck('total', 'statut')
                 ->toArray();
+
+            // Cartes par statut (avec gestion d'erreur)
+            $cartesParStatut = [];
+            try {
+                $cartesParStatut = CarteScolaire::whereHas('eleve', function ($q) use ($etablissementId) {
+                    $q->where('etablissement_id', $etablissementId);
+                })->select('statut', DB::raw('count(*) as total'))
+                    ->groupBy('statut')
+                    ->get()
+                    ->pluck('total', 'statut')
+                    ->toArray();
             } catch (\Exception $e) {
                 // Table pas encore accessible
             }
@@ -107,12 +107,12 @@ class DashboardController extends Controller
             $classesStats = Classe::where('etablissement_id', $etablissementId)
                 ->withCount([
                     'elevesActifs',
-                    'elevesActifs as eleves_avec_photo' => function($q) {
+                    'elevesActifs as eleves_avec_photo' => function ($q) {
                         $q->whereHas('photoActive');
-                    }
+                    },
                 ])
                 ->get()
-                ->map(function($classe) {
+                ->map(function ($classe) {
                     return [
                         'id' => $classe->id,
                         'nom' => $classe->nom,
@@ -122,7 +122,7 @@ class DashboardController extends Controller
                         'sans_photo' => $classe->eleves_actifs_count - $classe->eleves_avec_photo,
                         'taux_completion' => $classe->eleves_actifs_count > 0
                             ? round(($classe->eleves_avec_photo / $classe->eleves_actifs_count) * 100, 1)
-                            : 0
+                            : 0,
                     ];
                 });
 
@@ -136,58 +136,58 @@ class DashboardController extends Controller
                 ->toArray();
 
             // ========== ACTIVITÉ RÉCENTE ==========
-            $activiteRecente = HistoriqueAction::whereHas('user', function($q) use ($etablissementId) {
+            $activiteRecente = HistoriqueAction::whereHas('user', function ($q) use ($etablissementId) {
                 $q->where('etablissement_id', $etablissementId);
             })
-            ->with('user:id,nom,prenom,role')
-            ->orderBy('date_action', 'desc')
-            ->limit(10)
-            ->get()
-            ->map(function($action) {
-                return [
-                    'id' => $action->id,
-                    'action' => $action->action,
-                    'utilisateur' => $action->user ? "{$action->user->prenom} {$action->user->nom}" : 'Utilisateur supprimé',
-                    'role' => $action->user ? $action->user->role : null,
-                    'details' => $action->details,
-                    'date' => $action->date_action->format('d/m/Y H:i'),
-                    'date_relative' => $action->date_action->diffForHumans(),
-                ];
-            });
+                ->with('user:id,nom,prenom,role')
+                ->orderBy('date_action', 'desc')
+                ->limit(10)
+                ->get()
+                ->map(function ($action) {
+                    return [
+                        'id' => $action->id,
+                        'action' => $action->action,
+                        'utilisateur' => $action->user ? "{$action->user->prenom} {$action->user->nom}" : 'Utilisateur supprimé',
+                        'role' => $action->user ? $action->user->role : null,
+                        'details' => $action->details,
+                        'date' => $action->date_action->format('d/m/Y H:i'),
+                        'date_relative' => $action->date_action->diffForHumans(),
+                    ];
+                });
 
             // ========== PROGRESSION (derniers 7 jours) ==========
-            $progressionPhotos = Photo::whereHas('eleve', function($q) use ($etablissementId) {
+            $progressionPhotos = Photo::whereHas('eleve', function ($q) use ($etablissementId) {
                 $q->where('etablissement_id', $etablissementId);
             })
-            ->where('date_prise', '>=', now()->subDays(7))
-            ->select(DB::raw('DATE(date_prise) as date'), DB::raw('count(*) as total'))
-            ->groupBy('date')
-            ->orderBy('date')
-            ->get()
-            ->map(function($item) {
-                return [
-                    'date' => $item->date,
-                    'total' => $item->total
-                ];
-            });
-
-            $progressionCartes = [];
-            try {
-                $progressionCartes = CarteScolaire::whereHas('eleve', function($q) use ($etablissementId) {
-                    $q->where('etablissement_id', $etablissementId);
-                })
-                ->where('date_generation', '>=', now()->subDays(7))
-                ->whereNotNull('date_generation')
-                ->select(DB::raw('DATE(date_generation) as date'), DB::raw('count(*) as total'))
+                ->where('date_prise', '>=', now()->subDays(7))
+                ->select(DB::raw('DATE(date_prise) as date'), DB::raw('count(*) as total'))
                 ->groupBy('date')
                 ->orderBy('date')
                 ->get()
-                ->map(function($item) {
+                ->map(function ($item) {
                     return [
                         'date' => $item->date,
-                        'total' => $item->total
+                        'total' => $item->total,
                     ];
                 });
+
+            $progressionCartes = [];
+            try {
+                $progressionCartes = CarteScolaire::whereHas('eleve', function ($q) use ($etablissementId) {
+                    $q->where('etablissement_id', $etablissementId);
+                })
+                    ->where('date_generation', '>=', now()->subDays(7))
+                    ->whereNotNull('date_generation')
+                    ->select(DB::raw('DATE(date_generation) as date'), DB::raw('count(*) as total'))
+                    ->groupBy('date')
+                    ->orderBy('date')
+                    ->get()
+                    ->map(function ($item) {
+                        return [
+                            'date' => $item->date,
+                            'total' => $item->total,
+                        ];
+                    });
             } catch (\Exception $e) {
                 // Pas encore de cartes
             }
@@ -226,24 +226,23 @@ class DashboardController extends Controller
                         'photos' => $progressionPhotos,
                         'cartes' => $progressionCartes,
                     ],
-                ]
+                ],
             ], 200);
 
         } catch (\Exception $e) {
             Log::error('Erreur Dashboard Proviseur', [
                 'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
+                'trace' => $e->getTraceAsString(),
             ]);
 
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors du chargement du dashboard',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
 
-   
     /**
      * 📊 Dashboard du SURVEILLANT GÉNÉRAL
      */
@@ -251,10 +250,10 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->isSurveillant() && !$user->isAdmin()) {
+        if (! $user->isSurveillant() && ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -270,7 +269,7 @@ class DashboardController extends Controller
             ->whereHas('photoActive')
             ->count();
 
-        $photosAValider = Photo::whereHas('eleve', function($q) use ($etablissementId) {
+        $photosAValider = Photo::whereHas('eleve', function ($q) use ($etablissementId) {
             $q->where('etablissement_id', $etablissementId);
         })->where('statut', 'brouillon')->count();
 
@@ -282,7 +281,7 @@ class DashboardController extends Controller
                     'eleves_avec_photo' => $elevesAvecPhoto,
                     'photos_a_valider' => $photosAValider,
                 ],
-            ]
+            ],
         ], 200);
     }
 
@@ -293,10 +292,10 @@ class DashboardController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->isOperateur() && !$user->isAdmin()) {
+        if (! $user->isOperateur() && ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -320,7 +319,7 @@ class DashboardController extends Controller
                     'photos_aujourdhui' => $photosAujourdhui,
                     'eleves_restants' => $elevesRestants,
                 ],
-            ]
+            ],
         ], 200);
     }
 }

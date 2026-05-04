@@ -6,9 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\ModeleCarte;
 use App\Services\HistoriqueService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class ModeleCarteController extends Controller
 {
@@ -26,10 +25,10 @@ class ModeleCarteController extends Controller
     {
         $user = $request->user();
 
-        if (!$user) {
+        if (! $user) {
             return response()->json([
                 'success' => false,
-                'message' => 'Utilisateur non authentifié'
+                'message' => 'Utilisateur non authentifié',
             ], 401);
         }
 
@@ -62,7 +61,7 @@ class ModeleCarteController extends Controller
             }
         } catch (\Throwable $e) {
             Log::error('Erreur auto-init modèles cartes', [
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
         }
 
@@ -71,10 +70,10 @@ class ModeleCarteController extends Controller
         /**
          * FILTRAGE PAR ÉTABLISSEMENT
          */
-        if (!$user->isAdmin()) {
+        if (! $user->isAdmin()) {
             $query->where(function ($q) use ($user) {
                 $q->where('etablissement_id', $user->etablissement_id)
-                  ->orWhereNull('etablissement_id');
+                    ->orWhereNull('etablissement_id');
             });
         }
 
@@ -103,7 +102,7 @@ class ModeleCarteController extends Controller
                 'per_page' => $modeles->perPage(),
                 'current_page' => $modeles->currentPage(),
                 'last_page' => $modeles->lastPage(),
-            ]
+            ],
         ], 200);
     }
 
@@ -114,10 +113,10 @@ class ModeleCarteController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->isProviseur() && !$user->isAdmin()) {
+        if (! $user->isProviseur() && ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -131,7 +130,7 @@ class ModeleCarteController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'success' => false,
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -162,7 +161,7 @@ class ModeleCarteController extends Controller
 
             return response()->json([
                 'success' => true,
-                'data' => $modele
+                'data' => $modele,
             ], 201);
 
         } catch (\Throwable $e) {
@@ -170,7 +169,7 @@ class ModeleCarteController extends Controller
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur lors de la création'
+                'message' => 'Erreur lors de la création',
             ], 500);
         }
     }
@@ -182,19 +181,19 @@ class ModeleCarteController extends Controller
     {
         $user = $request->user();
 
-        if (!$user->isProviseur() && !$user->isAdmin()) {
+        if (! $user->isProviseur() && ! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
         $modele = ModeleCarte::find($id);
 
-        if (!$modele) {
+        if (! $modele) {
             return response()->json([
                 'success' => false,
-                'message' => 'Modèle non trouvé'
+                'message' => 'Modèle non trouvé',
             ], 404);
         }
 
@@ -207,14 +206,14 @@ class ModeleCarteController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Modèle défini par défaut'
+                'message' => 'Modèle défini par défaut',
             ]);
         } catch (\Throwable $e) {
             Log::error($e);
 
             return response()->json([
                 'success' => false,
-                'message' => 'Erreur serveur'
+                'message' => 'Erreur serveur',
             ], 500);
         }
     }

@@ -35,7 +35,7 @@ class AppTest extends TestCase
     public function test_csrf_protection_is_active(): void
     {
         $response = $this->post('/login', [
-            'email'    => 'test@example.com',
+            'email' => 'test@example.com',
             'password' => 'password',
         ]);
         $this->assertContains($response->status(), [302, 404, 419, 422]);

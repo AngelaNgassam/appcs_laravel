@@ -6,8 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Etablissement;
 use App\Services\HistoriqueService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
 
 class EtablissementController extends Controller
 {
@@ -24,6 +24,7 @@ class EtablissementController extends Controller
      *     tags={"Etablissements"},
      *     summary="Liste des établissements (Admin uniquement)",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(response=200, description="Liste des établissements")
      * )
      */
@@ -32,10 +33,10 @@ class EtablissementController extends Controller
         $user = $request->user();
 
         // Seul l'admin peut voir tous les établissements
-        if (!$user->isAdmin()) {
+        if (! $user->isAdmin()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -46,9 +47,9 @@ class EtablissementController extends Controller
         // Recherche
         if ($request->has('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('nom', 'like', "%{$search}%")
-                  ->orWhere('ville', 'like', "%{$search}%");
+                    ->orWhere('ville', 'like', "%{$search}%");
             });
         }
 
@@ -67,7 +68,7 @@ class EtablissementController extends Controller
                 'per_page' => $etablissements->perPage(),
                 'current_page' => $etablissements->currentPage(),
                 'last_page' => $etablissements->lastPage(),
-            ]
+            ],
         ], 200);
     }
 
@@ -77,12 +78,15 @@ class EtablissementController extends Controller
      *     tags={"Etablissements"},
      *     summary="Détails d'un établissement",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Détails de l'établissement")
      * )
      */
@@ -94,21 +98,21 @@ class EtablissementController extends Controller
             'proviseur',
             'anneeActive',
             'classes',
-            'eleves'
+            'eleves',
         ])->find($id);
 
-        if (!$etablissement) {
+        if (! $etablissement) {
             return response()->json([
                 'success' => false,
-                'message' => 'Établissement non trouvé'
+                'message' => 'Établissement non trouvé',
             ], 404);
         }
 
         // Vérifier les droits
-        if (!$user->isAdmin() && $user->etablissement_id !== $etablissement->id) {
+        if (! $user->isAdmin() && $user->etablissement_id !== $etablissement->id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -119,7 +123,7 @@ class EtablissementController extends Controller
             'total_utilisateurs' => $etablissement->utilisateurs()->count(),
             'eleves_avec_photo' => $etablissement->eleves()->whereHas('photoActive')->count(),
             'cartes_generees' => $etablissement->eleves()
-                ->whereHas('carteActive', function($q) {
+                ->whereHas('carteActive', function ($q) {
                     $q->where('statut', '!=', 'en_attente');
                 })->count(),
         ];
@@ -127,7 +131,7 @@ class EtablissementController extends Controller
         return response()->json([
             'success' => true,
             'data' => $etablissement,
-            'statistiques' => $stats
+            'statistiques' => $stats,
         ], 200);
     }
 
@@ -137,15 +141,20 @@ class EtablissementController extends Controller
      *     tags={"Etablissements"},
      *     summary="Mettre à jour un établissement",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\JsonContent(
+     *
      *             @OA\Property(property="nom", type="string"),
      *             @OA\Property(property="adresse", type="string"),
      *             @OA\Property(property="ville", type="string"),
@@ -153,6 +162,7 @@ class EtablissementController extends Controller
      *             @OA\Property(property="email", type="string")
      *         )
      *     ),
+     *
      *     @OA\Response(response=200, description="Établissement mis à jour")
      * )
      */
@@ -162,25 +172,25 @@ class EtablissementController extends Controller
 
         $etablissement = Etablissement::find($id);
 
-        if (!$etablissement) {
+        if (! $etablissement) {
             return response()->json([
                 'success' => false,
-                'message' => 'Établissement non trouvé'
+                'message' => 'Établissement non trouvé',
             ], 404);
         }
 
         // Vérifier les droits
-        if (!$user->isAdmin() && !$user->isProviseur()) {
+        if (! $user->isAdmin() && ! $user->isProviseur()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
         if ($user->isProviseur() && $user->etablissement_id !== $etablissement->id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Vous ne pouvez modifier que votre établissement'
+                'message' => 'Vous ne pouvez modifier que votre établissement',
             ], 403);
         }
 
@@ -196,13 +206,13 @@ class EtablissementController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur de validation',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         try {
             $etablissement->update($request->only([
-                'nom', 'adresse', 'ville', 'telephone', 'email'
+                'nom', 'adresse', 'ville', 'telephone', 'email',
             ]));
 
             // Historique
@@ -216,14 +226,14 @@ class EtablissementController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Établissement mis à jour avec succès',
-                'data' => $etablissement
+                'data' => $etablissement,
             ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -234,21 +244,28 @@ class EtablissementController extends Controller
      *     tags={"Etablissements"},
      *     summary="Mettre à jour le logo",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\RequestBody(
      *         required=true,
+     *
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
+     *
      *             @OA\Schema(
+     *
      *                 @OA\Property(property="logo", type="string", format="binary")
      *             )
      *         )
      *     ),
+     *
      *     @OA\Response(response=200, description="Logo mis à jour")
      * )
      */
@@ -258,18 +275,18 @@ class EtablissementController extends Controller
 
         $etablissement = Etablissement::find($id);
 
-        if (!$etablissement) {
+        if (! $etablissement) {
             return response()->json([
                 'success' => false,
-                'message' => 'Établissement non trouvé'
+                'message' => 'Établissement non trouvé',
             ], 404);
         }
 
         // Vérifier les droits
-        if (!$user->isProviseur() || $user->etablissement_id !== $etablissement->id) {
+        if (! $user->isProviseur() || $user->etablissement_id !== $etablissement->id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -281,7 +298,7 @@ class EtablissementController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur de validation',
-                'errors' => $validator->errors()
+                'errors' => $validator->errors(),
             ], 422);
         }
 
@@ -308,14 +325,14 @@ class EtablissementController extends Controller
             return response()->json([
                 'success' => true,
                 'message' => 'Logo mis à jour avec succès',
-                'logo_url' => $etablissement->logo_url
+                'logo_url' => $etablissement->logo_url,
             ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Erreur lors de la mise à jour du logo',
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], 500);
         }
     }
@@ -326,12 +343,15 @@ class EtablissementController extends Controller
      *     tags={"Etablissements"},
      *     summary="Statistiques détaillées d'un établissement",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Statistiques")
      * )
      */
@@ -341,18 +361,18 @@ class EtablissementController extends Controller
 
         $etablissement = Etablissement::find($id);
 
-        if (!$etablissement) {
+        if (! $etablissement) {
             return response()->json([
                 'success' => false,
-                'message' => 'Établissement non trouvé'
+                'message' => 'Établissement non trouvé',
             ], 404);
         }
 
         // Vérifier les droits
-        if (!$user->isAdmin() && $user->etablissement_id !== $etablissement->id) {
+        if (! $user->isAdmin() && $user->etablissement_id !== $etablissement->id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -376,19 +396,19 @@ class EtablissementController extends Controller
             'cartes' => [
                 'total' => $etablissement->eleves()->whereHas('carteActive')->count(),
                 'en_attente' => $etablissement->eleves()
-                    ->whereHas('carteActive', function($q) {
+                    ->whereHas('carteActive', function ($q) {
                         $q->where('statut', 'en_attente');
                     })->count(),
                 'generees' => $etablissement->eleves()
-                    ->whereHas('carteActive', function($q) {
+                    ->whereHas('carteActive', function ($q) {
                         $q->where('statut', 'generee');
                     })->count(),
                 'imprimees' => $etablissement->eleves()
-                    ->whereHas('carteActive', function($q) {
+                    ->whereHas('carteActive', function ($q) {
                         $q->where('statut', 'imprimee');
                     })->count(),
                 'distribuees' => $etablissement->eleves()
-                    ->whereHas('carteActive', function($q) {
+                    ->whereHas('carteActive', function ($q) {
                         $q->where('statut', 'distribuee');
                     })->count(),
             ],
@@ -403,7 +423,7 @@ class EtablissementController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $stats
+            'data' => $stats,
         ], 200);
     }
 }

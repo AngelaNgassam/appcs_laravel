@@ -18,12 +18,13 @@ class HistoriqueService
         ?string $details = null
     ): void {
         // ✅ Vérifier que l'utilisateur est authentifié
-        if (!Auth::check()) {
+        if (! Auth::check()) {
             Log::warning("Tentative d'enregistrement d'historique sans utilisateur authentifié", [
                 'action' => $action,
                 'cible_type' => $cibleType,
-                'cible_id' => $cibleId
+                'cible_id' => $cibleId,
             ]);
+
             return; // Ne rien faire si pas d'utilisateur connecté
         }
 
@@ -44,7 +45,7 @@ class HistoriqueService
                 'error' => $e->getMessage(),
                 'action' => $action,
                 'cible_type' => $cibleType,
-                'cible_id' => $cibleId
+                'cible_id' => $cibleId,
             ]);
         }
     }

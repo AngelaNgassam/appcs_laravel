@@ -22,13 +22,16 @@ class NotificationController extends Controller
      *     tags={"Notifications"},
      *     summary="Liste des notifications de l'utilisateur",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="lue",
      *         in="query",
      *         description="Filtrer par statut lu/non lu",
      *         required=false,
+     *
      *         @OA\Schema(type="boolean")
      *     ),
+     *
      *     @OA\Response(response=200, description="Liste des notifications")
      * )
      */
@@ -55,7 +58,7 @@ class NotificationController extends Controller
                 'per_page' => $notifications->perPage(),
                 'current_page' => $notifications->currentPage(),
                 'last_page' => $notifications->lastPage(),
-            ]
+            ],
         ], 200);
     }
 
@@ -65,12 +68,15 @@ class NotificationController extends Controller
      *     tags={"Notifications"},
      *     summary="Marquer une notification comme lue",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Notification marquée comme lue")
      * )
      */
@@ -80,10 +86,10 @@ class NotificationController extends Controller
 
         $notification = Notification::find($id);
 
-        if (!$notification) {
+        if (! $notification) {
             return response()->json([
                 'success' => false,
-                'message' => 'Notification non trouvée'
+                'message' => 'Notification non trouvée',
             ], 404);
         }
 
@@ -91,7 +97,7 @@ class NotificationController extends Controller
         if ($notification->user_id !== $user->id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -99,7 +105,7 @@ class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Notification marquée comme lue'
+            'message' => 'Notification marquée comme lue',
         ], 200);
     }
 
@@ -109,6 +115,7 @@ class NotificationController extends Controller
      *     tags={"Notifications"},
      *     summary="Marquer toutes les notifications comme lues",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Response(response=200, description="Toutes les notifications marquées comme lues")
      * )
      */
@@ -120,7 +127,7 @@ class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Toutes les notifications ont été marquées comme lues'
+            'message' => 'Toutes les notifications ont été marquées comme lues',
         ], 200);
     }
 
@@ -130,12 +137,15 @@ class NotificationController extends Controller
      *     tags={"Notifications"},
      *     summary="Supprimer une notification",
      *     security={{"bearerAuth":{}}},
+     *
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
+     *
      *         @OA\Schema(type="integer")
      *     ),
+     *
      *     @OA\Response(response=200, description="Notification supprimée")
      * )
      */
@@ -145,10 +155,10 @@ class NotificationController extends Controller
 
         $notification = Notification::find($id);
 
-        if (!$notification) {
+        if (! $notification) {
             return response()->json([
                 'success' => false,
-                'message' => 'Notification non trouvée'
+                'message' => 'Notification non trouvée',
             ], 404);
         }
 
@@ -156,7 +166,7 @@ class NotificationController extends Controller
         if ($notification->user_id !== $user->id) {
             return response()->json([
                 'success' => false,
-                'message' => 'Accès refusé'
+                'message' => 'Accès refusé',
             ], 403);
         }
 
@@ -164,7 +174,7 @@ class NotificationController extends Controller
 
         return response()->json([
             'success' => true,
-            'message' => 'Notification supprimée'
+            'message' => 'Notification supprimée',
         ], 200);
     }
 }

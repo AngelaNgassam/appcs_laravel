@@ -10,9 +10,9 @@ return new class extends Migration
     {
         Schema::table('etablissements', function (Blueprint $table) {
             $table->foreign('proviseur_id')
-                  ->references('id')
-                  ->on('users')
-                  ->onDelete('restrict');
+                ->references('id')
+                ->on('users')
+                ->onDelete('restrict');
         });
     }
 

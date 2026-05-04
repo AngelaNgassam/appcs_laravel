@@ -70,6 +70,6 @@ class Etablissement extends Model
     // Accessors
     public function getLogoUrlAttribute()
     {
-        return $this->logo ? asset('storage/' . $this->logo) : null;
+        return $this->logo ? asset('storage/'.$this->logo) : null;
     }
 }

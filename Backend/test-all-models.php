@@ -13,7 +13,7 @@ echo "=====================================\n\n";
 
 $eleve = Eleve::with(['classe', 'etablissement', 'photoActive'])->find(3);
 
-if (!$eleve) {
+if (! $eleve) {
     echo "❌ Élève non trouvé\n";
     exit(1);
 }
@@ -26,14 +26,14 @@ $modeles = ModeleCarte::where('actif', true)->get();
 
 foreach ($modeles as $modele) {
     echo "🎨 Test du modèle: {$modele->nom_modele}\n";
-    
+
     try {
         $carte = $pdfService->genererCarte($eleve, $modele->id);
         echo "   ✅ Carte générée: {$carte->chemin_pdf}\n";
-        
-        $fullPath = storage_path('app/public/' . $carte->chemin_pdf);
+
+        $fullPath = storage_path('app/public/'.$carte->chemin_pdf);
         echo "   📄 Fichier: {$fullPath}\n\n";
-        
+
     } catch (\Exception $e) {
         echo "   ❌ Erreur: {$e->getMessage()}\n\n";
     }

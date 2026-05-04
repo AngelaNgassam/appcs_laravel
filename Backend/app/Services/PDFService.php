@@ -20,13 +20,13 @@ class PDFService
     /**
      * Générer une carte scolaire en PDF
      */
-    public function genererCarte(Eleve $eleve, int $modeleId = null): CarteScolaire
+    public function genererCarte(Eleve $eleve, ?int $modeleId = null): CarteScolaire
     {
         // Récupérer la photo active (doit être validée)
         $photo = $eleve->photoActive;
 
-        if (!$photo || $photo->statut !== 'validee') {
-            throw new \Exception("Aucune photo validée trouvée pour cet élève");
+        if (! $photo || $photo->statut !== 'validee') {
+            throw new \Exception('Aucune photo validée trouvée pour cet élève');
         }
 
         // Choisir le modèle
@@ -35,7 +35,7 @@ class PDFService
             $modele = ModeleCarte::find($modeleId);
         }
 
-        if (!$modele) {
+        if (! $modele) {
             $modele = ModeleCarte::query()
                 ->where('actif', true)
                 ->where(function ($q) use ($eleve) {
@@ -65,7 +65,7 @@ class PDFService
             'etablissement' => $eleve->etablissement,
             'classe' => $eleve->classe,
             'modele' => $modele,
-            'anneeAcademique' => optional($eleve->etablissement->anneeActive)->annee ?? date('Y') . '-' . (date('Y') + 1),
+            'anneeAcademique' => optional($eleve->etablissement->anneeActive)->annee ?? date('Y').'-'.(date('Y') + 1),
         ];
 
         // Utiliser le template simplifié pour le PDF
@@ -81,8 +81,8 @@ class PDFService
             ->setOption('defaultFont', 'Arial');
 
         // Sauvegarder
-        $filename = 'carte_' . $eleve->matricule . '_' . time() . '.pdf';
-        $path = 'cartes/' . $filename;
+        $filename = 'carte_'.$eleve->matricule.'_'.time().'.pdf';
+        $path = 'cartes/'.$filename;
 
         Storage::disk('public')->put($path, $pdf->output());
 
@@ -108,29 +108,30 @@ class PDFService
      */
     public function imageToBase64(?string $path): ?string
     {
-        if (!$path) {
+        if (! $path) {
             return null;
         }
 
         $fullPath = Storage::disk('public')->path($path);
-        
-        if (!file_exists($fullPath)) {
+
+        if (! file_exists($fullPath)) {
             return null;
         }
 
         try {
             // Lire le fichier image
             $imageData = file_get_contents($fullPath);
-            if (!$imageData) {
+            if (! $imageData) {
                 return null;
             }
 
             // Créer une image à partir des données
             $image = imagecreatefromstring($imageData);
-            if (!$image) {
+            if (! $image) {
                 // Si imagecreatefromstring échoue, retourner directement en base64
                 $mimeType = mime_content_type($fullPath);
-                return 'data:' . $mimeType . ';base64,' . base64_encode($imageData);
+
+                return 'data:'.$mimeType.';base64,'.base64_encode($imageData);
             }
 
             // Obtenir les dimensions
@@ -140,12 +141,12 @@ class PDFService
             // Redimensionner pour les cartes (max 200x250px)
             $maxWidth = 200;
             $maxHeight = 250;
-            
+
             if ($width > $maxWidth || $height > $maxHeight) {
                 $ratio = min($maxWidth / $width, $maxHeight / $height);
-                $newWidth = (int)($width * $ratio);
-                $newHeight = (int)($height * $ratio);
-                
+                $newWidth = (int) ($width * $ratio);
+                $newHeight = (int) ($height * $ratio);
+
                 $resized = imagecreatetruecolor($newWidth, $newHeight);
                 imagecopyresampled($resized, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
                 imagedestroy($image);
@@ -158,12 +159,13 @@ class PDFService
             $compressedData = ob_get_clean();
             imagedestroy($image);
 
-            return 'data:image/jpeg;base64,' . base64_encode($compressedData);
+            return 'data:image/jpeg;base64,'.base64_encode($compressedData);
         } catch (\Exception $e) {
             // En cas d'erreur, retourner l'image originale en base64
             $mimeType = mime_content_type($fullPath);
             $imageData = file_get_contents($fullPath);
-            return 'data:' . $mimeType . ';base64,' . base64_encode($imageData);
+
+            return 'data:'.$mimeType.';base64,'.base64_encode($imageData);
         }
     }
 
@@ -211,7 +213,7 @@ class PDFService
             $modele = ModeleCarte::find($modeleId);
         }
 
-        if (!$modele) {
+        if (! $modele) {
             $modele = ModeleCarte::query()
                 ->where('actif', true)
                 ->orderByDesc('est_defaut')
@@ -226,8 +228,8 @@ class PDFService
 
         foreach ($eleves as $eleve) {
             $photo = $eleve->photoActive;
-            
-            if (!$photo || $photo->statut !== 'validee') {
+
+            if (! $photo || $photo->statut !== 'validee') {
                 continue;
             }
 
@@ -247,7 +249,7 @@ class PDFService
                 'matricule' => $eleve->matricule,
                 'etablissement' => $eleve->etablissement,
                 'classe' => $eleve->classe,
-                'anneeAcademique' => optional($eleve->etablissement->anneeActive)->annee ?? date('Y') . '-' . (date('Y') + 1),
+                'anneeAcademique' => optional($eleve->etablissement->anneeActive)->annee ?? date('Y').'-'.(date('Y') + 1),
             ];
         }
 
@@ -255,15 +257,15 @@ class PDFService
         $pdf = Pdf::loadView('cartes.planche-impression', [
             'cartes' => $cartesData,
             'modele' => $modele,
-            'viewName' => $viewName
+            'viewName' => $viewName,
         ])
             ->setPaper('A4', 'portrait')
             ->setOption('isHtml5ParserEnabled', true)
             ->setOption('isRemoteEnabled', true);
 
         // Sauvegarder
-        $filename = 'planche_cartes_' . time() . '.pdf';
-        $path = 'cartes/planches/' . $filename;
+        $filename = 'planche_cartes_'.time().'.pdf';
+        $path = 'cartes/planches/'.$filename;
 
         Storage::disk('public')->put($path, $pdf->output());
 
@@ -273,13 +275,13 @@ class PDFService
     /**
      * Générer une prévisualisation d'une carte (format carte individuelle)
      */
-    public function genererPrevisualisation(Eleve $eleve, int $modeleId = null): string
+    public function genererPrevisualisation(Eleve $eleve, ?int $modeleId = null): string
     {
         // Récupérer la photo active (doit être validée)
         $photo = $eleve->photoActive;
 
-        if (!$photo || $photo->statut !== 'validee') {
-            throw new \Exception("Aucune photo validée trouvée pour cet élève");
+        if (! $photo || $photo->statut !== 'validee') {
+            throw new \Exception('Aucune photo validée trouvée pour cet élève');
         }
 
         // Choisir le modèle
@@ -288,7 +290,7 @@ class PDFService
             $modele = ModeleCarte::find($modeleId);
         }
 
-        if (!$modele) {
+        if (! $modele) {
             $modele = ModeleCarte::query()
                 ->where('actif', true)
                 ->orderByDesc('est_defaut')
@@ -317,7 +319,7 @@ class PDFService
             'etablissement' => $eleve->etablissement,
             'classe' => $eleve->classe,
             'modele' => $modele,
-            'anneeAcademique' => optional($eleve->etablissement->anneeActive)->annee ?? date('Y') . '-' . (date('Y') + 1),
+            'anneeAcademique' => optional($eleve->etablissement->anneeActive)->annee ?? date('Y').'-'.(date('Y') + 1),
         ];
 
         // Générer le PDF au format carte (85.6mm x 53.98mm)
@@ -327,8 +329,8 @@ class PDFService
             ->setOption('isRemoteEnabled', true);
 
         // Sauvegarder temporairement
-        $filename = 'preview_carte_' . $eleve->matricule . '_' . time() . '.pdf';
-        $path = 'cartes/previews/' . $filename;
+        $filename = 'preview_carte_'.$eleve->matricule.'_'.time().'.pdf';
+        $path = 'cartes/previews/'.$filename;
 
         Storage::disk('public')->put($path, $pdf->output());
 

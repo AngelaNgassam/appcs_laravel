@@ -7,13 +7,12 @@ on:
     branches: [ "master", "develop" ]
 
 env:
-  # Configuration par défaut pour les tests
   DB_CONNECTION: mysql
   DB_HOST: 127.0.0.1
   DB_PORT: 3306
   DB_DATABASE: cartes_scolaires
   DB_USERNAME: root
-  DB_PASSWORD: "" # Laissé vide pour correspondre au service MySQL de la CI
+  DB_PASSWORD: ""
 
 jobs:
   # --- STAGE 1 : QUALITÉ & LINTING (Backend) ---
@@ -63,9 +62,10 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pdo, mysql, bcmath
           coverage: xdebug
 
-      - name: "📥 Install Deps"
-        working-directory: ./Backend
-        run: composer install --no-interaction --prefer-dist
+      - name: "🔍 Debug: Check Backend Path"
+        run: |
+          pwd
+          ls -R Backend | head -n 20
 
       - name: "🧪 Run Migrations & Tests"
         working-directory: ./Backend
@@ -97,14 +97,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          submodules: false # Évite les erreurs "fatal: aucune URL trouvée" lors du nettoyage
+          submodules: false
+
+      - name: "🔍 Debug: Verify Frontend Path"
+        run: |
+          echo "📍 Current Directory: $(pwd)"
+          echo "📂 Listing Root Files:"
+          ls -F
+          echo "📂 Checking for package-lock.json in Frontend:"
+          if [ -f "Frontend/package-lock.json" ]; then
+            echo "✅ package-lock.json found!"
+          else
+            echo "❌ package-lock.json NOT found at Frontend/package-lock.json"
+            ls -R Frontend
+          fi
 
       - name: "⚙️ Setup Node.js"
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
-          cache-dependency-path: Frontend/package-lock.json # Chemin corrigé (sans ./)
+          cache-dependency-path: Frontend/package-lock.json
 
       - name: "🏗️ Build Production"
         working-directory: ./Frontend
@@ -119,7 +132,7 @@ jobs:
           path: Frontend/dist/
           retention-days: 1
 
-  # --- STAGE 4 : DOCKER HUB (Optionnel) ---
+  # --- STAGE 4 : DOCKER HUB ---
   docker-hub:
     name: "🐳 Docker Build & Push"
     needs: tests-backend
@@ -154,6 +167,9 @@ jobs:
           name: frontend-dist
           path: ./dist-frontend
 
+      - name: "🔍 Debug: Check Downloaded Artifact"
+        run: ls -R ./dist-frontend
+
       - name: "🚀 FTP Deploy Backend"
         uses: SamKirkland/FTP-Deploy-Action@v4.3.5
         with:
@@ -174,7 +190,6 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          # Déploiement du contenu du build téléchargé
           local-dir: ./dist-frontend/
           server-dir: Frontend_Public/
 

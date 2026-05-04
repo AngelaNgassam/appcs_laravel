@@ -62,12 +62,6 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pdo, mysql, bcmath
           coverage: xdebug
 
-      - name: "🔍 Debug: Check Backend Path"
-        run: |
-          pwd
-          ls -R Backend | head -n 20
-
-      # CORRECTION : Installation indispensable pour avoir le dossier vendor/autoload.php
       - name: "📥 Install Dependencies"
         working-directory: ./Backend
         run: composer install --no-interaction --prefer-dist
@@ -101,26 +95,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: false
-
-      - name: "🔍 Debug: Verify Frontend Path"
-        run: |
-          echo "📍 Current Directory: $(pwd)"
-          ls -F
-          if [ -f "Frontend/package-lock.json" ]; then
-            echo "✅ package-lock.json found!"
-          else
-            echo "❌ package-lock.json NOT found"
-            ls -R Frontend | head -n 20
-          fi
 
       - name: "⚙️ Setup Node.js"
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
-          cache-dependency-path: Frontend/package-lock.json
+          cache-dependency-path: './Frontend/package-lock.json'
 
       - name: "🏗️ Build Production"
         working-directory: ./Frontend

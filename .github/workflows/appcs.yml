@@ -7,13 +7,13 @@ on:
     branches: [ "master", "develop" ]
 
 env:
-  # Configuration Base de données pour les tests
+  # Configuration par défaut pour les tests
   DB_CONNECTION: mysql
   DB_HOST: 127.0.0.1
   DB_PORT: 3306
   DB_DATABASE: cartes_scolaires
   DB_USERNAME: root
-  DB_PASSWORD: yes
+  DB_PASSWORD: "" # Laissé vide pour correspondre au service MySQL de la CI
 
 jobs:
   # --- STAGE 1 : QUALITÉ & LINTING (Backend) ---
@@ -46,7 +46,7 @@ jobs:
         image: mysql:8.0
         env:
           MYSQL_DATABASE: cartes_scolaires
-          MYSQL_ALLOW_EMPTY_PASSWORD: yes # Pas de mot de passe ici
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
@@ -67,32 +67,16 @@ jobs:
         working-directory: ./Backend
         run: composer install --no-interaction --prefer-dist
 
-      - name: "🧪 Run Tests"
+      - name: "🧪 Run Migrations & Tests"
         working-directory: ./Backend
-        # On force les variables DB directement dans la commande pour écraser le .env
         run: |
           cp .env.example .env
           php artisan key:generate
           php artisan migrate --force
+          php artisan test
         env:
-          DB_CONNECTION: mysql
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3306
-          DB_DATABASE: cartes_scolaires
-          DB_USERNAME: root
-          DB_PASSWORD: "" # On laisse vide pour correspondre au service MySQL ci-dessus
+          DB_PASSWORD: "" # Force le mot de passe vide pour la connexion locale au service
 
-      - name: "🏃 Execute Pest/PHPUnit"
-        working-directory: ./Backend
-        run: php artisan test
-        env:
-          DB_CONNECTION: mysql
-          DB_HOST: 127.0.0.1
-          DB_PORT: 3306
-          DB_DATABASE: cartes_scolaires
-          DB_USERNAME: root
-          DB_PASSWORD: ""
-      
       - name: "🛡️ Scan SonarCloud"
         uses: sonarsource/sonarqube-scan-action@v3
         env:
@@ -112,18 +96,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          submodules: false # Évite les erreurs "fatal: aucune URL trouvée"
 
       - name: "⚙️ Setup Node.js"
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
-          cache-dependency-path: ./Frontend/package-lock.json
+          cache-dependency-path: Frontend/package-lock.json
 
       - name: "🏗️ Build Production"
         working-directory: ./Frontend
         run: |
-          npm install
+          npm ci
           npm run build -- --configuration=production
 
       - name: "📤 Upload Artifact"
@@ -131,6 +117,7 @@ jobs:
         with:
           name: frontend-dist
           path: Frontend/dist/
+          retention-days: 1
 
   # --- STAGE 4 : DOCKER HUB (Optionnel) ---
   docker-hub:
@@ -187,7 +174,6 @@ jobs:
           server: ${{ secrets.FTP_SERVER }}
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
-          # Ajustez le chemin local selon la structure générée par Angular dans 'dist/'
           local-dir: ./dist-frontend/
           server-dir: Frontend_Public/
 
